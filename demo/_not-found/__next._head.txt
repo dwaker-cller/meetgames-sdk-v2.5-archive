@@ -1,6 +1,6 @@
 1:"$Sreact.fragment"
-2:I[9678,["./_next/static/chunks/44rmzwx08scfc.js"],"ViewportBoundary"]
-3:I[9678,["./_next/static/chunks/44rmzwx08scfc.js"],"MetadataBoundary"]
+2:I[9678,["./_next/static/chunks/2c3iyqbsfg6bp.js","./_next/static/chunks/24nn151c8nclt.js"],"ViewportBoundary"]
+3:I[9678,["./_next/static/chunks/2c3iyqbsfg6bp.js","./_next/static/chunks/24nn151c8nclt.js"],"MetadataBoundary"]
 4:"$Sreact.suspense"
-5:I[85709,["./_next/static/chunks/44rmzwx08scfc.js"],"IconMark"]
-0:{"rsc":["$","$1","h",{"children":[["$","meta",null,{"name":"robots","content":"noindex"}],["$","$L2",null,{"children":[["$","meta","0",{"charSet":"utf-8"}],["$","meta","1",{"name":"viewport","content":"width=device-width, initial-scale=1"}]]}],["$","div",null,{"hidden":true,"children":["$","$L3",null,{"children":["$","$4",null,{"name":"Next.Metadata","children":[["$","title","0",{"children":"MeetGames SDK 工具高保真 Demo"}],["$","meta","1",{"name":"description","content":"聚合登录支付与三步 SDK 快速配置流程高保真交互 Demo"}],["$","link","2",{"rel":"icon","href":"/icon.svg?icon.1e2ux_byo1zp2.svg","sizes":"any","type":"image/svg+xml"}],["$","$L5","3",{}]]}]}]}],null]}],"isPartial":false,"staleTime":300,"varyParams":null,"buildId":"PR6OZ9EpHW6lGuJR8zGJB"}
+5:I[85709,["./_next/static/chunks/2c3iyqbsfg6bp.js","./_next/static/chunks/24nn151c8nclt.js"],"IconMark"]
+0:{"rsc":["$","$1","h",{"children":[["$","meta",null,{"name":"robots","content":"noindex"}],["$","$L2",null,{"children":[["$","meta","0",{"charSet":"utf-8"}],["$","meta","1",{"name":"viewport","content":"width=device-width, initial-scale=1"}]]}],["$","div",null,{"hidden":true,"children":["$","$L3",null,{"children":["$","$4",null,{"name":"Next.Metadata","children":[["$","title","0",{"children":"MeetGames SDK 工具 Demo"}],["$","meta","1",{"name":"description","content":"配置中心、SDK 选择与运营数据交互 Demo"}],["$","link","2",{"rel":"icon","href":"/icon.svg?icon.1e2ux_byo1zp2.svg","sizes":"any","type":"image/svg+xml"}],["$","$L5","3",{}]]}]}]}],null]}],"isPartial":false,"staleTime":300,"varyParams":null,"buildId":"RPangAs5VUz7bKE9qxw_X"}
