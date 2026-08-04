@@ -1,4 +1,4 @@
-﻿MeetGames SDK 工具 Demo V1.7
+﻿MeetGames SDK 工具 Demo V1.8
 
 打开方式：
 1. 请先完整解压本压缩包。
