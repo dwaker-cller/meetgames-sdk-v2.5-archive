@@ -1,0 +1,566 @@
+/* MeetGames SDK configuration card + dialog redesign (2026-08-04). */
+
+.mgp-foundation-page:has(.mgp-config-step-navigation) {
+  display: flex;
+  flex-direction: column;
+}
+
+.mgp-foundation-page:has(.mgp-config-step-navigation) > .mgp-foundation-toolbar {
+  order: 1;
+}
+
+.mgp-foundation-page:has(.mgp-config-step-navigation) > #config-panel-release {
+  display: contents;
+}
+
+#config-panel-release > .mgp-config-body {
+  order: 2;
+  border: 1px solid #e6e8ef;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 8px 24px rgba(20, 25, 40, 0.04);
+}
+
+.mgp-foundation-page:has(.mgp-config-step-navigation) > .mgp-config-step-navigation {
+  display: block !important;
+  width: auto !important;
+  min-height: 330px !important;
+  height: auto !important;
+  max-height: none !important;
+  overflow: visible !important;
+  order: 3;
+  margin-top: 18px;
+  padding: 20px;
+  border: 1px solid #e6e8ef;
+  border-radius: 14px;
+  background: #fff;
+}
+
+#config-panel-release > .mgp-config-footer {
+  position: static !important;
+  inset: auto !important;
+  transform: none !important;
+  order: 4;
+  margin-top: 18px;
+}
+
+.mgp-config-card-grid {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 14px !important;
+  margin-top: 16px;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+}
+
+.mgp-config-card {
+  display: grid !important;
+  grid-template-columns: 42px minmax(0, 1fr) 18px !important;
+  align-items: center;
+  gap: 12px;
+  height: 112px !important;
+  min-height: 112px !important;
+  padding: 16px !important;
+  border: 1px solid #e3e5ec !important;
+  border-radius: 12px !important;
+  background: #fff !important;
+  color: #242638 !important;
+  text-align: left;
+  justify-items: stretch !important;
+  box-shadow: none !important;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
+}
+
+.mgp-config-card:hover,
+.mgp-config-card:focus-visible {
+  border-color: #c9ced8 !important;
+  box-shadow: 0 8px 20px rgba(31, 37, 51, 0.08) !important;
+  transform: translateY(-1px);
+}
+
+.mgp-config-card.active,
+.mgp-config-card.configured {
+  border: 1px solid #e3e5ec !important;
+  padding: 16px !important;
+  box-shadow: none !important;
+}
+
+.mgp-config-card:focus-visible {
+  outline: 2px solid #9aa3b2 !important;
+  outline-offset: 2px;
+}
+
+.mgp-config-card.active::after {
+  display: none !important;
+  content: none !important;
+}
+
+.mgp-config-card-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 11px;
+  background: #f4f0ff;
+  color: #6d35d6;
+}
+
+.mgp-config-card-copy {
+  display: grid;
+  gap: 7px;
+  min-width: 0;
+  min-height: 0 !important;
+  height: auto !important;
+  width: auto !important;
+  max-width: none !important;
+  padding: 0 !important;
+  overflow: visible !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  color: inherit !important;
+  text-align: left !important;
+  justify-self: stretch !important;
+  align-self: center !important;
+  place-items: start stretch !important;
+}
+
+.mgp-config-card-copy strong {
+  width: auto !important;
+  font-size: 15px;
+  line-height: 1.3;
+}
+
+.mgp-config-card-copy small {
+  width: auto !important;
+  color: #777d8f;
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.mgp-config-card-arrow {
+  transform: rotate(-90deg);
+}
+
+.mgp-config-card-modal {
+  position: fixed !important;
+  z-index: 1100 !important;
+  top: 50% !important;
+  left: 50% !important;
+  display: grid !important;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  width: min(1040px, calc(100vw - 64px)) !important;
+  max-width: 1040px !important;
+  max-height: min(88vh, 900px) !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  border: 1px solid #e1e3eb !important;
+  border-radius: 16px !important;
+  background: #fff !important;
+  box-shadow: 0 0 0 100vmax rgba(17, 18, 28, 0.48), 0 24px 64px rgba(25, 18, 45, 0.24) !important;
+  transform: translate(-50%, -50%);
+}
+
+.mgp-config-card-modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 20px 24px;
+  border-bottom: 1px solid #ececf2;
+}
+
+.mgp-config-card-modal-header h2 {
+  margin: 0;
+  font-size: 19px;
+}
+
+.mgp-config-card-modal-header p {
+  margin: 6px 0 0;
+  color: #747a8c;
+  font-size: 13px;
+}
+
+.mgp-config-card-modal > .mgp-config-body {
+  min-height: 0;
+  padding: 22px 24px !important;
+  overflow: auto;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+.mgp-config-card-modal > .mgp-config-body > .mgp-config-module-heading {
+  display: none;
+}
+
+.mgp-config-card-modal > .mgp-config-footer {
+  position: static !important;
+  inset: auto !important;
+  transform: none !important;
+  margin: 0 !important;
+  padding: 14px 24px !important;
+  border-top: 1px solid #ececf2;
+  background: #fff;
+}
+
+.mgp-config-card-modal .mgp-modal-backdrop {
+  z-index: 10 !important;
+}
+
+.mgp-page > .mgp-modal-backdrop {
+  z-index: 1200 !important;
+}
+
+.mgp-provider-choice-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin: 12px 0 18px;
+}
+
+.mgp-provider-choice-grid > button {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 7px 12px;
+  min-height: 112px;
+  padding: 15px;
+  border: 1px solid #dedfe7;
+  border-radius: 11px;
+  background: #fff;
+  color: #282a3a;
+  text-align: left;
+}
+
+.mgp-provider-choice-grid > button strong,
+.mgp-provider-choice-grid > button span,
+.mgp-provider-choice-grid > button small {
+  grid-column: 1;
+}
+
+.mgp-provider-choice-grid > button svg {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  color: #7c3aed;
+}
+
+.mgp-provider-choice-grid > button small,
+.mgp-provider-choice-grid > button p {
+  margin: 0;
+  color: #73798b;
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.mgp-provider-choice-grid > button.selected,
+.mgp-provider-choice-grid > button[aria-checked="true"],
+.mgp-provider-choice-grid > button[aria-pressed="true"] {
+  border: 2px solid #7c3aed;
+  padding: 14px;
+  background: #faf8ff;
+}
+
+#config-panel-login .mgp-login-head,
+#config-panel-login .mgp-login-row {
+  grid-template-columns: 56px 140px minmax(0, 1fr) 96px !important;
+}
+
+#config-panel-login .mgp-login-head > span:last-child {
+  text-align: center;
+}
+
+#config-panel-login .mgp-login-doc {
+  justify-content: center;
+}
+
+.mgp-login-platforms {
+  grid-template-columns: minmax(0, 1fr) !important;
+}
+
+.mgp-login-platform-summary {
+  grid-column: 1;
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.mgp-login-platform-summary .mgp-login-platform-status {
+  justify-self: start;
+}
+
+#config-panel-login .mgp-login-platform-details {
+  grid-column: 3 / 5 !important;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 96px;
+  align-items: start;
+  gap: 12px 16px;
+}
+
+#config-panel-login .mgp-login-platform-details > .mgp-login-platform-section {
+  grid-column: 1;
+}
+
+#config-panel-login .mgp-login-expanded-doc {
+  grid-column: 2;
+  grid-row: 1;
+  justify-self: start;
+  align-self: start;
+  white-space: nowrap;
+}
+
+.mgp-data-provider-choices {
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 8px 10px;
+  margin: 8px 0 12px;
+}
+
+.mgp-data-provider-choices > [data-data-provider="firebase"] {
+  grid-column: 1 / -1;
+}
+
+.mgp-data-provider-choices > button {
+  align-content: center;
+  min-height: 74px;
+  gap: 3px 8px;
+  padding: 10px 12px;
+  border-radius: 8px;
+}
+
+.mgp-data-provider-choices > button.selected,
+.mgp-data-provider-choices > button[aria-pressed="true"] {
+  padding: 9px 11px;
+}
+
+.mgp-data-provider-choices .mgp-provider-description {
+  color: #73798b;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.55;
+}
+
+#config-panel-agreement.mgp-config-card-modal {
+  width: min(880px, calc(100vw - 64px)) !important;
+  max-width: 880px !important;
+  height: auto !important;
+  max-height: min(78vh, 720px) !important;
+}
+
+#config-panel-agreement.mgp-config-card-modal:has(.mgp-agreement-modal) {
+  overflow: visible !important;
+}
+
+#config-panel-agreement > .mgp-config-body:has(.mgp-agreement-modal) {
+  overflow: visible !important;
+}
+
+#config-panel-agreement .mgp-modal-backdrop {
+  position: absolute !important;
+  inset: auto !important;
+  top: 50% !important;
+  left: 50% !important;
+  z-index: 30 !important;
+  width: 100vw;
+  height: 100vh;
+  padding: 24px;
+  align-items: center;
+  justify-content: center;
+  transform: translate(-50%, -50%);
+}
+
+#config-panel-agreement .mgp-agreement-modal {
+  width: min(840px, calc(100% - 48px)) !important;
+  max-width: 840px !important;
+  min-height: 0 !important;
+  max-height: calc(100% - 48px) !important;
+  margin: 0 !important;
+}
+
+#config-panel-agreement .mgp-agreement-modal > .mgp-modal-body {
+  min-height: 0;
+  overflow-y: auto !important;
+}
+
+.mgp-kws-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+#config-panel-support .mgp-upload-field {
+  max-width: 420px;
+}
+
+#config-panel-support .mgp-upload-field img,
+#config-panel-support .mgp-upload-field [class*="preview"] {
+  max-height: 150px;
+  object-fit: cover;
+}
+
+.mgp-config-package-head,
+.mgp-config-package-row {
+  grid-template-columns: minmax(220px, 1.15fr) minmax(210px, 0.9fr) minmax(460px, 1.8fr) !important;
+}
+
+.mgp-sdk-channel-primary-cell > span:last-child {
+  display: grid;
+  gap: 3px;
+}
+
+.mgp-sdk-channel-primary-cell small {
+  color: #83889a;
+  font-size: 12px;
+}
+
+/* Keep the desktop create-package flow within one standard-height viewport. */
+.mgp-foundation-page:has(.mgp-config-step-navigation) {
+  padding-top: 12px;
+  padding-bottom: 12px;
+}
+
+.mgp-foundation-page:has(.mgp-config-step-navigation) > .mgp-foundation-toolbar {
+  min-height: 50px;
+  margin-bottom: 8px;
+  padding: 8px 12px;
+}
+
+.mgp-foundation-page:has(.mgp-config-step-navigation) .mgp-config-module-heading {
+  margin-bottom: 12px;
+}
+
+.mgp-foundation-page:has(.mgp-config-step-navigation) .mgp-config-module-heading .mgp-plain-section-title {
+  margin-bottom: 4px;
+  line-height: 1.25;
+}
+
+.mgp-foundation-page:has(.mgp-config-step-navigation) .mgp-config-module-heading > p {
+  line-height: 1.4;
+}
+
+#config-panel-release > .mgp-config-body {
+  padding: 16px 22px 18px;
+}
+
+#config-panel-release .mgp-selected-channel-head {
+  min-height: 36px;
+  padding: 7px 12px;
+}
+
+#config-panel-release .mgp-selected-channel-summary {
+  min-height: 44px;
+  padding: 7px 12px;
+}
+
+#config-panel-release .mgp-channel-picker-fields {
+  gap: 12px;
+  margin-top: 10px;
+}
+
+#config-panel-release .mgp-store-select-trigger,
+#config-panel-release .mgp-field input {
+  height: 34px;
+}
+
+#config-panel-release .mgp-release-delivery-address {
+  margin-top: 12px;
+  padding-top: 10px;
+}
+
+#config-panel-release .mgp-field {
+  gap: 4px;
+}
+
+#config-panel-release .mgp-field small {
+  line-height: 1.35;
+}
+
+#config-panel-release .mgp-other-payment-link {
+  margin-top: 8px;
+}
+
+.mgp-foundation-page:has(.mgp-config-step-navigation) > .mgp-config-step-navigation {
+  min-height: 0 !important;
+  margin-top: 10px;
+  padding: 14px;
+}
+
+.mgp-foundation-page:has(.mgp-config-step-navigation) .mgp-config-card-grid {
+  gap: 10px !important;
+  margin-top: 12px;
+}
+
+.mgp-foundation-page:has(.mgp-config-step-navigation) .mgp-config-card {
+  height: 92px !important;
+  min-height: 92px !important;
+  padding: 12px 14px !important;
+}
+
+#config-panel-release > .mgp-config-footer {
+  min-height: 52px;
+  margin-top: 10px;
+  padding: 8px 14px;
+}
+
+#config-panel-support p.mgp-config-error {
+  color: #d9363e;
+  background: #fff1f1;
+  border-left: 3px solid #d9363e;
+  border-radius: 4px;
+  margin: 10px 0 0;
+  padding: 6px 8px;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.45;
+}
+
+@media (max-width: 1100px) {
+  .mgp-config-card-grid,
+  .mgp-provider-choice-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 760px) {
+  .mgp-config-card-grid,
+  .mgp-provider-choice-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .mgp-config-card-modal {
+    width: calc(100vw - 24px) !important;
+    max-height: calc(100vh - 24px) !important;
+  }
+}
+
+#config-panel-support .mgp-support-title-static {
+  display: grid;
+  min-width: 0;
+  gap: 4px;
+}
+
+#config-panel-support .mgp-support-title-description {
+  display: block;
+  color: #7d8899;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+#operations-workspace-sdk .mgp-country-sdk-module-list {
+  grid-template-columns: repeat(7, minmax(116px, 1fr)) !important;
+  gap: 6px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+}
+
+#operations-workspace-sdk .mgp-country-sdk-module-list > div {
+  min-height: 46px;
+  gap: 4px;
+  padding: 7px 6px;
+}
+
+#operations-workspace-sdk .mgp-country-sdk-module-list > div > strong {
+  white-space: nowrap;
+  font-size: 10px;
+}

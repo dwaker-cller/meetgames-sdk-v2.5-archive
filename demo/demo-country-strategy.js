@@ -1,829 +1,1008 @@
 (() => {
   "use strict";
 
-  if (window.__MEETGAMES_COUNTRY_STRATEGY_V18__) return;
-  window.__MEETGAMES_COUNTRY_STRATEGY_V18__ = true;
+  if (window.__MGP_STRATEGY_GROUPS_V2__) return;
+  window.__MGP_STRATEGY_GROUPS_V2__ = true;
 
-  const countryGroups = [
-    {
-      name: "美洲",
-      regions: [
-        {
-          name: "北美",
-          countries: [
-            ["US", "美国", "United States"],
-            ["CA", "加拿大", "Canada"],
-            ["MX", "墨西哥", "Mexico"],
-          ],
-        },
-        {
-          name: "南美",
-          countries: [
-            ["BR", "巴西", "Brazil"],
-            ["AR", "阿根廷", "Argentina"],
-            ["CL", "智利", "Chile"],
-          ],
-        },
-      ],
-    },
-    {
-      name: "欧洲",
-      regions: [
-        {
-          name: "西欧",
-          countries: [
-            ["GB", "英国", "United Kingdom"],
-            ["DE", "德国", "Germany"],
-            ["FR", "法国", "France"],
-          ],
-        },
-        {
-          name: "南欧",
-          countries: [
-            ["IT", "意大利", "Italy"],
-            ["ES", "西班牙", "Spain"],
-          ],
-        },
-      ],
-    },
-    {
-      name: "亚洲",
-      regions: [
-        {
-          name: "东亚",
-          countries: [
-            ["JP", "日本", "Japan"],
-            ["KR", "韩国", "South Korea"],
-          ],
-        },
-        {
-          name: "港澳台",
-          countries: [
-            ["HK", "中国香港", "Hong Kong"],
-            ["MO", "中国澳门", "Macao"],
-            ["TW", "中国台湾", "Taiwan"],
-          ],
-        },
-        {
-          name: "东南亚",
-          countries: [
-            ["SG", "新加坡", "Singapore"],
-            ["MY", "马来西亚", "Malaysia"],
-            ["TH", "泰国", "Thailand"],
-            ["ID", "印度尼西亚", "Indonesia"],
-            ["VN", "越南", "Vietnam"],
-            ["PH", "菲律宾", "Philippines"],
-          ],
-        },
-        {
-          name: "中东",
-          countries: [
-            ["AE", "阿联酋", "United Arab Emirates"],
-            ["SA", "沙特阿拉伯", "Saudi Arabia"],
-            ["TR", "土耳其", "Türkiye"],
-          ],
-        },
-      ],
-    },
-    {
-      name: "大洋洲",
-      regions: [
-        {
-          name: "澳新",
-          countries: [
-            ["AU", "澳大利亚", "Australia"],
-            ["NZ", "新西兰", "New Zealand"],
-          ],
-        },
-      ],
-    },
+  const STORAGE_PREFIX = "meetgames:operations-strategy-groups:v2:";
+  const MODULES = [
+    ["login", "登录SDK", "为当前策略选择登录方式并调整展示顺序。"],
+    ["agreement", "协议SDK", "为当前策略选择需要生效的协议分组。"],
+    ["payment", "支付SDK", "沿用当前发行渠道在配置中心维护的支付参数。"],
+    ["compliance", "合规SDK", "按策略维护年龄门槛、KWS 验证与游客保护。"],
+    ["support", "客服工具SDK", "按策略启用在线客服、表单反馈与 FAQ。"],
+    ["data", "三方数据SDK", "控制 Firebase 与归因平台是否在当前策略中运行。"],
+    ["advertising", "广告变现SDK", "控制组合包中的广告变现能力是否在当前策略中运行。"],
   ];
-
-  const countries = countryGroups.flatMap((continent) =>
-    continent.regions.flatMap((region) =>
-      region.countries.map(([code, name, english]) => ({
-        code,
-        name,
-        english,
-        continent: continent.name,
-        region: region.name,
-      })),
-    ),
+  const MODULE_KEY_BY_TITLE = new Map(MODULES.map(([key, title]) => [title, key]));
+  const LOGIN_METHODS = [
+    ["guest", "Guest", "访客登录"],
+    ["apple", "Apple", "Apple 登录"],
+    ["email", "Email", "邮箱登录"],
+    ["google", "Google", "Google 登录"],
+    ["facebook", "Facebook", "Facebook 登录"],
+    ["kakao", "Kakao", "Kakao 登录"],
+    ["x", "X", "X 登录"],
+    ["line", "LINE", "LINE 登录"],
+    ["tiktok", "TikTok", "TikTok 登录"],
+    ["snapchat", "Snapchat", "Snapchat 登录"],
+    ["naver", "NAVER", "NAVER 登录"],
+    ["discord", "Discord", "Discord 登录"],
+  ];
+  const LOGIN_ID_BY_NAME = new Map(
+    LOGIN_METHODS.flatMap(([id, name]) => [[name.toLowerCase(), id], [id, id]]),
   );
-  const countryByCode = new Map(countries.map((country) => [country.code, country]));
-  const countryByName = new Map(countries.map((country) => [country.name, country]));
-  const modalRegions = [
-    ["north-america", "北美", ["US", "CA", "MX"]],
-    ["east-asia", "东亚", ["JP", "KR"]],
-    ["greater-china", "港澳台", ["HK", "MO", "TW"]],
-    ["southeast-asia", "东南亚", ["SG", "MY", "TH", "ID", "VN", "PH"]],
-    ["middle-east", "中东", ["AE", "SA", "TR"]],
-    ["europe", "欧洲", ["GB", "DE", "FR", "IT", "ES"]],
-    ["latin-america", "拉丁美洲", ["BR", "AR", "CL"]],
-    ["oceania", "澳新", ["AU", "NZ"]],
-  ].map(([id, name, codes]) => ({
-    id,
-    name,
-    countries: codes.map((code) => countryByCode.get(code)).filter(Boolean),
-  }));
-  const state = {
-    active: "default",
-    scheduled: false,
-    modal: null,
-    allowOriginalBatchAction: false,
-    suppressOriginalBatchToastUntil: 0,
+  const LOGIN_BY_ID = new Map(LOGIN_METHODS.map((method) => [method[0], method]));
+  const LOGIN_LOGO_IMAGES = {
+    apple: "./assets/brands/apple.svg",
+    kakao: "./assets/brands/kakao.svg",
   };
+  const LOGIN_LOGO_GLYPHS = {
+    guest: "♙",
+    email: "@",
+    google: "G",
+    facebook: "f",
+    x: "𝕏",
+    line: "N",
+    tiktok: "♪",
+    snapchat: "👻",
+    naver: "N",
+    discord: "⌁",
+  };
+  const COUNTRIES = [
+    ["美洲", "北美", "US", "美国", "United States"],
+    ["美洲", "北美", "CA", "加拿大", "Canada"],
+    ["美洲", "北美", "MX", "墨西哥", "Mexico"],
+    ["美洲", "南美", "BR", "巴西", "Brazil"],
+    ["美洲", "南美", "AR", "阿根廷", "Argentina"],
+    ["美洲", "南美", "CL", "智利", "Chile"],
+    ["欧洲", "西欧", "GB", "英国", "United Kingdom"],
+    ["欧洲", "西欧", "DE", "德国", "Germany"],
+    ["欧洲", "西欧", "FR", "法国", "France"],
+    ["欧洲", "南欧", "IT", "意大利", "Italy"],
+    ["欧洲", "南欧", "ES", "西班牙", "Spain"],
+    ["亚洲", "东亚", "JP", "日本", "Japan"],
+    ["亚洲", "东亚", "KR", "韩国", "South Korea"],
+    ["亚洲", "港澳台", "HK", "中国香港", "Hong Kong"],
+    ["亚洲", "港澳台", "MO", "中国澳门", "Macao"],
+    ["亚洲", "港澳台", "TW", "中国台湾", "Taiwan"],
+    ["亚洲", "东南亚", "SG", "新加坡", "Singapore"],
+    ["亚洲", "东南亚", "MY", "马来西亚", "Malaysia"],
+    ["亚洲", "东南亚", "TH", "泰国", "Thailand"],
+    ["亚洲", "东南亚", "ID", "印度尼西亚", "Indonesia"],
+    ["亚洲", "东南亚", "VN", "越南", "Vietnam"],
+    ["亚洲", "东南亚", "PH", "菲律宾", "Philippines"],
+    ["亚洲", "中东", "AE", "阿联酋", "United Arab Emirates"],
+    ["亚洲", "中东", "SA", "沙特阿拉伯", "Saudi Arabia"],
+    ["亚洲", "中东", "TR", "土耳其", "Türkiye"],
+    ["大洋洲", "澳新", "AU", "澳大利亚", "Australia"],
+    ["大洋洲", "澳新", "NZ", "新西兰", "New Zealand"],
+  ].map(([continent, region, code, name, english]) => ({
+    continent,
+    region,
+    code,
+    name,
+    english,
+  }));
+  const COUNTRY_BY_CODE = new Map(COUNTRIES.map((country) => [country.code, country]));
+  const DEFAULT_RUNTIME = {
+    agreementReminder: true,
+    welcomeMessage: true,
+    guestLogoutReminder: true,
+    guestPayment: false,
+    crashReport: true,
+    personalizedAds: false,
+    silentLoginMethod: "none",
+  };
+  const instances = new WeakMap();
+  const configuredSourceCache = new WeakMap();
+  let scheduled = false;
+  let activeModal = null;
 
   const escapeHtml = (value) =>
-    String(value)
+    String(value ?? "")
       .replaceAll("&", "&amp;")
       .replaceAll("<", "&lt;")
       .replaceAll(">", "&gt;")
       .replaceAll('"', "&quot;")
       .replaceAll("'", "&#039;");
 
-  const nextFrame = () =>
-    new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+  const clone = (value) => JSON.parse(JSON.stringify(value));
 
-  function selectedCountryCodes(section) {
-    const entries = section.querySelectorAll(
-      ".mgp-region-selected-column > div > div",
-    );
-    return Array.from(entries)
-      .map((entry) => {
-        const detail = entry.querySelector("small")?.textContent ?? "";
-        return detail.match(/·\s*([A-Z]{2})\s*$/)?.[1] ?? "";
-      })
-      .filter((code) => countryByCode.has(code));
+  function unique(values) {
+    return Array.from(new Set(values.filter(Boolean)));
   }
 
-  function selectedEntry(section, code) {
+  function countryName(code) {
+    return COUNTRY_BY_CODE.get(code)?.name || code;
+  }
+
+  function normalizeLoginIds(ids, availableIds) {
+    const allowed = new Set(availableIds);
+    const normalized = unique(ids).filter((id) => allowed.has(id));
+    const withoutGuest = normalized.filter((id) => id !== "guest");
+    return allowed.has("guest") ? ["guest", ...withoutGuest] : withoutGuest;
+  }
+
+  function selectedCountryCodes(drawer) {
     return Array.from(
-      section.querySelectorAll(".mgp-region-selected-column > div > div"),
-    ).find((entry) => {
-      const detail = entry.querySelector("small")?.textContent ?? "";
-      return detail.match(/·\s*([A-Z]{2})\s*$/)?.[1] === code;
+      drawer.querySelectorAll(".mgp-region-selected-column > div > div"),
+    )
+      .map((entry) => {
+        const detail = entry.querySelector("small")?.textContent || "";
+        return detail.match(/·\s*([A-Z]{2})\s*$/)?.[1] || "";
+      })
+      .filter((code) => COUNTRY_BY_CODE.has(code));
+  }
+
+  function extractConfiguredSource(drawer) {
+    if (configuredSourceCache.has(drawer)) return configuredSourceCache.get(drawer);
+    const source = {
+      loginMethodIds: [],
+      agreementGroups: [],
+      compliance: {},
+    };
+    const fiberKey = Object.keys(drawer).find((key) => key.startsWith("__reactFiber$"));
+    let fiber = fiberKey ? drawer[fiberKey] : null;
+    for (let depth = 0; fiber && depth < 48; depth += 1, fiber = fiber.return) {
+      const props = fiber.memoizedProps;
+      if (!props || typeof props !== "object") continue;
+      if (Array.isArray(props.configuredLoginMethodIds) && props.configuredLoginMethodIds.length) {
+        source.loginMethodIds = props.configuredLoginMethodIds.map((id) =>
+          String(id).toLowerCase() === "twitter" ? "x" : String(id).toLowerCase(),
+        );
+      }
+      if (Array.isArray(props.configuredAgreementGroups) && props.configuredAgreementGroups.length) {
+        source.agreementGroups = props.configuredAgreementGroups.map((group, index) => ({
+          id: String(group.id || `agreement-${index + 1}`),
+          name: String(group.name || `协议分组${index + 1}`),
+          languages: Array.isArray(group.languages)
+            ? group.languages.join("、")
+            : String(group.languages || ""),
+        }));
+      }
+      if (props.configuredCompliance && typeof props.configuredCompliance === "object") {
+        source.compliance = {
+          ageThreshold: String(props.configuredCompliance.ageThreshold || "").trim(),
+          gdprPrompt: props.configuredCompliance.gdpr !== false,
+          ageParentalControl: props.configuredCompliance.ageGate !== false,
+          kwsVerification: props.configuredCompliance.kwsEnabled !== false,
+        };
+      }
+    }
+    configuredSourceCache.set(drawer, source);
+    return source;
+  }
+
+  function extractLoginOptions(drawer) {
+    const renderedOptions = Array.from(drawer.querySelectorAll(".mgp-country-login-option"))
+      .map((button) => {
+        const rawName = button.querySelector("strong")?.textContent?.trim() || "";
+        const id = LOGIN_ID_BY_NAME.get(rawName.toLowerCase()) || rawName.toLowerCase();
+        const order = Number(button.querySelector("em")?.textContent || 999);
+        return {
+          id,
+          name: rawName || id,
+          selected: button.classList.contains("selected"),
+          order,
+        };
+      })
+      .filter((option) => option.id);
+    const renderedById = new Map(renderedOptions.map((option) => [option.id, option]));
+    const configuredIds = unique(extractConfiguredSource(drawer).loginMethodIds)
+      .filter((id) => LOGIN_BY_ID.has(id));
+    if (configuredIds.length) {
+      return configuredIds.map((id, index) => {
+        const method = LOGIN_BY_ID.get(id);
+        const rendered = renderedById.get(id);
+        return {
+          id,
+          name: method?.[1] || id,
+          selected: rendered ? rendered.selected : true,
+          order: rendered?.order ?? index + 1,
+        };
+      });
+    }
+    if (!renderedOptions.length) {
+      return LOGIN_METHODS.slice(0, 5).map(([id, name], index) => ({
+        id,
+        name,
+        selected: true,
+        order: index + 1,
+      }));
+    }
+    return renderedOptions;
+  }
+
+  function loginLogoMarkup(id) {
+    const image = LOGIN_LOGO_IMAGES[id];
+    if (image) {
+      return `<img src="${image}" alt="" aria-hidden="true">`;
+    }
+    return `<span class="osg-login-logo-glyph osg-login-logo-${escapeHtml(id)}" aria-hidden="true">${escapeHtml(LOGIN_LOGO_GLYPHS[id] || id.slice(0, 1).toUpperCase())}</span>`;
+  }
+
+  function extractAgreementGroups(drawer) {
+    const renderedGroups = Array.from(
+      drawer.querySelectorAll(".mgp-country-agreement-grid > button"),
+    ).map((button, index) => ({
+      id: button.dataset.groupId || `agreement-${index + 1}`,
+      name: button.querySelector("strong")?.textContent?.trim() || `协议分组${index + 1}`,
+      languages: button.querySelector("small")?.textContent?.trim() || "",
+      selected: button.classList.contains("selected"),
+    }));
+    const selectedNames = new Set(
+      renderedGroups.filter((group) => group.selected).map((group) => group.name),
+    );
+    const configuredGroups = extractConfiguredSource(drawer).agreementGroups;
+    if (configuredGroups.length) {
+      return configuredGroups.map((group) => ({
+        ...group,
+        selected: selectedNames.size ? selectedNames.has(group.name) : true,
+      }));
+    }
+    return renderedGroups.length
+      ? renderedGroups
+      : [{ id: "agreement-default", name: "默认协议分组", languages: "英语、简体中文", selected: true }];
+  }
+
+  function extractModuleFlags(drawer) {
+    const flags = Object.fromEntries(MODULES.map(([key]) => [key, true]));
+    drawer.querySelectorAll(".mgp-country-sdk-module-list > div").forEach((item) => {
+      const title = item.querySelector(":scope > strong")?.textContent?.trim();
+      const key = MODULE_KEY_BY_TITLE.get(title);
+      if (!key) return;
+      const control = item.querySelector('[role="switch"]');
+      flags[key] = control?.getAttribute("aria-checked") !== "false";
     });
+    return flags;
+  }
+
+  function createBaseConfig(drawer) {
+    const loginOptions = extractLoginOptions(drawer);
+    const configuredCompliance = extractConfiguredSource(drawer).compliance;
+    // The operations drawer only renders methods selected in 配置中心; the
+    // selected class itself is the per-country strategy override.
+    const availableLoginIds = unique(loginOptions.map((option) => option.id));
+    const selectedLoginIds = loginOptions
+      .filter((option) => option.selected)
+      .sort((left, right) => left.order - right.order)
+      .map((option) => option.id);
+    const agreementGroups = extractAgreementGroups(drawer);
+    return {
+      modules: extractModuleFlags(drawer),
+      availableLoginIds,
+      loginMethodIds: normalizeLoginIds(selectedLoginIds, availableLoginIds),
+      availableAgreementGroups: agreementGroups.map(({ id, name, languages }) => ({
+        id,
+        name,
+        languages,
+      })),
+      agreementGroupIds: agreementGroups.filter((group) => group.selected).map((group) => group.id),
+      compliance: {
+        ageThreshold: configuredCompliance.ageThreshold || "13",
+        gdprPrompt: configuredCompliance.gdprPrompt ?? true,
+        ageParentalControl: configuredCompliance.ageParentalControl ?? true,
+        kwsVerification: configuredCompliance.kwsVerification ?? true,
+      },
+      support: {
+        onlineService: true,
+        feedback: true,
+        faq: true,
+        smartService: true,
+        faqGroup: "default",
+      },
+      runtime: { ...DEFAULT_RUNTIME },
+    };
+  }
+
+  function packageIdentity(drawer) {
+    const label = drawer.querySelector(".mgp-operations-workspace-context strong")?.textContent?.trim();
+    return label || drawer.getAttribute("aria-label") || "default-package";
+  }
+
+  function storageKey(packageId) {
+    return `${STORAGE_PREFIX}${packageId}`;
+  }
+
+  function initialModel(drawer, packageId) {
+    const baseConfig = createBaseConfig(drawer);
+    const releaseCountryCodes = unique(selectedCountryCodes(drawer));
+    return {
+      version: 2,
+      packageId,
+      releaseCountryCodes: releaseCountryCodes.length ? releaseCountryCodes : ["US", "DE", "FR"],
+      strategies: [
+        {
+          id: "default",
+          name: "默认策略",
+          countryCodes: [],
+          config: baseConfig,
+        },
+      ],
+      activeStrategyId: "default",
+    };
+  }
+
+  function normalizeStoredModel(model, fallback) {
+    if (!model || model.version !== 2 || !Array.isArray(model.strategies)) return fallback;
+    const defaultStrategy = model.strategies.find((strategy) => strategy.id === "default");
+    if (!defaultStrategy?.config) return fallback;
+    const normalized = clone(model);
+    normalized.packageId = fallback.packageId;
+    normalized.releaseCountryCodes = unique(normalized.releaseCountryCodes || fallback.releaseCountryCodes);
+    normalized.strategies = normalized.strategies.map((strategy) => ({
+      ...strategy,
+      countryCodes: strategy.id === "default" ? [] : unique(strategy.countryCodes || []),
+      config: {
+        ...clone(fallback.strategies[0].config),
+        ...strategy.config,
+        availableLoginIds: unique(
+          strategy.config?.availableLoginIds || fallback.strategies[0].config.availableLoginIds,
+        ),
+        loginMethodIds: normalizeLoginIds(
+          strategy.config?.loginMethodIds || fallback.strategies[0].config.loginMethodIds,
+          strategy.config?.availableLoginIds || fallback.strategies[0].config.availableLoginIds,
+        ),
+        modules: {
+          ...fallback.strategies[0].config.modules,
+          ...(strategy.config?.modules || {}),
+        },
+        compliance: {
+          ...fallback.strategies[0].config.compliance,
+          ...(strategy.config?.compliance || {}),
+        },
+        support: {
+          ...fallback.strategies[0].config.support,
+          ...(strategy.config?.support || {}),
+        },
+        runtime: {
+          ...fallback.strategies[0].config.runtime,
+          ...(strategy.config?.runtime || {}),
+        },
+      },
+    }));
+    if (!normalized.strategies.some((strategy) => strategy.id === normalized.activeStrategyId)) {
+      normalized.activeStrategyId = "default";
+    }
+    return normalized;
+  }
+
+  function syncConfigurationSources(model, fallback) {
+    const fallbackConfig = fallback.strategies[0].config;
+    const availableLoginIds = unique(fallbackConfig.availableLoginIds);
+    const availableAgreementGroups = clone(fallbackConfig.availableAgreementGroups || []);
+    const fallbackAgreementIds = unique(fallbackConfig.agreementGroupIds || []);
+    model.strategies.forEach((strategy) => {
+      const config = strategy.config;
+      const previousAvailableLoginIds = unique(config.availableLoginIds || availableLoginIds);
+      const previousLoginIds = normalizeLoginIds(config.loginMethodIds, previousAvailableLoginIds);
+      const retainedLoginIds = previousLoginIds.filter((id) => availableLoginIds.includes(id));
+      const newLoginIds = availableLoginIds.filter((id) => !previousAvailableLoginIds.includes(id));
+      config.availableLoginIds = [...availableLoginIds];
+      config.loginMethodIds = normalizeLoginIds(
+        [...retainedLoginIds, ...newLoginIds],
+        availableLoginIds,
+      );
+
+      const previousAgreementGroups = config.availableAgreementGroups || availableAgreementGroups;
+      const previousAgreementIds = unique(config.agreementGroupIds || []);
+      const retainedAgreementIds = previousAgreementIds.filter((id) =>
+        availableAgreementGroups.some((group) => group.id === id),
+      );
+      const newDefaultAgreementIds = strategy.id === "default"
+        ? fallbackAgreementIds.filter((id) => !previousAgreementGroups.some((group) => group.id === id))
+        : [];
+      config.availableAgreementGroups = clone(availableAgreementGroups);
+      config.agreementGroupIds = unique([...retainedAgreementIds, ...newDefaultAgreementIds]);
+      config.compliance.ageThreshold = fallbackConfig.compliance.ageThreshold;
+    });
+    return model;
+  }
+
+  function loadModel(drawer, packageId) {
+    const fallback = initialModel(drawer, packageId);
+    try {
+      const stored = JSON.parse(localStorage.getItem(storageKey(packageId)) || "null");
+      return syncConfigurationSources(normalizeStoredModel(stored, fallback), fallback);
+    } catch (_error) {
+      return fallback;
+    }
+  }
+
+  function modelSignature(model) {
+    return JSON.stringify({
+      releaseCountryCodes: unique(model.releaseCountryCodes).sort(),
+      strategies: model.strategies.map((strategy) => ({
+        id: strategy.id,
+        name: strategy.name,
+        countryCodes: unique(strategy.countryCodes).sort(),
+        config: strategy.config,
+      })),
+    });
+  }
+
+  function explicitCountryOwner(model, code) {
+    return model.strategies.find(
+      (strategy) => strategy.id !== "default" && strategy.countryCodes.includes(code),
+    );
+  }
+
+  function defaultCountryCodes(model) {
+    const assigned = new Set(
+      model.strategies
+        .filter((strategy) => strategy.id !== "default")
+        .flatMap((strategy) => strategy.countryCodes),
+    );
+    return model.releaseCountryCodes.filter((code) => !assigned.has(code));
+  }
+
+  function activeStrategy(instance) {
+    return (
+      instance.model.strategies.find(
+        (strategy) => strategy.id === instance.model.activeStrategyId,
+      ) || instance.model.strategies[0]
+    );
+  }
+
+  function strategyCountryCodes(instance, strategy) {
+    return strategy.id === "default"
+      ? defaultCountryCodes(instance.model)
+      : strategy.countryCodes;
+  }
+
+  function conciseCountryList(codes) {
+    if (!codes.length) return "暂无国家";
+    const names = codes.slice(0, 2).map(countryName);
+    return codes.length > 2 ? `${names.join("、")}等 ${codes.length} 个` : names.join("、");
+  }
+
+  function strategyTabs(instance) {
+    return instance.model.strategies
+      .map((strategy) => {
+        const codes = strategyCountryCodes(instance, strategy);
+        const active = strategy.id === instance.model.activeStrategyId;
+        return `
+          <div class="osg-strategy-tab-wrap ${active ? "is-active" : ""}">
+            <button type="button" class="osg-strategy-tab" role="tab"
+              aria-selected="${active}" data-action="select-strategy"
+              data-strategy-id="${escapeHtml(strategy.id)}">
+              <strong>${escapeHtml(strategy.name)}</strong>
+              <small>${escapeHtml(conciseCountryList(codes))}</small>
+            </button>
+            ${
+              strategy.id === "default"
+                ? ""
+                : `<button type="button" class="osg-strategy-remove" data-action="remove-strategy"
+                    data-strategy-id="${escapeHtml(strategy.id)}"
+                    aria-label="删除${escapeHtml(strategy.name)}">×</button>`
+            }
+          </div>`;
+      })
+      .join("");
+  }
+
+  function switchButton(moduleKey, checked, label) {
+    return `
+      <button type="button" class="osg-switch ${checked ? "is-on" : ""}"
+        role="switch" aria-checked="${checked}" data-action="toggle-module"
+        data-module="${escapeHtml(moduleKey)}" aria-label="${escapeHtml(label)}">
+        <span></span>
+      </button>`;
+  }
+
+  function inlineSwitch(action, key, checked, label, disabled = false) {
+    return `
+      <button type="button" class="osg-switch ${checked ? "is-on" : ""} ${disabled ? "is-disabled" : ""}"
+        role="switch" aria-checked="${checked}" data-action="${escapeHtml(action)}"
+        data-key="${escapeHtml(key)}" aria-label="${escapeHtml(label)}" ${disabled ? 'disabled aria-disabled="true"' : ""}>
+        <span></span>
+      </button>`;
+  }
+
+  function moduleSection(key, title, description, enabled, body, extraClass = "", expanded = false) {
+    const hasBody = Boolean(String(body || "").trim());
+    const heading = hasBody
+      ? `<button type="button" class="osg-sdk-section-toggle ${expanded ? "is-expanded" : ""}"
+          data-action="toggle-section" data-section="${escapeHtml(key)}" aria-expanded="${expanded}">
+          <span class="osg-sdk-section-heading-copy">
+            <span class="osg-sdk-section-heading-title">${escapeHtml(title)}</span>
+            <span class="osg-sdk-section-heading-description">${escapeHtml(description)}</span>
+          </span>
+          <span class="osg-section-chevron" aria-hidden="true">⌄</span>
+        </button>`
+      : `<div><h3>${escapeHtml(title)}</h3><p>${escapeHtml(description)}</p></div>`;
+    return `
+      <section class="osg-sdk-section ${enabled ? "is-enabled" : "is-disabled"} ${extraClass}"
+        data-module-section="${escapeHtml(key)}">
+        <header>
+          ${heading}
+          ${switchButton(key, enabled, `${title}${enabled ? "已开启" : "已关闭"}`)}
+        </header>
+        ${hasBody && expanded ? `<div class="osg-sdk-section-body" aria-disabled="${!enabled}">${body}</div>` : ""}
+      </section>`;
+  }
+
+  function loginSection(config) {
+    const selectedIds = normalizeLoginIds(config.loginMethodIds, config.availableLoginIds);
+    const selectedOrder = new Map(selectedIds.map((id, index) => [id, index]));
+    const orderedIds = [
+      ...selectedIds,
+      ...config.availableLoginIds.filter((id) => !selectedOrder.has(id)),
+    ];
+    const cards = orderedIds
+      .map((id) => {
+        const method = LOGIN_BY_ID.get(id) || [id, id, "登录方式"];
+        const selected = selectedOrder.has(id);
+        const required = id === "guest";
+        return `
+          <button type="button" class="osg-login-method ${selected ? "is-selected" : ""}"
+            data-action="toggle-login" data-login-id="${escapeHtml(id)}"
+            draggable="${selected && !required}" aria-pressed="${selected}"
+            ${required ? 'aria-disabled="true"' : ""}>
+            <span class="osg-login-logo">${loginLogoMarkup(id)}</span>
+            <span class="osg-login-copy"><strong>${escapeHtml(method[1])}</strong><small>${escapeHtml(method[2])}</small></span>
+            ${
+              selected
+                ? `<span class="osg-login-order">${selectedOrder.get(id) + 1}</span>
+                   <span class="osg-login-drag" aria-hidden="true">${required ? "🔒" : "⋮⋮"}</span>`
+                : '<span class="osg-login-check"></span>'
+            }
+          </button>`;
+      })
+      .join("");
+    return `<div class="osg-login-grid" aria-label="登录方式选择及排序">${cards}</div>`;
+  }
+
+  function agreementSection(config) {
+    const groups = config.availableAgreementGroups || [];
+    if (!groups.length) {
+      return '<div class="osg-empty">当前发行渠道暂无可用协议，请先前往配置中心维护。</div>';
+    }
+    return `<div class="osg-agreement-grid">${groups
+      .map((group) => {
+        const checked = config.agreementGroupIds.includes(group.id);
+        return `
+          <button type="button" class="osg-agreement-option ${checked ? "is-selected" : ""}"
+            data-action="toggle-agreement" data-agreement-id="${escapeHtml(group.id)}"
+            aria-pressed="${checked}">
+            <span class="osg-agreement-icon">▤</span>
+            <span><strong>${escapeHtml(group.name)}</strong><small>${escapeHtml(group.languages || "尚未配置语种")}</small></span>
+            <i>${checked ? "✓" : ""}</i>
+          </button>`;
+      })
+      .join("")}</div>`;
+  }
+
+  function complianceSection(config) {
+    return `
+      <fieldset class="osg-field-grid osg-compliance-fields">
+        <div class="osg-readonly-field"><span>年龄门槛</span><strong aria-readonly="true">${escapeHtml(config.compliance.ageThreshold)} 岁</strong></div>
+        <div class="osg-compliance-switches">
+          <div class="osg-inline-setting"><span><strong>GDPR 隐私协议弹窗</strong><small>控制隐私协议同意弹窗。</small></span>${inlineSwitch("toggle-compliance", "gdprPrompt", config.compliance.gdprPrompt, "GDPR 隐私协议弹窗")}</div>
+          <div class="osg-inline-setting"><span><strong>年龄获取与家长控制</strong><small>开启后可控制 KWS 年龄验证。</small></span>${inlineSwitch("toggle-compliance", "ageParentalControl", config.compliance.ageParentalControl, "年龄获取与家长控制")}</div>
+          <div class="osg-inline-setting"><span><strong>KWS 年龄验证</strong><small>需要家长验证时接入 KWS。</small></span>${inlineSwitch("toggle-compliance", "kwsVerification", config.compliance.kwsVerification, "KWS 年龄验证", !config.compliance.ageParentalControl)}</div>
+        </div>
+      </fieldset>`;
+  }
+
+  function supportSection(config) {
+    const items = [
+      ["onlineService", "在线客服", "实时会话与客服名称"],
+      ["feedback", "表单反馈", "玩家问题类型与反馈表单"],
+      ["faq", "FAQ", "FAQ 语种与问题分组"],
+      ["smartService", "智能客服配置", "智能客服问答与推荐"],
+    ];
+    return `
+      <div class="osg-support-options">${items
+        .map(([key, title, detail]) => `
+          <div><span><strong>${title}</strong><small>${detail}</small></span>
+            ${inlineSwitch("toggle-support", key, config.support[key], title)}
+          </div>`)
+        .join("")}</div>
+      <label class="osg-compact-field"><span>FAQ 分组</span>
+        <select data-field="support.faqGroup" ${config.support.faq ? "" : "disabled"}>
+          <option value="default" ${config.support.faqGroup === "default" ? "selected" : ""}>默认 FAQ 分组</option>
+          <option value="payment" ${config.support.faqGroup === "payment" ? "selected" : ""}>支付问题 FAQ</option>
+          <option value="account" ${config.support.faqGroup === "account" ? "selected" : ""}>账号问题 FAQ</option>
+        </select>
+      </label>`;
+  }
+
+  function runtimeSection(config) {
+    const items = [
+      ["agreementReminder", "协议提醒开关"],
+      ["welcomeMessage", "欢迎语开关"],
+      ["guestLogoutReminder", "游客退出登录提醒开关"],
+      ["guestPayment", "游客支付开关"],
+      ["crashReport", "崩溃上报开关"],
+      ["personalizedAds", "个性化广告开关"],
+    ];
+    return `
+      <section class="osg-runtime-section">
+        <header><div><h3>开关配置</h3><p>以下运行开关仅对当前策略组生效。</p></div></header>
+        <div class="osg-runtime-grid">${items
+          .map(([key, title]) => `<div><strong>${title}</strong>${inlineSwitch("toggle-runtime", key, config.runtime[key], title)}</div>`)
+          .join("")}</div>
+        <label class="osg-silent-login"><span>静默登录方式</span>
+          <select data-field="runtime.silentLoginMethod">
+            <option value="none" ${config.runtime.silentLoginMethod === "none" ? "selected" : ""}>关</option>
+            <option value="last" ${config.runtime.silentLoginMethod === "last" ? "selected" : ""}>上次登录方式</option>
+            <option value="guest" ${config.runtime.silentLoginMethod === "guest" ? "selected" : ""}>游客登录</option>
+          </select>
+        </label>
+      </section>`;
+  }
+
+  function render(instance) {
+    const strategy = activeStrategy(instance);
+    const config = strategy.config;
+    const strategyCodes = strategyCountryCodes(instance, strategy);
+    const packageLabel = instance.packageLabel;
+    instance.root.innerHTML = `
+      <div class="osg-context">
+        <span><small>当前渠道包</small><strong>${escapeHtml(packageLabel)}</strong></span>
+        <span><small>发行范围</small><strong>${instance.model.releaseCountryCodes.length} 个国家/地区</strong></span>
+        <em class="${instance.dirty ? "is-dirty" : "is-synced"}" role="status">${instance.dirty ? "有未保存修改" : "配置已同步"}</em>
+      </div>
+      <section class="osg-strategy-panel">
+        <header>
+          <div><h3>发行策略</h3><p>一次选择一个或多个国家创建一个策略组；未单独分组的国家使用默认策略。</p></div>
+          <button type="button" class="osg-add-strategy" data-action="add-strategy"><span>+</span>添加</button>
+        </header>
+        <nav class="osg-strategy-tabs" role="tablist" aria-label="策略组">${strategyTabs(instance)}</nav>
+        <div class="osg-current-strategy">
+          <span>当前编辑：<strong>${escapeHtml(strategy.name)}</strong></span>
+          <small>${escapeHtml(conciseCountryList(strategyCodes))}</small>
+        </div>
+      </section>
+      <div class="osg-sdk-stack">
+        ${moduleSection("login", "登录SDK", MODULES[0][2], config.modules.login, loginSection(config), "", instance.expandedModules.has("login"))}
+        ${moduleSection("agreement", "协议SDK", MODULES[1][2], config.modules.agreement, agreementSection(config), "", instance.expandedModules.has("agreement"))}
+        ${moduleSection("payment", "支付SDK", MODULES[2][2], config.modules.payment, "", "is-compact")}
+        ${moduleSection("compliance", "合规SDK", MODULES[3][2], config.modules.compliance, complianceSection(config), "", instance.expandedModules.has("compliance"))}
+        ${moduleSection("support", "客服工具SDK", MODULES[4][2], config.modules.support, supportSection(config), "", instance.expandedModules.has("support"))}
+        ${moduleSection("data", "三方数据SDK", MODULES[5][2], config.modules.data, '<div class="osg-summary-line"><strong>已接入平台</strong><span class="osg-chip">Firebase</span><span class="osg-chip">AppsFlyer</span></div>', "is-compact", instance.expandedModules.has("data"))}
+        ${moduleSection("advertising", "广告变现SDK", MODULES[6][2], config.modules.advertising, '<div class="osg-summary-line"><strong>广告平台</strong><span>跟随组合包中的广告变现配置。</span></div>', "is-compact", instance.expandedModules.has("advertising"))}
+        ${runtimeSection(config)}
+      </div>`;
+    instance.root
+      .querySelectorAll(
+        ".osg-sdk-section.is-disabled .osg-sdk-section-body button, .osg-sdk-section.is-disabled .osg-sdk-section-body select, .osg-sdk-section.is-disabled .osg-sdk-section-body input",
+      )
+      .forEach((control) => {
+        control.disabled = true;
+        control.setAttribute("aria-disabled", "true");
+      });
+    updateFooterState(instance);
+  }
+
+  function setDirty(instance) {
+    instance.dirty = modelSignature(instance.model) !== instance.savedSignature;
+    render(instance);
+  }
+
+  function updateFooterState(instance) {
+    const footerState = instance.drawer.querySelector(".mgp-operations-save-state");
+    if (!footerState) return;
+    footerState.classList.toggle("is-dirty", instance.dirty);
+    footerState.classList.toggle("is-synced", !instance.dirty);
+    footerState.textContent = instance.dirty ? "有未保存修改" : "所有修改已保存";
+  }
+
+  function closeModal() {
+    activeModal?.remove();
+    activeModal = null;
+  }
+
+  function openStrategyModal(instance) {
+    closeModal();
+    const pending = new Set();
+    const layer = document.createElement("div");
+    layer.className = "osg-modal-layer";
+    const assignedOwners = new Map();
+    instance.model.strategies
+      .filter((strategy) => strategy.id !== "default")
+      .forEach((strategy) =>
+        strategy.countryCodes.forEach((code) => assignedOwners.set(code, strategy.name)),
+      );
+    const regionGroups = Array.from(
+      COUNTRIES.reduce((map, country) => {
+        const key = `${country.continent}-${country.region}`;
+        if (!map.has(key)) map.set(key, { name: country.region, countries: [] });
+        map.get(key).countries.push(country);
+        return map;
+      }, new Map()).values(),
+    );
+    layer.innerHTML = `
+      <section class="osg-modal" role="dialog" aria-modal="true" aria-labelledby="osg-modal-title">
+        <header><div><h3 id="osg-modal-title">添加策略组</h3><p>可单选或多选国家；本次选中的国家将共同使用一份策略配置。</p></div><button type="button" data-action="close-modal" aria-label="关闭">×</button></header>
+        <div class="osg-modal-body">${regionGroups
+          .map((group) => `<section><h4>${escapeHtml(group.name)}</h4><div>${group.countries
+            .map((country) => {
+              const owner = assignedOwners.get(country.code);
+              return `<label class="${owner ? "is-assigned" : ""}"><input type="checkbox" data-country-code="${country.code}" ${owner ? "disabled" : ""}><span><strong>${escapeHtml(country.name)}</strong><small>${escapeHtml(country.english)} · ${country.code}</small></span>${owner ? `<em>${escapeHtml(owner)}</em>` : ""}</label>`;
+            })
+            .join("")}</div></section>`)
+          .join("")}</div>
+        <footer><span>请选择国家/地区</span><button type="button" data-action="close-modal">取消</button><button type="button" class="primary" data-action="confirm-strategy" disabled>添加策略</button></footer>
+      </section>`;
+    document.body.append(layer);
+    activeModal = layer;
+    const confirm = layer.querySelector('[data-action="confirm-strategy"]');
+    const summary = layer.querySelector("footer span");
+    const update = () => {
+      confirm.disabled = pending.size === 0;
+      summary.textContent = pending.size ? `已选择 ${pending.size} 个国家/地区` : "请选择国家/地区";
+    };
+    layer.addEventListener("change", (event) => {
+      const code = event.target.dataset.countryCode;
+      if (!code) return;
+      if (event.target.checked) pending.add(code);
+      else pending.delete(code);
+      update();
+    });
+    layer.addEventListener("click", (event) => {
+      const button = event.target.closest("button[data-action]");
+      if (!button) return;
+      if (button.dataset.action === "close-modal") {
+        closeModal();
+        return;
+      }
+      if (button.dataset.action !== "confirm-strategy" || !pending.size) return;
+      const usedNumbers = instance.model.strategies
+        .map((strategy) => Number(strategy.name.match(/^策略(\d+)$/)?.[1]))
+        .filter(Number.isFinite);
+      const nextNumber = usedNumbers.length ? Math.max(...usedNumbers) + 1 : 1;
+      const defaultConfig = clone(
+        instance.model.strategies.find((strategy) => strategy.id === "default").config,
+      );
+      const strategy = {
+        id: `strategy-${Date.now()}-${nextNumber}`,
+        name: `策略${nextNumber}`,
+        countryCodes: Array.from(pending),
+        config: defaultConfig,
+      };
+      instance.model.releaseCountryCodes = unique([
+        ...instance.model.releaseCountryCodes,
+        ...strategy.countryCodes,
+      ]);
+      instance.model.strategies.push(strategy);
+      instance.model.activeStrategyId = strategy.id;
+      closeModal();
+      setDirty(instance);
+    });
+    layer.querySelector('input:not(:disabled)')?.focus();
+  }
+
+  function toggleLogin(instance, id) {
+    if (id === "guest") return;
+    const config = activeStrategy(instance).config;
+    const current = normalizeLoginIds(config.loginMethodIds, config.availableLoginIds);
+    config.loginMethodIds = current.includes(id)
+      ? current.filter((methodId) => methodId !== id)
+      : [...current, id];
+    config.loginMethodIds = normalizeLoginIds(config.loginMethodIds, config.availableLoginIds);
+    setDirty(instance);
+  }
+
+  function reorderLogin(instance, sourceId, targetId) {
+    if (!sourceId || !targetId || sourceId === "guest" || sourceId === targetId) return;
+    const config = activeStrategy(instance).config;
+    const current = normalizeLoginIds(config.loginMethodIds, config.availableLoginIds);
+    const sourceIndex = current.indexOf(sourceId);
+    const targetIndex = current.indexOf(targetId);
+    if (sourceIndex < 1 || targetIndex < 1) return;
+    const next = [...current];
+    next.splice(sourceIndex, 1);
+    next.splice(targetIndex, 0, sourceId);
+    config.loginMethodIds = next;
+    instance.draggedLoginId = "";
+    instance.suppressLoginClickUntil = Date.now() + 250;
+    setDirty(instance);
+  }
+
+  function handleRootClick(instance, event) {
+    const button = event.target.closest("button[data-action]");
+    if (!button || !instance.root.contains(button)) return;
+    const action = button.dataset.action;
+    if (action === "toggle-section") {
+      const sectionKey = button.dataset.section;
+      if (instance.expandedModules.has(sectionKey)) {
+        instance.expandedModules.delete(sectionKey);
+      } else {
+        instance.expandedModules.add(sectionKey);
+      }
+      render(instance);
+      return;
+    }
+    if (action === "add-strategy") {
+      openStrategyModal(instance);
+      return;
+    }
+    if (action === "select-strategy") {
+      instance.model.activeStrategyId = button.dataset.strategyId;
+      render(instance);
+      return;
+    }
+    if (action === "remove-strategy") {
+      const strategy = instance.model.strategies.find(
+        (item) => item.id === button.dataset.strategyId,
+      );
+      if (!strategy || strategy.id === "default") return;
+      if (!window.confirm(`确认删除“${strategy.name}”吗？该组国家将回落到默认策略。`)) return;
+      instance.model.strategies = instance.model.strategies.filter(
+        (item) => item.id !== strategy.id,
+      );
+      if (instance.model.activeStrategyId === strategy.id) {
+        instance.model.activeStrategyId = "default";
+      }
+      setDirty(instance);
+      return;
+    }
+    const strategy = activeStrategy(instance);
+    if (action === "toggle-module") {
+      const moduleKey = button.dataset.module;
+      strategy.config.modules[moduleKey] = !strategy.config.modules[moduleKey];
+      setDirty(instance);
+      return;
+    }
+    if (action === "toggle-login") {
+      if (!strategy.config.modules.login || Date.now() < instance.suppressLoginClickUntil) return;
+      toggleLogin(instance, button.dataset.loginId);
+      return;
+    }
+    if (action === "toggle-agreement") {
+      if (!strategy.config.modules.agreement) return;
+      const id = button.dataset.agreementId;
+      strategy.config.agreementGroupIds = strategy.config.agreementGroupIds.includes(id)
+        ? strategy.config.agreementGroupIds.filter((groupId) => groupId !== id)
+        : [...strategy.config.agreementGroupIds, id];
+      setDirty(instance);
+      return;
+    }
+    if (action === "toggle-compliance") {
+      if (!strategy.config.modules.compliance) return;
+      const key = button.dataset.key;
+      if (key === "kwsVerification" && !strategy.config.compliance.ageParentalControl) return;
+      strategy.config.compliance[key] = !strategy.config.compliance[key];
+      setDirty(instance);
+      return;
+    }
+    if (action === "toggle-support") {
+      if (!strategy.config.modules.support) return;
+      const key = button.dataset.key;
+      strategy.config.support[key] = !strategy.config.support[key];
+      setDirty(instance);
+      return;
+    }
+    if (action === "toggle-runtime") {
+      const key = button.dataset.key;
+      strategy.config.runtime[key] = !strategy.config.runtime[key];
+      setDirty(instance);
+    }
+  }
+
+  function handleRootChange(instance, event) {
+    const field = event.target.dataset.field;
+    if (!field) return;
+    const [group, key] = field.split(".");
+    const strategy = activeStrategy(instance);
+    if (group === "compliance" && !strategy.config.modules.compliance) return;
+    if (group === "support" && !strategy.config.modules.support) return;
+    strategy.config[group][key] = event.target.value;
+    setDirty(instance);
+  }
+
+  function wireRoot(instance) {
+    instance.root.addEventListener("click", (event) => handleRootClick(instance, event));
+    instance.root.addEventListener("change", (event) => handleRootChange(instance, event));
+    instance.root.addEventListener("dragstart", (event) => {
+      const item = event.target.closest(".osg-login-method[draggable='true']");
+      if (!item || !activeStrategy(instance).config.modules.login) return;
+      instance.draggedLoginId = item.dataset.loginId;
+      event.dataTransfer.effectAllowed = "move";
+      event.dataTransfer.setData("text/plain", instance.draggedLoginId);
+    });
+    instance.root.addEventListener("dragover", (event) => {
+      const target = event.target.closest(".osg-login-method.is-selected");
+      if (!target || target.dataset.loginId === "guest" || !instance.draggedLoginId) return;
+      event.preventDefault();
+      event.dataTransfer.dropEffect = "move";
+    });
+    instance.root.addEventListener("drop", (event) => {
+      const target = event.target.closest(".osg-login-method.is-selected");
+      if (!target) return;
+      event.preventDefault();
+      reorderLogin(
+        instance,
+        event.dataTransfer.getData("text/plain") || instance.draggedLoginId,
+        target.dataset.loginId,
+      );
+    });
+    instance.root.addEventListener("dragend", () => {
+      instance.draggedLoginId = "";
+    });
+  }
+
+  function installOperationsDrawer(drawer) {
+    if (instances.has(drawer)) return;
+    const body = drawer.querySelector(".mgp-operations-drawer-body");
+    const oldHead = body?.querySelector(":scope > .mgp-operations-workspace-head");
+    const oldSections = body?.querySelectorAll(":scope > .mgp-operations-section");
+    if (!body || !oldHead || !oldSections?.length) return;
+    const packageId = packageIdentity(drawer);
+    const root = document.createElement("div");
+    root.className = "osg-workspace";
+    root.dataset.packageId = packageId;
+    oldHead.before(root);
+    oldHead.classList.add("osg-original-hidden");
+    oldSections.forEach((section) => section.classList.add("osg-original-hidden"));
+    const model = loadModel(drawer, packageId);
+    const instance = {
+      drawer,
+      body,
+      root,
+      model,
+      packageLabel: packageId,
+      savedSignature: modelSignature(model),
+      dirty: false,
+      draggedLoginId: "",
+      suppressLoginClickUntil: 0,
+      expandedModules: new Set(),
+    };
+    instances.set(drawer, instance);
+    wireRoot(instance);
+    render(instance);
+  }
+
+  function moveOtherPaymentButton() {
+    const panel = document.querySelector("#config-panel-release");
+    const fields = panel?.querySelector(".mgp-channel-picker-fields");
+    const button = panel?.querySelector(".mgp-other-payment-link");
+    if (!fields || !button || button.closest(".mgp-other-payment-inline")) return;
+    const wrapper = document.createElement("div");
+    wrapper.className = "mgp-other-payment-inline";
+    fields.append(wrapper);
+    wrapper.append(button);
   }
 
   function scheduleSync() {
-    if (state.scheduled) return;
-    state.scheduled = true;
+    if (scheduled) return;
+    scheduled = true;
     requestAnimationFrame(() => {
-      state.scheduled = false;
-      syncStrategyPanel();
-      syncEditingContext();
-      syncBatchApplyButton();
+      scheduled = false;
+      document.querySelectorAll(".mgp-operations-drawer").forEach(installOperationsDrawer);
+      moveOtherPaymentButton();
     });
-  }
-
-  const regionStateId = (regionId) => `region:${regionId}`;
-
-  function completeStrategyRegions(selectedCodes) {
-    const selected = new Set(selectedCodes);
-    return modalRegions.filter(
-      (region) =>
-        region.countries.length > 1 &&
-        region.countries.every((country) => selected.has(country.code)),
-    );
-  }
-
-  function activeStrategyRegion() {
-    if (!state.active.startsWith("region:")) return null;
-    const regionId = state.active.slice("region:".length);
-    return modalRegions.find((region) => region.id === regionId) ?? null;
-  }
-
-  function regionStrategyLabel(region) {
-    return `${region.name}（${region.countries.length}个国家）`;
-  }
-
-  function renderTabs(section, root, selectedCodes) {
-    const completeRegions = completeStrategyRegions(selectedCodes);
-    const activeRegion = activeStrategyRegion();
-    if (activeRegion && !completeRegions.some((region) => region.id === activeRegion.id)) {
-      state.active = "default";
-    } else if (state.active !== "default" && !activeRegion && !selectedCodes.includes(state.active)) {
-      state.active = "default";
-    }
-
-    if (state.active !== "default" && !activeStrategyRegion()) {
-      const groupedRegion = completeRegions.find((region) =>
-        region.countries.some((country) => country.code === state.active),
-      );
-      if (groupedRegion) state.active = regionStateId(groupedRegion.id);
-    }
-    const signature = `${selectedCodes.join(",")}|${state.active}`;
-    if (root.dataset.signature === signature) return;
-    root.dataset.signature = signature;
-
-    const countryTabs = selectedCodes
-      .map((code) => countryByCode.get(code))
-      .filter(Boolean)
-      .map(
-        (country) => `
-          <div class="mgp-country-strategy-tab ${
-            state.active === country.code ? "is-active" : ""
-          }" role="presentation">
-            <button class="mgp-country-strategy-tab-select" type="button" role="tab"
-              aria-selected="${state.active === country.code}"
-              data-action="select" data-code="${country.code}">
-              ${escapeHtml(country.name)}
-            </button>
-            <button class="mgp-country-strategy-tab-remove" type="button"
-              aria-label="删除${escapeHtml(country.name)}差异化策略"
-              title="删除差异化策略" data-action="remove" data-code="${country.code}">×</button>
-          </div>`,
-      )
-      .join("");
-
-    root.innerHTML = `
-      <div class="mgp-country-strategy-toolbar">
-        <div class="mgp-country-strategy-tabs" role="tablist" aria-label="国家策略">
-          <button class="mgp-country-strategy-default ${
-            state.active === "default" ? "is-active" : ""
-          }" type="button" role="tab" aria-selected="${
-            state.active === "default"
-          }" data-action="default">默认策略</button>
-          ${countryTabs}
-        </div>
-        <button class="mgp-country-strategy-add" type="button" data-action="add"
-          aria-haspopup="dialog"><span aria-hidden="true">＋</span>添加差异化国家</button>
-      </div>`;
-
-    completeRegions.forEach((region) => {
-      const regionTabs = region.countries
-        .map((country) =>
-          root
-            .querySelector(`.mgp-country-strategy-tab-select[data-code="${country.code}"]`)
-            ?.closest(".mgp-country-strategy-tab"),
-        )
-        .filter(Boolean);
-      const groupTab = regionTabs[0];
-      if (!groupTab) return;
-
-      const label = regionStrategyLabel(region);
-      const activeId = regionStateId(region.id);
-      const selectButton = groupTab.querySelector(".mgp-country-strategy-tab-select");
-      selectButton.textContent = label;
-      selectButton.dataset.action = "select-region";
-      selectButton.dataset.regionId = region.id;
-      delete selectButton.dataset.code;
-      selectButton.setAttribute("aria-selected", String(state.active === activeId));
-      groupTab.classList.toggle("is-active", state.active === activeId);
-
-      const removeButton = groupTab.querySelector(".mgp-country-strategy-tab-remove");
-      removeButton.dataset.action = "remove-region";
-      removeButton.dataset.regionId = region.id;
-      delete removeButton.dataset.code;
-      removeButton.setAttribute("aria-label", `删除${label}差异化策略`);
-      removeButton.title = "删除区域差异化策略";
-      regionTabs.slice(1).forEach((tab) => tab.remove());
-    });
-
-    root.onclick = async (event) => {
-      const button = event.target.closest("button[data-action]");
-      if (!button) return;
-      const action = button.dataset.action;
-      const code = button.dataset.code;
-      const regionId = button.dataset.regionId;
-
-      if (action === "default") {
-        state.active = "default";
-        root.dataset.signature = "";
-        renderTabs(section, root, selectedCountryCodes(section));
-        return;
-      }
-
-      if (action === "select" && code) {
-        state.active = code;
-        const entry = selectedEntry(section, code);
-        entry?.querySelector("button:not(.mgp-region-selected-remove)")?.click();
-        root.dataset.signature = "";
-        renderTabs(section, root, selectedCountryCodes(section));
-        return;
-      }
-
-      if (action === "select-region" && regionId) {
-        const region = modalRegions.find((candidate) => candidate.id === regionId);
-        if (!region) return;
-        state.active = regionStateId(region.id);
-        const sourceCode = region.countries.find((country) => selectedCodes.includes(country.code))?.code;
-        const entry = sourceCode ? selectedEntry(section, sourceCode) : null;
-        entry?.querySelector("button:not(.mgp-region-selected-remove)")?.click();
-        root.dataset.signature = "";
-        renderTabs(section, root, selectedCountryCodes(section));
-        return;
-      }
-
-      if (action === "remove" && code) {
-        const entry = selectedEntry(section, code);
-        entry?.querySelector(".mgp-region-selected-remove")?.click();
-        if (state.active === code) state.active = "default";
-        scheduleSync();
-        return;
-      }
-
-      if (action === "remove-region" && regionId) {
-        const region = modalRegions.find((candidate) => candidate.id === regionId);
-        if (!region) return;
-        const label = regionStrategyLabel(region);
-        if (
-          !window.confirm(
-            `确认删除“${label}”差异化策略吗？\n删除后，该区域内的国家将恢复默认策略。`,
-          )
-        ) {
-          return;
-        }
-        state.active = "default";
-        for (const country of region.countries) {
-          const entry = selectedEntry(section, country.code);
-          entry?.querySelector(".mgp-region-selected-remove")?.click();
-          await nextFrame();
-        }
-        scheduleSync();
-        return;
-      }
-
-      if (action === "add") openCountryModal(section);
-    };
-  }
-
-  function syncStrategyPanel() {
-    const section = document.querySelector("#operations-workspace-range");
-    if (!section) return;
-    const tree = section.querySelector(".mgp-region-tree");
-    if (!tree) return;
-
-    section.dataset.strategyUpgraded = "true";
-    const heading = section.querySelector(":scope > header h3");
-    const description = section.querySelector(":scope > header p");
-    const count = section.querySelector(":scope > header > strong");
-    if (heading && heading.textContent !== "国家策略配置") {
-      heading.textContent = "国家策略配置";
-    }
-    if (description) {
-      description.textContent =
-        "设置当前 SDK 包内服务在不同发行国家的展示、启用与顺序；未单独设置的国家使用默认策略。";
-    }
-
-    const selectedCodes = selectedCountryCodes(section);
-    if (count) count.textContent = `已配置 ${selectedCodes.length} 个差异化国家`;
-
-    let root = section.querySelector(":scope > .mgp-country-strategy-upgrade");
-    if (!root) {
-      root = document.createElement("div");
-      root.className = "mgp-country-strategy-upgrade";
-      tree.before(root);
-    }
-    renderTabs(section, root, selectedCodes);
-  }
-
-  async function waitFor(getter, attempts = 30) {
-    for (let index = 0; index < attempts; index += 1) {
-      const value = getter();
-      if (value) return value;
-      await nextFrame();
-    }
-    return null;
-  }
-
-  function exactButton(container, label) {
-    return Array.from(container?.querySelectorAll("button") ?? []).find(
-      (button) => button.textContent?.trim() === label,
-    );
-  }
-
-  async function addCountryToOriginal(section, country) {
-    let tree = section.querySelector(".mgp-region-tree");
-    if (!tree) return false;
-    exactButton(tree.children[0], country.continent)?.click();
-    await nextFrame();
-
-    tree = await waitFor(() => section.querySelector(".mgp-region-tree"));
-    const regionButton = await waitFor(() => exactButton(tree?.children[1], country.region));
-    regionButton?.click();
-    await nextFrame();
-
-    tree = await waitFor(() => section.querySelector(".mgp-region-tree"));
-    const input = await waitFor(() =>
-      tree?.querySelector(`input[aria-label="选择${country.name}"]`),
-    );
-    if (!input) return false;
-    if (!input.checked) input.click();
-    await nextFrame();
-    return true;
-  }
-
-  async function removeCountryFromOriginal(section, code) {
-    const entry = selectedEntry(section, code);
-    const remove = entry?.querySelector(".mgp-region-selected-remove");
-    if (!remove) return false;
-    remove.click();
-    const removed = await waitFor(() => !selectedCountryCodes(section).includes(code));
-    return Boolean(removed);
-  }
-
-  function batchApplyButton() {
-    return document.querySelector(
-      ".mgp-operations-login-layout.single .mgp-operations-login-editor > .mgp-operations-batch-bar > button",
-    );
-  }
-
-  function currentEditingCountryCode() {
-    if (state.active === "default") return "";
-    const region = activeStrategyRegion();
-    return region?.countries[0]?.code ?? state.active;
-  }
-
-  function syncEditingContext() {
-    const region = activeStrategyRegion();
-    const activeLabel =
-      state.active === "default"
-        ? "默认策略"
-        : region
-          ? regionStrategyLabel(region)
-          : countryByCode.get(state.active)?.name ?? "默认策略";
-    const batchLabel = document.querySelector(
-      ".mgp-operations-login-layout.single .mgp-operations-login-editor > .mgp-operations-batch-bar > span",
-    );
-    if (batchLabel && batchLabel.textContent?.trim() !== `当前编辑：${activeLabel}`) {
-      batchLabel.textContent = `当前编辑：${activeLabel}`;
-    }
-
-    const contextItem = Array.from(
-      document.querySelectorAll(".mgp-operations-workspace-context > span"),
-    ).find((item) => item.querySelector("small")?.textContent?.trim() === "当前编辑国家/地区");
-    const contextValue = contextItem?.querySelector("strong");
-    if (contextValue && contextValue.textContent?.trim() !== activeLabel) {
-      contextValue.textContent = activeLabel;
-    }
-
-    const regionalDescription = document.querySelector(
-      "#operations-workspace-regional > header p",
-    );
-    const description =
-      "点击上方国家或区域可切换编辑，默认策略适用于所有未单独设置的发行国家。";
-    if (regionalDescription && regionalDescription.textContent?.trim() !== description) {
-      regionalDescription.textContent = description;
-    }
-  }
-
-  function syncBatchApplyButton() {
-    const button = batchApplyButton();
-    if (!button) return;
-    if (state.active === "default") {
-      if (!("originalDisabled" in button.dataset)) {
-        button.dataset.originalDisabled = String(button.disabled);
-      }
-      button.disabled = true;
-      button.title = "默认策略自动适用于所有未单独设置的发行国家";
-      delete button.dataset.countrySyncProxy;
-    } else {
-      if ("originalDisabled" in button.dataset) {
-        button.disabled = button.dataset.originalDisabled === "true";
-        delete button.dataset.originalDisabled;
-      }
-      button.removeAttribute("title");
-      button.dataset.countrySyncProxy = "true";
-    }
-    if (button.textContent?.trim() !== "应用到其他国家") {
-      button.textContent = "应用到其他国家";
-    }
-    const originalBatchToasts = Array.from(
-      document.querySelectorAll('.mgp-toast.success[role="status"]'),
-    );
-    if (Date.now() < state.suppressOriginalBatchToastUntil) {
-      originalBatchToasts
-        .filter((node) => node.textContent?.includes("已成功应用到"))
-        .forEach((node) => {
-          node.style.display = "none";
-        });
-    } else {
-      originalBatchToasts.forEach((node) => node.style.removeProperty("display"));
-    }
-  }
-
-  function showToast(message) {
-    document.querySelector(".mgp-country-strategy-toast")?.remove();
-    const toast = document.createElement("div");
-    toast.className = "mgp-country-strategy-toast";
-    toast.setAttribute("role", "status");
-    toast.textContent = message;
-    document.body.append(toast);
-    window.setTimeout(() => toast.remove(), 2200);
-  }
-
-  function closeCountryModal() {
-    state.modal?.remove();
-    state.modal = null;
-  }
-
-  function openCountryModal(section) {
-    closeCountryModal();
-    const selectedCodes = new Set(selectedCountryCodes(section));
-    const pendingCodes = new Set();
-    let activeRegionId =
-      modalRegions.find((region) =>
-        region.countries.some((country) => !selectedCodes.has(country.code)),
-      )?.id ?? modalRegions[0].id;
-    const layer = document.createElement("div");
-    layer.className = "mgp-country-strategy-modal-layer";
-    layer.innerHTML = `
-      <section class="mgp-country-strategy-modal" role="dialog" aria-modal="true"
-        aria-labelledby="country-strategy-modal-title">
-        <header>
-          <div>
-            <h3 id="country-strategy-modal-title">添加差异化国家</h3>
-            <p>先选择区域，再勾选需要单独配置策略的国家；已配置项不可重复添加。</p>
-          </div>
-          <button class="mgp-country-strategy-modal-close" type="button"
-            data-action="close" aria-label="关闭">×</button>
-        </header>
-        <div class="mgp-country-strategy-region-body">
-          <aside class="mgp-country-strategy-region-nav" aria-label="区域列表"></aside>
-          <section class="mgp-country-strategy-region-detail">
-            <header></header>
-            <div class="mgp-country-strategy-region-grid"></div>
-            <p>新增国家会先继承默认策略，进入国家页签后可调整为差异化配置。</p>
-          </section>
-        </div>
-        <footer>
-          <span></span>
-          <button type="button" data-action="close">取消</button>
-          <button type="button" data-action="confirm" disabled>添加</button>
-        </footer>
-      </section>`;
-    document.body.append(layer);
-    state.modal = layer;
-
-    const confirm = layer.querySelector('button[data-action="confirm"]');
-    const summary = layer.querySelector("footer span");
-    const regionNav = layer.querySelector(".mgp-country-strategy-region-nav");
-    const regionHeader = layer.querySelector(".mgp-country-strategy-region-detail > header");
-    const regionGrid = layer.querySelector(".mgp-country-strategy-region-grid");
-
-    const renderRegion = () => {
-      const activeRegion = modalRegions.find((region) => region.id === activeRegionId);
-      regionNav.innerHTML = modalRegions
-        .map((region) => {
-          const configuredCount = region.countries.filter((country) =>
-            selectedCodes.has(country.code),
-          ).length;
-          const pendingCount = region.countries.filter((country) =>
-            pendingCodes.has(country.code),
-          ).length;
-          return `
-            <button type="button" class="${region.id === activeRegionId ? "is-active" : ""}"
-              data-action="region" data-region="${region.id}">
-              <strong>${region.name}</strong>
-              <span>${configuredCount + pendingCount}/${region.countries.length}</span>
-            </button>`;
-        })
-        .join("");
-
-      const selectableCountries = activeRegion.countries.filter(
-        (country) => !selectedCodes.has(country.code),
-      );
-      const pendingInRegion = selectableCountries.filter((country) =>
-        pendingCodes.has(country.code),
-      ).length;
-      const allPending =
-        selectableCountries.length > 0 && pendingInRegion === selectableCountries.length;
-
-      regionHeader.innerHTML = `
-        <div>
-          <h4>${activeRegion.name}</h4>
-          <span>已添加的国家不可重复选择</span>
-        </div>
-        <label class="mgp-country-strategy-region-select-all">
-          <input type="checkbox" data-action="select-region" ${
-            allPending ? "checked" : ""
-          } ${selectableCountries.length ? "" : "disabled"}>
-          <strong>选择整个${activeRegion.name}</strong>
-        </label>
-        <em>待添加 ${pendingInRegion} 个</em>`;
-
-      regionGrid.innerHTML = activeRegion.countries
-        .map((country) => {
-          const configured = selectedCodes.has(country.code);
-          const pending = pendingCodes.has(country.code);
-          return `
-            <label class="mgp-country-strategy-region-country ${
-              configured ? "is-configured" : pending ? "is-pending" : ""
-            }">
-              <input type="checkbox" data-country-code="${country.code}" ${
-                configured || pending ? "checked" : ""
-              } ${configured ? "disabled" : ""}>
-              <strong>${country.name}</strong>
-              <small>${country.code}</small>
-              ${configured ? "<em>已添加</em>" : ""}
-            </label>`;
-        })
-        .join("");
-
-      confirm.disabled = pendingCodes.size === 0;
-      summary.textContent = pendingCodes.size
-        ? `已选择 ${pendingCodes.size} 个待添加国家`
-        : `还有 ${countries.length - selectedCodes.size} 个国家可添加`;
-    };
-
-    layer.addEventListener("change", (event) => {
-      const input = event.target;
-      const activeRegion = modalRegions.find((region) => region.id === activeRegionId);
-      if (input.matches('input[data-action="select-region"]')) {
-        activeRegion.countries
-          .filter((country) => !selectedCodes.has(country.code))
-          .forEach((country) => {
-            if (input.checked) pendingCodes.add(country.code);
-            else pendingCodes.delete(country.code);
-          });
-        renderRegion();
-        return;
-      }
-      const code = input.dataset.countryCode;
-      if (!code) return;
-      if (input.checked) pendingCodes.add(code);
-      else pendingCodes.delete(code);
-      renderRegion();
-    });
-    layer.addEventListener("click", async (event) => {
-      const actionButton = event.target.closest("button[data-action]");
-      if (!actionButton) return;
-      if (actionButton.dataset.action === "region") {
-        activeRegionId = actionButton.dataset.region;
-        renderRegion();
-        return;
-      }
-      if (actionButton.dataset.action === "close") {
-        closeCountryModal();
-        return;
-      }
-      if (actionButton.dataset.action !== "confirm") return;
-
-      const additions = Array.from(pendingCodes)
-        .map((code) => countryByCode.get(code))
-        .filter(Boolean);
-      if (!additions.length) return;
-      actionButton.disabled = true;
-      actionButton.textContent = "添加中…";
-
-      let added = 0;
-      for (const country of additions) {
-        if (await addCountryToOriginal(section, country)) added += 1;
-      }
-      state.active = additions.at(-1)?.code ?? "default";
-      closeCountryModal();
-      showToast(`已添加 ${added} 个差异化国家`);
-      scheduleSync();
-    });
-    renderRegion();
-    layer.querySelector(".mgp-country-strategy-region-nav button")?.focus();
-  }
-
-  async function applyLoginToCountries(section, sourceCode, targetCodes) {
-    const originalCodes = selectedCountryCodes(section);
-    const keep = new Set([sourceCode, ...targetCodes]);
-    const temporarilyRemoved = originalCodes.filter((code) => !keep.has(code));
-
-    for (const code of temporarilyRemoved) {
-      await removeCountryFromOriginal(section, code);
-    }
-
-    const originalAction = await waitFor(() => batchApplyButton());
-    if (!originalAction) return false;
-    state.suppressOriginalBatchToastUntil = Date.now() + 2600;
-    state.allowOriginalBatchAction = true;
-    originalAction.click();
-    await nextFrame();
-    state.suppressOriginalBatchToastUntil = 0;
-
-    for (const code of temporarilyRemoved) {
-      const country = countryByCode.get(code);
-      if (country) await addCountryToOriginal(section, country);
-    }
-    const sourceEntry = await waitFor(() => selectedEntry(section, sourceCode));
-    sourceEntry
-      ?.querySelector("button:not(.mgp-region-selected-remove)")
-      ?.click();
-    await nextFrame();
-    state.active = sourceCode;
-    scheduleSync();
-    return true;
-  }
-
-  function openApplyCountryModal(section) {
-    closeCountryModal();
-    const sourceCode = currentEditingCountryCode();
-    const sourceCountry = countryByCode.get(sourceCode);
-    const targets = selectedCountryCodes(section)
-      .filter((code) => code !== sourceCode)
-      .map((code) => countryByCode.get(code))
-      .filter(Boolean);
-    if (!sourceCountry || !targets.length) {
-      showToast("当前没有可应用的其他国家");
-      return;
-    }
-
-    const layer = document.createElement("div");
-    layer.className = "mgp-country-strategy-modal-layer";
-    layer.innerHTML = `
-      <section class="mgp-country-strategy-modal mgp-country-sync-modal" role="dialog"
-        aria-modal="true" aria-labelledby="country-sync-modal-title">
-        <header>
-          <div>
-            <h3 id="country-sync-modal-title">应用到其他国家</h3>
-            <p>将${sourceCountry.name}当前的登录方式与排序同步到选中的国家。</p>
-          </div>
-          <button class="mgp-country-strategy-modal-close" type="button"
-            data-action="close" aria-label="关闭">×</button>
-        </header>
-        <div class="mgp-country-sync-modal-body">
-          <div class="mgp-country-sync-source">
-            <span>策略来源</span><strong>${sourceCountry.name}</strong>
-          </div>
-          <label class="mgp-country-sync-select-all">
-            <input type="checkbox" data-action="select-all">
-            <strong>选择全部其他国家</strong>
-          </label>
-          <div class="mgp-country-sync-options">
-            ${targets
-              .map(
-                (country) => `
-                  <label class="mgp-country-strategy-region-country">
-                    <input type="checkbox" data-country-code="${country.code}">
-                    <strong>${country.name}</strong>
-                    <small>${country.english} · ${country.code}</small>
-                  </label>`,
-              )
-              .join("")}
-          </div>
-        </div>
-        <footer>
-          <span>请选择目标国家</span>
-          <button type="button" data-action="close">取消</button>
-          <button type="button" data-action="confirm" disabled>应用</button>
-        </footer>
-      </section>`;
-    document.body.append(layer);
-    state.modal = layer;
-
-    const confirm = layer.querySelector('button[data-action="confirm"]');
-    const summary = layer.querySelector("footer span");
-    const targetInputs = () =>
-      Array.from(layer.querySelectorAll("input[data-country-code]"));
-    const update = () => {
-      const checked = targetInputs().filter((input) => input.checked);
-      confirm.disabled = checked.length === 0;
-      summary.textContent = checked.length
-        ? `已选择 ${checked.length} 个目标国家`
-        : "请选择目标国家";
-      const selectAll = layer.querySelector('input[data-action="select-all"]');
-      selectAll.checked = checked.length === targetInputs().length;
-    };
-
-    layer.addEventListener("change", (event) => {
-      if (event.target.matches('input[data-action="select-all"]')) {
-        targetInputs().forEach((input) => {
-          input.checked = event.target.checked;
-        });
-      }
-      update();
-    });
-    layer.addEventListener("click", async (event) => {
-      const button = event.target.closest("button[data-action]");
-      if (!button) return;
-      if (button.dataset.action === "close") {
-        closeCountryModal();
-        return;
-      }
-      if (button.dataset.action !== "confirm") return;
-      const targetCodes = targetInputs()
-        .filter((input) => input.checked)
-        .map((input) => input.dataset.countryCode);
-      button.disabled = true;
-      button.textContent = "应用中…";
-      const applied = await applyLoginToCountries(section, sourceCode, targetCodes);
-      closeCountryModal();
-      showToast(applied ? `已应用到 ${targetCodes.length} 个国家` : "应用失败，请重试");
-    });
-    layer.querySelector("input[data-country-code]")?.focus();
   }
 
   document.addEventListener(
     "click",
     (event) => {
-      const button = event.target.closest('button[data-country-sync-proxy="true"]');
-      if (!button) return;
-      if (state.allowOriginalBatchAction) {
-        state.allowOriginalBatchAction = false;
+      const drawer = event.target.closest(".mgp-operations-drawer");
+      if (!drawer) return;
+      const instance = instances.get(drawer);
+      if (!instance) return;
+      const saveButton = event.target.closest(
+        ".mgp-sdk-drawer-footer .mgp-button.primary",
+      );
+      if (saveButton) {
+        localStorage.setItem(storageKey(instance.model.packageId), JSON.stringify(instance.model));
+        instance.savedSignature = modelSignature(instance.model);
+        instance.dirty = false;
+        updateFooterState(instance);
         return;
       }
-      event.preventDefault();
-      event.stopPropagation();
-      event.stopImmediatePropagation();
-      const section = document.querySelector("#operations-workspace-range");
-      if (section) openApplyCountryModal(section);
+      const closeButton = event.target.closest(
+        ".mgp-sdk-drawer-header > button, .mgp-sdk-drawer-footer .mgp-button.secondary",
+      );
+      if (!closeButton || !instance.dirty) return;
+      if (!window.confirm("当前运营配置有未保存修改，确定放弃修改并关闭吗？")) {
+        event.preventDefault();
+        event.stopPropagation();
+        event.stopImmediatePropagation();
+      }
     },
     true,
   );
