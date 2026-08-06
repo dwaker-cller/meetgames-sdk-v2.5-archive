@@ -247,7 +247,14 @@
   }
 
   function extractModuleFlags(drawer) {
-    const flags = Object.fromEntries(MODULES.map(([key]) => [key, true]));
+    const flags = {};
+    const packageCapabilities = String(drawer.dataset.packageCapabilities || "")
+      .split(",")
+      .map((item) => item.trim())
+      .filter(Boolean);
+    packageCapabilities.forEach((key) => {
+      flags[key === "ops-data" ? "data" : key] = true;
+    });
     drawer.querySelectorAll(".mgp-country-sdk-module-list > div").forEach((item) => {
       const title = item.querySelector(":scope > strong")?.textContent?.trim();
       const key = MODULE_KEY_BY_TITLE.get(title);
@@ -344,10 +351,12 @@
           strategy.config?.loginMethodIds || fallback.strategies[0].config.loginMethodIds,
           strategy.config?.availableLoginIds || fallback.strategies[0].config.availableLoginIds,
         ),
-        modules: {
-          ...fallback.strategies[0].config.modules,
-          ...(strategy.config?.modules || {}),
-        },
+        modules: Object.fromEntries(
+          Object.keys(fallback.strategies[0].config.modules).map((key) => [
+            key,
+            strategy.config?.modules?.[key] ?? fallback.strategies[0].config.modules[key],
+          ]),
+        ),
         compliance: {
           ...fallback.strategies[0].config.compliance,
           ...(strategy.config?.compliance || {}),
@@ -657,13 +666,13 @@
         </div>
       </section>
       <div class="osg-sdk-stack">
-        ${moduleSection("login", "登录SDK", MODULES[0][2], config.modules.login, loginSection(config), "", instance.expandedModules.has("login"))}
-        ${moduleSection("agreement", "协议SDK", MODULES[1][2], config.modules.agreement, agreementSection(config), "", instance.expandedModules.has("agreement"))}
-        ${moduleSection("payment", "支付SDK", MODULES[2][2], config.modules.payment, "", "is-compact")}
-        ${moduleSection("compliance", "合规SDK", MODULES[3][2], config.modules.compliance, complianceSection(config), "", instance.expandedModules.has("compliance"))}
-        ${moduleSection("support", "客服工具SDK", MODULES[4][2], config.modules.support, supportSection(config), "", instance.expandedModules.has("support"))}
-        ${moduleSection("data", "三方数据SDK", MODULES[5][2], config.modules.data, '<div class="osg-summary-line"><strong>已接入平台</strong><span class="osg-chip">Firebase</span><span class="osg-chip">AppsFlyer</span></div>', "is-compact", instance.expandedModules.has("data"))}
-        ${moduleSection("advertising", "广告变现SDK", MODULES[6][2], config.modules.advertising, '<div class="osg-summary-line"><strong>广告平台</strong><span>跟随组合包中的广告变现配置。</span></div>', "is-compact", instance.expandedModules.has("advertising"))}
+        ${Object.hasOwn(config.modules, "login") ? moduleSection("login", "登录SDK", MODULES[0][2], config.modules.login, loginSection(config), "", instance.expandedModules.has("login")) : ""}
+        ${Object.hasOwn(config.modules, "agreement") ? moduleSection("agreement", "协议SDK", MODULES[1][2], config.modules.agreement, agreementSection(config), "", instance.expandedModules.has("agreement")) : ""}
+        ${Object.hasOwn(config.modules, "payment") ? moduleSection("payment", "支付SDK", MODULES[2][2], config.modules.payment, "", "is-compact") : ""}
+        ${Object.hasOwn(config.modules, "compliance") ? moduleSection("compliance", "合规SDK", MODULES[3][2], config.modules.compliance, complianceSection(config), "", instance.expandedModules.has("compliance")) : ""}
+        ${Object.hasOwn(config.modules, "support") ? moduleSection("support", "客服工具SDK", MODULES[4][2], config.modules.support, supportSection(config), "", instance.expandedModules.has("support")) : ""}
+        ${Object.hasOwn(config.modules, "data") ? moduleSection("data", "三方数据SDK", MODULES[5][2], config.modules.data, '<div class="osg-summary-line"><strong>已接入平台</strong><span class="osg-chip">Firebase</span><span class="osg-chip">AppsFlyer</span></div>', "is-compact", instance.expandedModules.has("data")) : ""}
+        ${Object.hasOwn(config.modules, "advertising") ? moduleSection("advertising", "广告变现SDK", MODULES[6][2], config.modules.advertising, '<div class="osg-summary-line"><strong>广告平台</strong><span>跟随渠道包中的广告变现配置。</span></div>', "is-compact", instance.expandedModules.has("advertising")) : ""}
         ${runtimeSection(config)}
       </div>`;
     instance.root

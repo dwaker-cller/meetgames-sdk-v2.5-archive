@@ -564,3 +564,758 @@
   white-space: nowrap;
   font-size: 10px;
 }
+
+/* V2.0: configuration stores reusable capability parameters; channel bundles are built separately. */
+.mgp-foundation-page:has(.mgp-config-step-navigation) > #config-panel-release {
+  display: grid !important;
+}
+
+#config-panel-release > .mgp-config-body {
+  order: initial !important;
+  padding: 22px 24px !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+#config-panel-release > .mgp-config-footer {
+  position: static !important;
+  inset: auto !important;
+  order: initial !important;
+  margin: 0 !important;
+  padding: 14px 24px !important;
+}
+
+.mgp-config-card-grid > [data-config-card="release"] {
+  grid-column: auto !important;
+}
+
+.mgp-config-card-grid > [data-config-card="release"] .mgp-config-card-icon {
+  background: #fff6e8;
+  color: #c56a08;
+}
+
+#config-panel-release.mgp-config-card-modal {
+  width: min(1120px, calc(100vw - 64px)) !important;
+  max-width: 1120px !important;
+}
+
+#config-panel-release .mgp-selected-channel-head,
+#config-panel-release .mgp-selected-channel-summary {
+  grid-template-columns: minmax(132px, .72fr) minmax(190px, 1fr) minmax(190px, 1fr) 112px 68px !important;
+}
+
+#config-panel-release .mgp-selected-channel-summary {
+  cursor: pointer;
+}
+
+#config-panel-release .mgp-selected-channel-details {
+  display: block !important;
+  padding: 14px 18px 16px !important;
+}
+
+#config-panel-release .mgp-inline-payment-fields {
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+}
+
+.mgp-config-card.configured,
+.mgp-config-card.configured.active,
+.mgp-config-card.configured:hover,
+.mgp-config-card.configured:focus-visible {
+  border-color: #722ed1 !important;
+  box-shadow: 0 0 0 1px rgba(114, 46, 209, .16) !important;
+}
+
+.mgp-advertising-provider-choices {
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+}
+
+#config-panel-release .mgp-channel-picker-fields {
+  grid-template-columns: minmax(220px, .8fr) minmax(300px, 1.2fr) !important;
+}
+
+.mgp-channel-package-page {
+  width: min(1440px, 100vw - 244px);
+  max-width: none;
+  padding: 24px;
+}
+
+.mgp-foundation-page > .mgp-page-heading,
+.mgp-operations-plan-page > .mgp-page-heading {
+  min-height: auto;
+  margin-bottom: 12px;
+}
+
+.mgp-sdk-release-list-toolbar {
+  min-height: 64px !important;
+  padding: 12px 16px !important;
+}
+
+.mgp-sdk-release-game-selector {
+  display: grid;
+  grid-template-columns: auto 230px;
+  align-items: center;
+  gap: 10px;
+  color: #5f697a;
+  font-size: 12px;
+}
+
+.mgp-sdk-release-game-selector select {
+  width: 230px;
+  height: 40px;
+  padding: 0 11px;
+  border: 1px solid #cfd7e2;
+  border-radius: 8px;
+  background: #fff;
+  color: #263044;
+  font: inherit;
+}
+
+.mgp-package-build-context {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  min-height: 64px;
+  margin-bottom: 14px;
+  padding: 12px 16px;
+  border: 1px solid var(--mgp-border, #e2e7ee);
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 6px 22px rgba(31, 37, 51, .04);
+}
+
+.mgp-package-build-context label {
+  display: grid;
+  grid-template-columns: auto 230px;
+  align-items: center;
+  gap: 10px;
+  color: #5f697a;
+  font-size: 12px;
+}
+
+.mgp-package-build-context select,
+.mgp-channel-package-fields select,
+.mgp-channel-package-fields input {
+  height: 40px;
+  padding: 0 11px;
+  border: 1px solid #cfd7e2;
+  border-radius: 8px;
+  background: #fff;
+  color: #263044;
+  font: inherit;
+}
+
+.mgp-package-build-context p {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin: 0;
+  color: #617083;
+  font-size: 12px;
+}
+
+.mgp-package-build-context p svg {
+  color: #0b8f70;
+}
+
+.mgp-channel-package-builder {
+  overflow: hidden;
+  border-radius: 12px;
+}
+
+.mgp-channel-package-builder > header {
+  min-height: 78px;
+  background: #fff;
+}
+
+.mgp-channel-package-builder-body {
+  display: grid;
+  gap: 16px;
+  padding: 18px 20px 20px;
+  background: #f7f9fc;
+}
+
+.mgp-channel-package-builder-body > section {
+  padding: 18px;
+  border: 1px solid #e1e6ee;
+  border-radius: 10px;
+  background: #fff;
+}
+
+.mgp-channel-package-section-heading {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.mgp-channel-package-section-heading > span:first-child {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #722ed1;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.mgp-channel-package-section-heading h3,
+.mgp-channel-package-section-heading p {
+  margin: 0;
+}
+
+.mgp-channel-package-section-heading h3 {
+  color: #202736;
+  font-size: 15px;
+}
+
+.mgp-channel-package-section-heading p {
+  margin-top: 4px;
+  color: #7a8597;
+  font-size: 12px;
+}
+
+.mgp-channel-package-fields {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.mgp-channel-package-fields label {
+  display: grid;
+  align-content: start;
+  gap: 7px;
+  min-width: 0;
+  color: #4d596b;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.mgp-channel-package-fields label small {
+  min-height: 18px;
+  color: #8993a3;
+  font-size: 10px;
+  font-weight: 400;
+  line-height: 1.45;
+}
+
+.mgp-channel-package-fields label.has-error select,
+.mgp-channel-package-fields label.has-error input {
+  border-color: #d84a4a;
+  box-shadow: 0 0 0 3px rgba(216, 74, 74, .08);
+}
+
+.mgp-channel-package-fields label.has-error small {
+  color: #c83e48;
+}
+
+.mgp-channel-package-select-control {
+  position: relative;
+  min-width: 0;
+}
+
+.mgp-channel-package-select-control select {
+  width: 100%;
+}
+
+.mgp-channel-package-select-control > .mgp-platform-logo,
+.mgp-channel-package-select-control > .mgp-store-logo {
+  position: absolute;
+  z-index: 1;
+  top: 50%;
+  left: 11px;
+  pointer-events: none;
+  transform: translateY(-50%);
+}
+
+.mgp-channel-package-select-control.has-logo select {
+  padding-left: 42px;
+}
+
+.mgp-channel-package-capability-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.mgp-channel-package-capability-grid > button {
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 9px;
+  min-height: 66px;
+  padding: 10px 11px;
+  border: 1px solid #d9dfe8;
+  border-radius: 8px;
+  background: #fff;
+  color: #344052;
+  text-align: left;
+}
+
+.mgp-channel-package-capability-grid > button.selected {
+  border-color: #a980dc;
+  background: #faf7ff;
+  box-shadow: inset 3px 0 0 #722ed1;
+}
+
+.mgp-channel-package-capability-grid > button > span:nth-child(2) {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.mgp-channel-package-capability-grid strong {
+  font-size: 12px;
+}
+
+.mgp-channel-package-capability-grid small {
+  color: #818b9b;
+  font-size: 10px;
+}
+
+.mgp-channel-package-capability-grid em {
+  color: #97670b;
+  white-space: nowrap;
+  font-size: 10px;
+  font-style: normal;
+}
+
+.mgp-channel-package-capability-grid button.configured em {
+  color: #087c5f;
+}
+
+.mgp-channel-package-capability-check {
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  border: 1px solid #b9c2cf;
+  border-radius: 4px;
+  color: #fff;
+  background: #fff;
+}
+
+.mgp-channel-package-capability-grid button.selected .mgp-channel-package-capability-check {
+  border-color: #722ed1;
+  background: #722ed1;
+}
+
+.mgp-channel-package-capability-grid.has-error {
+  padding: 8px;
+  border: 1px solid #d84a4a;
+  border-radius: 10px;
+}
+
+.mgp-channel-package-error {
+  margin: 8px 0 0;
+  color: #c83e48;
+  font-size: 11px;
+}
+
+.mgp-channel-package-builder > footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  min-height: 64px;
+  padding: 12px 20px;
+  border-top: 1px solid #e4e9f1;
+  background: #fff;
+}
+
+.mgp-channel-package-builder > footer > span {
+  color: #748093;
+  font-size: 12px;
+}
+
+.mgp-channel-package-builder > footer > div {
+  display: flex;
+  gap: 10px;
+}
+
+@media (max-width: 1100px) {
+  .mgp-channel-package-capability-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .mgp-channel-package-fields {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* V2.0 workbench feedback: direct SDK download flow and reusable configuration summaries. */
+.mgp-config-card {
+  height: auto !important;
+  min-height: 126px !important;
+}
+
+.mgp-config-card-summary {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+  margin-top: 1px;
+}
+
+.mgp-config-card-summary > em {
+  flex: none;
+  padding: 2px 6px;
+  border-radius: 999px;
+  background: #f0e8ff;
+  color: #722ed1;
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 700;
+}
+
+.mgp-config-card-summary-items {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.mgp-config-card-summary-item {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 4px;
+  max-width: 118px;
+  color: #5d477b;
+  font-size: 10px;
+}
+
+.mgp-config-card-summary-item.text {
+  overflow: hidden;
+  padding: 2px 6px;
+  border: 1px solid #e4d6fb;
+  border-radius: 999px;
+  background: #fbf8ff;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mgp-config-card-summary-item .mgp-login-brand {
+  width: 20px;
+  height: 20px;
+  font-size: 9px;
+}
+
+.mgp-channel-package-fields {
+  grid-template-columns: minmax(0, 2fr) minmax(300px, .8fr) !important;
+  align-items: start;
+}
+
+.mgp-channel-package-channel-field {
+  display: grid;
+  gap: 7px;
+  min-width: 0;
+  color: #4d596b;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.mgp-channel-package-channel-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.mgp-channel-package-channel-grid > button {
+  display: grid;
+  grid-template-columns: 30px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  min-height: 64px;
+  padding: 9px 10px;
+  border: 1px solid #d8dee8;
+  border-radius: 9px;
+  background: #fff;
+  color: #344052;
+  text-align: left;
+  cursor: pointer;
+}
+
+.mgp-channel-package-channel-grid > button:hover,
+.mgp-channel-package-channel-grid > button:focus-visible {
+  border-color: #9f78d5;
+}
+
+.mgp-channel-package-channel-grid > button.selected {
+  border-color: #722ed1;
+  background: #faf7ff;
+  box-shadow: inset 3px 0 0 #722ed1;
+}
+
+.mgp-channel-package-channel-grid > button > span:nth-child(2) {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+}
+
+.mgp-channel-package-channel-grid strong {
+  overflow: hidden;
+  font-size: 11px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mgp-channel-package-channel-grid small {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: #7c8798;
+  font-size: 9px;
+}
+
+.mgp-channel-package-channel-grid em {
+  color: #722ed1;
+  white-space: nowrap;
+  font-size: 9px;
+  font-style: normal;
+}
+
+.mgp-channel-package-channel-field.has-error .mgp-channel-package-channel-grid {
+  padding: 6px;
+  border: 1px solid #d84a4a;
+  border-radius: 10px;
+}
+
+.mgp-channel-package-capability-grid > .mgp-channel-package-capability-card {
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 9px;
+  min-height: 82px;
+  padding: 10px 11px;
+  border: 1px solid #d9dfe8;
+  border-radius: 8px;
+  background: #fff;
+  color: #344052;
+  text-align: left;
+  cursor: pointer;
+}
+
+.mgp-channel-package-capability-grid > .mgp-channel-package-capability-card.disabled {
+  cursor: not-allowed;
+  opacity: .55;
+}
+
+.mgp-channel-package-capability-grid > .mgp-channel-package-capability-card.locked {
+  cursor: not-allowed;
+}
+
+.mgp-sdk-download-fab {
+  position: fixed;
+  z-index: 500;
+  right: 28px;
+  bottom: 28px;
+  min-width: 122px;
+  height: 46px;
+  padding: 0 22px;
+  border: 0;
+  border-radius: 23px;
+  background: #722ed1;
+  color: #fff;
+  box-shadow: 0 12px 28px rgba(114, 46, 209, .28);
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.mgp-sdk-download-fab:hover,
+.mgp-sdk-download-fab:focus-visible {
+  background: #531dab;
+  outline: 3px solid rgba(114, 46, 209, .18);
+  outline-offset: 3px;
+}
+
+.mgp-channel-package-capability-grid > .mgp-channel-package-capability-card.selected {
+  border-color: #a980dc;
+  background: #faf7ff;
+  box-shadow: inset 3px 0 0 #722ed1;
+}
+
+.mgp-channel-package-capability-card.selected .mgp-channel-package-capability-check {
+  border-color: #722ed1;
+  background: #722ed1;
+}
+
+.mgp-channel-package-capability-card > span:nth-child(2) {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.mgp-channel-package-capability-card strong {
+  font-size: 12px;
+}
+
+.mgp-channel-package-capability-card small {
+  color: #818b9b;
+  font-size: 10px;
+  line-height: 1.45;
+}
+
+.mgp-channel-package-capability-actions {
+  display: grid;
+  justify-items: end;
+  gap: 6px;
+}
+
+.mgp-channel-package-capability-actions em {
+  color: #97670b;
+  white-space: nowrap;
+  font-size: 10px;
+  font-style: normal;
+}
+
+.mgp-channel-package-capability-card.configured .mgp-channel-package-capability-actions em {
+  color: #087c5f;
+}
+
+.mgp-capability-config-action {
+  padding: 2px 7px;
+  border: 1px solid #b58de7;
+  border-radius: 5px;
+  background: #fff;
+  color: #722ed1;
+  cursor: pointer;
+  font-size: 10px;
+  white-space: nowrap;
+}
+
+.mgp-sdk-quick-config-backdrop {
+  z-index: 1200 !important;
+}
+
+.mgp-sdk-quick-config-modal {
+  z-index: 1210 !important;
+}
+
+@media (max-width: 1180px) {
+  .mgp-channel-package-channel-grid,
+  .mgp-channel-package-capability-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .mgp-channel-package-fields {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* V2.0 workbench feedback: compact one-line cards and in-page SDK tabs. */
+.mgp-config-card-copy > small {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mgp-config-card-summary {
+  gap: 0;
+  overflow: hidden;
+  color: #777d8f;
+  font-size: 10px;
+  line-height: 20px;
+  white-space: nowrap;
+}
+
+.mgp-config-card-summary > em {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: inherit;
+  font-size: inherit;
+  font-style: normal;
+  font-weight: 400;
+}
+
+.mgp-config-card-summary-items {
+  gap: 5px;
+  overflow: hidden;
+}
+
+.mgp-config-card-summary-item {
+  max-width: none;
+  overflow: visible;
+  color: inherit;
+  font-size: inherit;
+  text-overflow: clip;
+  white-space: nowrap;
+}
+
+.mgp-config-card-summary-item.text {
+  overflow: visible;
+  max-width: none;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: inherit;
+  text-overflow: clip;
+}
+
+.mgp-config-card-summary-item.text + .mgp-config-card-summary-item.text::before {
+  content: "、";
+}
+
+.mgp-config-card-summary-item .mgp-store-logo,
+.mgp-config-card-summary-item .mgp-login-brand {
+  flex: none;
+}
+
+.mgp-sdk-workbench-tabs {
+  display: flex;
+  align-items: end;
+  gap: 4px;
+  min-height: 42px;
+  margin: 12px 0 0 14px;
+}
+
+.mgp-sdk-workbench-tabs > button {
+  min-width: 104px;
+  height: 42px;
+  padding: 0 18px;
+  border: 1px solid #dfe4ec;
+  border-bottom-color: #d2d8e2;
+  border-radius: 8px 8px 0 0;
+  background: #f7f9fc;
+  color: #667286;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.mgp-sdk-workbench-tabs > button.active {
+  border-color: #cfc1e8;
+  border-bottom-color: #fff;
+  background: #fff;
+  color: #722ed1;
+}
+
+.mgp-foundation-page > .mgp-sdk-workbench-tabs {
+  order: 2;
+  position: relative;
+  z-index: 2;
+  margin-bottom: -1px;
+}
+
+.mgp-foundation-page:has(.mgp-config-step-navigation) > .mgp-config-step-navigation {
+  order: 3;
+  margin-top: 0 !important;
+}
+
+.mgp-channel-package-page > .mgp-sdk-workbench-tabs {
+  margin-bottom: -1px;
+}
+
+.mgp-channel-package-page > .mgp-channel-package-builder {
+  border-top-left-radius: 0;
+}
