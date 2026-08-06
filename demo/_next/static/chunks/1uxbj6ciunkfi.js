@@ -2,7 +2,7 @@
     "use strict";
     if ("object" == typeof document && !document.getElementById("mgp-sdk-card-redesign-styles")) {
         let e = document.createElement("link");
-        e.id = "mgp-sdk-card-redesign-styles", e.rel = "stylesheet", e.href = "./demo-sdk-card-redesign.css?v=20260806-sdk-locking-feedback-4", 
+        e.id = "mgp-sdk-card-redesign-styles", e.rel = "stylesheet", e.href = "./demo-sdk-card-redesign.css?v=20260806-sdk-quick-title-feedback-14", 
         document.head.appendChild(e);
     }
     var a = e.i(51503), n = e.i(97424), s = e.i(70391), l = e.i(12951);
@@ -106,34 +106,34 @@
     var K = e.i(79895), z = e.i(58414), P = e.i(30770), O = e.i(5437), M = e.i(16213), L = e.i(90264), T = e.i(8406);
     let R = [ {
         id: "release",
-        title: "支付方式",
-        short: "支付方式",
+        title: "支付",
+        short: "支付",
         description: "维护渠道支付参数，SDK 下载时自动引用。",
         icon: u.CreditCard,
         help: "https://docs.meetgames.com/sdk/channel"
     }, {
         id: "login",
-        title: "登录方式",
-        short: "登录方式",
+        title: "登录",
+        short: "登录",
         description: "维护登录方式及对应平台参数。",
         icon: $.LogIn,
         help: "https://docs.meetgames.com/sdk/login"
     }, {
         id: "agreement",
-        title: "协议配置",
-        short: "协议",
+        title: "协议与隐私",
+        short: "协议与隐私",
         description: "维护隐私政策、用户协议及儿童隐私。",
         icon: b.FileCheck2
     }, {
         id: "compliance",
-        title: "合规配置",
+        title: "合规",
         short: "合规",
         description: "配置年龄与 KWS 验证参数。",
         icon: P.ShieldCheck,
         help: "https://docs.meetgames.com/sdk/compliance"
     }, {
         id: "data",
-        title: "三方数据配置",
+        title: "三方数据",
         short: "三方数据",
         description: "配置 Firebase、AppsFlyer 或 Adjust。",
         icon: g.Database,
@@ -147,8 +147,8 @@
         help: "https://docs.meetgames.com/sdk/advertising"
     }, {
         id: "support",
-        title: "客服配置",
-        short: "客服",
+        title: "客服工具",
+        short: "客服工具",
         description: "配置在线客服、表单反馈、FAQ 或智能客服。",
         icon: N.Headphones
     } ], G = [ {
@@ -925,25 +925,25 @@
         link: ""
     }), ec = [ {
         id: "login",
-        title: "登录SDK"
+        title: "登录"
     }, {
         id: "payment",
-        title: "支付SDK"
+        title: "支付"
     }, {
         id: "agreement",
-        title: "协议SDK"
+        title: "协议与隐私"
     }, {
         id: "compliance",
-        title: "合规SDK"
+        title: "合规"
     }, {
         id: "support",
-        title: "客服工具SDK"
+        title: "客服工具"
     }, {
         id: "ops-data",
-        title: "三方数据SDK"
+        title: "三方数据"
     }, {
         id: "advertising",
-        title: "广告变现SDK"
+        title: "广告变现"
     } ], em = {
         login: 4.8,
         payment: 3.2,
@@ -1496,9 +1496,9 @@
         return (0, a.jsxs)("div", {
             className: "mgp-page-heading",
             children: [ (0, a.jsxs)("div", {
-                children: [ (0, a.jsx)("span", {
+                children: [ e ? (0, a.jsx)("span", {
                     children: e
-                }), (0, a.jsx)("h1", {
+                }) : null, (0, a.jsx)("h1", {
                     children: n
                 }), (0, a.jsx)("p", {
                     children: s
@@ -3967,19 +3967,19 @@
                     className: "mgp-config-panel mgp-foundation-panel mgp-config-card-modal mgp-sdk-quick-config-modal",
                     role: "dialog",
                     "aria-modal": "true",
-                    "aria-label": `快速配置${step.title}`,
+                    "aria-label": step.title,
                     children: [ (0, a.jsxs)("header", {
                         className: "mgp-config-card-modal-header",
                         children: [ (0, a.jsxs)("div", {
-                            children: [ (0, a.jsxs)("h2", {
-                                children: [ "快速配置 · ", step.title ]
+                            children: [ (0, a.jsx)("h2", {
+                                children: step.title
                             }), (0, a.jsx)("p", {
-                                children: "完成后继续当前 SDK 出包流程，无需返回配置中心。"
+                                children: step.description
                             }) ]
                         }), (0, a.jsx)("button", {
                             type: "button",
                             className: "mgp-icon-button",
-                            "aria-label": `关闭${step.title}快速配置`,
+                            "aria-label": `关闭${step.title}弹窗`,
                             onClick: onClose,
                             children: (0, a.jsx)(T.X, {
                                 size: 18
@@ -4030,18 +4030,13 @@
                         showErrors: showErrors
                     }) : null, (0, a.jsxs)("footer", {
                         className: "mgp-config-footer",
-                        children: [ (0, a.jsx)("button", {
-                            type: "button",
-                            className: "mgp-button secondary",
-                            onClick: onClose,
-                            children: "暂时关闭"
-                        }), (0, a.jsxs)("button", {
+                        children: [ (0, a.jsxs)("button", {
                             type: "button",
                             className: "mgp-button primary",
                             onClick: complete,
                             children: [ (0, a.jsx)(z.Save, {
                                 size: 16
-                            }), "保存并继续出包" ]
+                            }), "保存" ]
                         }) ]
                     }) ]
                 })
@@ -4073,7 +4068,7 @@
         });
     }
     function ChannelPackageBuilder({gameName: gameName, games: games, onGameChange: onGameChange, gameProfile: gameProfile, packages: packages, config: config, onSave: onSave, onDownload: onDownload, onEnterOperations: onEnterOperations, onDelete: onDelete, onUpdateConfig: onUpdateConfig, onBackToConfig: onBackToConfig, toast: toast}) {
-        let [editingId, setEditingId] = (0, n.useState)(null), [quickConfigCapability, setQuickConfigCapability] = (0, n.useState)(null), [form, setForm] = (0, 
+        let [editingId, setEditingId] = (0, n.useState)(null), [quickConfigCapability, setQuickConfigCapability] = (0, n.useState)(null), [channelDrafts, setChannelDrafts] = (0, n.useState)({}), [downloadConfirmation, setDownloadConfirmation] = (0, n.useState)(null), [form, setForm] = (0, 
         n.useState)({
             platform: "",
             storeId: "",
@@ -4097,8 +4092,21 @@
                 includedCapabilities: eK(e).filter(a => getCapabilityConfigurationStatus(a, config, e.storeId).ready)
             }), setErrors({});
         }, selectChannel = e => {
-            let a = e$(e), n = packages.find(a => a.storeId === e);
-            n ? startEdit(n) : (setEditingId(null), setForm({
+            let a = e$(e), nextDrafts = {
+                ...channelDrafts
+            };
+            form.storeId && (nextDrafts[form.storeId] = {
+                editingId: editingId,
+                form: {
+                    ...form,
+                    includedCapabilities: [ ...form.includedCapabilities ]
+                }
+            }), setChannelDrafts(nextDrafts);
+            let saved = nextDrafts[e], existing = packages.find(a => a.storeId === e);
+            saved ? (setEditingId(saved.editingId || null), setForm({
+                ...saved.form,
+                includedCapabilities: saved.form.includedCapabilities.filter(a => getCapabilityConfigurationStatus(a, config, e).ready)
+            }), setErrors({})) : existing ? startEdit(existing) : (setEditingId(null), setForm({
                 platform: a?.platform || "",
                 storeId: e,
                 packageName: "",
@@ -4118,21 +4126,37 @@
                 includedCapabilities: Array.from(new Set(readyCapabilities)),
                 updatedAt: (new Date).toISOString()
             };
-            !1 !== onSave(i) && (setEditingId(i.id), onDownload(i), toast("SDK 包已生成并开始下载"));
+            setDownloadConfirmation(i);
+        }, confirmDownload = () => {
+            let i = downloadConfirmation;
+            i && !1 !== onSave(i) && (setEditingId(i.id), setChannelDrafts(e => ({
+                ...e,
+                [i.storeId]: {
+                    editingId: i.id,
+                    form: {
+                        ...form,
+                        packageName: i.packageName,
+                        includedCapabilities: [ ...i.includedCapabilities ]
+                    }
+                }
+            })), onDownload(i), toast("SDK 包已生成并开始下载"), setDownloadConfirmation(null));
         };
+        (0, n.useEffect)(() => {
+            setChannelDrafts({}), setDownloadConfirmation(null), setQuickConfigCapability(null), startNew();
+        }, [ gameName ]);
         return (0, a.jsxs)("div", {
             className: "mgp-page mgp-channel-package-page",
             children: [ (0, a.jsx)(eZ, {
-                eyebrow: "发行服务 / SDK 工具",
-                title: "SDK下载",
-                description: `当前游戏：${gameName}。直接选择渠道、填写包名与 SDK 能力后出包。`,
+                eyebrow: null,
+                title: "配置中心",
+                description: "维护游戏级 SDK 能力参数，为 SDK 下载准备可复用能力配置。",
                 action: (0, a.jsxs)("button", {
                     type: "button",
                     className: "mgp-button secondary",
                     onClick: onBackToConfig,
                     children: [ (0, a.jsx)(s.ArrowLeft, {
                         size: 15
-                    }), "返回配置中心" ]
+                    }), "返回SDK配置" ]
                 })
             }), (0, a.jsx)(SdkWorkbenchTabs, {
                 active: "download",
@@ -4143,26 +4167,33 @@
                 "data-build-mode": editingId ? "edit" : "create",
                 children: [ (0, a.jsxs)("div", {
                     className: "mgp-channel-package-builder-body",
-                    children: [ (0, a.jsxs)("section", {
+                    children: [ (0, a.jsx)("div", {
+                        className: "mgp-config-card-heading mgp-foundation-panel mgp-channel-package-download-heading",
+                        children: (0, a.jsxs)("div", {
+                            className: "mgp-config-module-heading",
+                            children: [ (0, a.jsx)("h3", {
+                                className: "mgp-plain-section-title",
+                                children: "SDK下载"
+                            }), (0, a.jsx)("p", {
+                                children: "选择发行渠道、填写包名并按渠道确认 SDK 能力，生成可接入游戏的渠道 SDK 包。"
+                            }) ]
+                        })
+                    }), (0, a.jsxs)("section", {
                         className: "mgp-channel-package-target",
                         children: [ (0, a.jsxs)("div", {
                             className: "mgp-channel-package-section-heading",
                             children: [ (0, a.jsx)("span", {
                                 children: "1"
                             }), (0, a.jsxs)("div", {
-                                children: [ (0, a.jsx)("h3", {
-                                    children: "发行渠道与包名"
-                                }), (0, a.jsx)("p", {
-                                    children: "直接选择四个目标渠道之一；已有包的渠道会自动进入更新状态。"
-                                }) ]
+                                children: (0, a.jsx)("h3", {
+                                    children: "选择发行渠道"
+                                })
                             }) ]
                         }), (0, a.jsxs)("div", {
                             className: "mgp-channel-package-fields",
                             children: [ (0, a.jsxs)("div", {
                                 className: `mgp-channel-package-channel-field ${errors.storeId ? "has-error" : ""}`,
-                                children: [ (0, a.jsx)("span", {
-                                    children: "选择发行渠道"
-                                }), (0, a.jsx)("div", {
+                                children: [ (0, a.jsx)("div", {
                                     className: "mgp-channel-package-channel-grid",
                                     role: "radiogroup",
                                     "aria-label": "选择发行渠道",
@@ -4227,20 +4258,10 @@
                             children: [ (0, a.jsx)("span", {
                                 children: "2"
                             }), (0, a.jsxs)("div", {
-                                children: [ (0, a.jsx)("h3", {
+                                children: (0, a.jsx)("h3", {
                                     children: "选择 SDK 能力"
-                                }), (0, a.jsx)("p", {
-                                    children: "能力状态会随所选渠道联动；待配置项可在当前页面直接补充。"
-                                }) ]
-                            }), form.storeId ? (0, a.jsx)("button", {
-                                type: "button",
-                                className: "mgp-text-action",
-                                onClick: () => setForm(e => ({
-                                    ...e,
-                                    includedCapabilities: configuredCapabilitiesFor(e.storeId)
-                                })),
-                                children: "恢复默认选择"
-                            }) : null ]
+                                })
+                            }) ]
                         }), (0, a.jsx)("div", {
                             className: `mgp-channel-package-capability-grid ${errors.capabilities ? "has-error" : ""}`,
                             role: "group",
@@ -4302,19 +4323,14 @@
                     children: [ (0, a.jsx)("span", {
                         children: form.storeId ? `已选择 ${form.includedCapabilities.length} / ${ec.length} 项能力` : "选择渠道后自动带入已配置能力"
                     }), (0, a.jsxs)("div", {
-                        children: [ (0, a.jsx)("button", {
-                            type: "button",
-                            className: "mgp-button secondary",
-                            onClick: startNew,
-                            children: "清空"
-                        }), (0, a.jsxs)("button", {
+                        children: (0, a.jsxs)("button", {
                             type: "button",
                             className: "mgp-button primary",
                             onClick: submit,
                             children: [ (0, a.jsx)(z.Save, {
                                 size: 16
                             }), "下载" ]
-                        }) ]
+                        })
                     }) ]
                 }) ]
             }), quickConfigCapability ? (0, a.jsx)(QuickConfigEditor, {
@@ -4328,6 +4344,60 @@
                     includedCapabilities: a.includedCapabilities.includes(e) ? a.includedCapabilities : [ ...a.includedCapabilities, e ]
                 })),
                 toast: toast
+            }) : null, downloadConfirmation ? (0, a.jsx)("div", {
+                className: "mgp-modal-backdrop mgp-sdk-download-confirm-backdrop",
+                role: "presentation",
+                children: (0, a.jsxs)("section", {
+                    className: "mgp-modal mgp-sdk-download-confirm-modal",
+                    role: "dialog",
+                    "aria-modal": "true",
+                    "aria-label": "确认下载SDK包",
+                    children: [ (0, a.jsxs)("header", {
+                        children: [ (0, a.jsx)("h2", {
+                            children: "确认下载"
+                        }), (0, a.jsx)("p", {
+                            children: "请确认本次生成的渠道 SDK 包信息。"
+                        }) ]
+                    }), (0, a.jsxs)("div", {
+                        className: "mgp-sdk-download-confirm-content",
+                        children: [ (0, a.jsxs)("dl", {
+                            children: [ (0, a.jsx)("dt", {
+                                children: "游戏名称"
+                            }), (0, a.jsx)("dd", {
+                                children: gameName
+                            }), (0, a.jsx)("dt", {
+                                children: "发行渠道"
+                            }), (0, a.jsx)("dd", {
+                                children: e$(downloadConfirmation.storeId)?.name || downloadConfirmation.storeId
+                            }), (0, a.jsx)("dt", {
+                                children: "包名"
+                            }), (0, a.jsx)("dd", {
+                                children: downloadConfirmation.packageName
+                            }) ]
+                        }), (0, a.jsxs)("section", {
+                            children: [ (0, a.jsx)("strong", {
+                                children: "SDK 能力"
+                            }), (0, a.jsx)("div", {
+                                className: "mgp-sdk-download-confirm-capabilities",
+                                children: downloadConfirmation.includedCapabilities.map(e => (0, a.jsx)("span", {
+                                    children: ec.find(a => a.id === e)?.title || e
+                                }, e))
+                            }) ]
+                        }) ]
+                    }), (0, a.jsxs)("footer", {
+                        children: [ (0, a.jsx)("button", {
+                            type: "button",
+                            className: "mgp-button secondary",
+                            onClick: () => setDownloadConfirmation(null),
+                            children: "取消"
+                        }), (0, a.jsx)("button", {
+                            type: "button",
+                            className: "mgp-button primary",
+                            onClick: confirmDownload,
+                            children: "确认并生成"
+                        }) ]
+                    }) ]
+                })
             }) : null ]
         });
     }
@@ -4345,11 +4415,11 @@
         return (0, a.jsxs)("div", {
             className: "mgp-page mgp-foundation-page",
             children: [ (0, a.jsx)(eZ, {
-                eyebrow: "发行服务 / SDK 工具",
+                eyebrow: null,
                 title: "配置中心",
-                description: "维护游戏级 SDK 能力参数，为 SDK 下载准备可复用能力配置。"
-            }), (0, a.jsxs)("section", {
-                className: "mgp-foundation-toolbar",
+                description: "维护游戏级 SDK 能力参数，为 SDK 下载准备可复用能力配置。",
+                action: (0, a.jsxs)("section", {
+                className: "mgp-foundation-toolbar mgp-foundation-toolbar-inline",
                 children: [ (0, a.jsx)("div", {
                     className: "mgp-foundation-toolbar-row",
                     children: "home" === v ? (0, a.jsxs)(a.Fragment, {
@@ -4403,6 +4473,7 @@
                         }) ]
                     })
                 }) ]
+            })
             }), (0, a.jsx)(SdkWorkbenchTabs, {
                 active: "config",
                 onConfig: () => {},
@@ -4504,16 +4575,24 @@
                             }), (0, a.jsx)("p", {
                                 children: _.description
                             }) ]
-                        }), (0, a.jsx)("button", {
-                            type: "button",
-                            className: "mgp-icon-button",
-                            "aria-label": `关闭${_.title}弹窗`,
-                            onClick: () => {
-                                H(_.id) && g[_.id] && j(_.id), U(null), u(-1);
-                            },
-                            children: (0, a.jsx)(T.X, {
-                                size: 18
-                            })
+                        }), (0, a.jsxs)("div", {
+                            className: "mgp-config-card-modal-header-actions",
+                            children: [ "login" === _.id ? (0, a.jsx)("button", {
+                                type: "button",
+                                className: "mgp-button secondary mgp-login-csv-import",
+                                onClick: () => {},
+                                children: "批量导入"
+                            }) : null, (0, a.jsx)("button", {
+                                type: "button",
+                                className: "mgp-icon-button",
+                                "aria-label": `关闭${_.title}弹窗`,
+                                onClick: () => {
+                                    H(_.id) && g[_.id] && j(_.id), U(null), u(-1);
+                                },
+                                children: (0, a.jsx)(T.X, {
+                                    size: 18
+                                })
+                            }) ]
                         }) ]
                     }), "release" === _.id ? (0, a.jsx)(ar, {
                         config: c.release,
@@ -4574,15 +4653,6 @@
                         className: "mgp-config-footer",
                         children: [ (0, a.jsxs)("button", {
                             type: "button",
-                            className: "mgp-button secondary mgp-config-return-home",
-                            onClick: () => {
-                                U(null), u(-1);
-                            },
-                            children: [ (0, a.jsx)(s.ArrowLeft, {
-                                size: 16
-                            }), "关闭" ]
-                        }), (0, a.jsxs)("button", {
-                            type: "button",
                             className: "mgp-button primary",
                             onClick: () => {
                                 if ("release" === _.id) {
@@ -4601,7 +4671,7 @@
                             },
                             children: [ (0, a.jsx)(z.Save, {
                                 size: 16
-                            }), "release" === _.id ? "保存支付方式" : "完成" ]
+                            }), "保存" ]
                         }) ]
                     }) ]
                 }) : null ]
@@ -5874,29 +5944,30 @@
         }, [ p, h ]), (0, a.jsxs)("div", {
             className: "mgp-page mgp-sdk-page mgp-operations-plan-page",
             children: [ (0, a.jsx)(eZ, {
-                eyebrow: "发行服务 / SDK 工具",
+                eyebrow: null,
                 title: "运营配置",
-                description: "运营配置直接承接 SDK 下载生成的渠道包，用于维护发行范围、区域化策略、SDK 能力启停与运行开关。"
-            }), (0, a.jsx)("section", {
-                className: "mgp-foundation-toolbar mgp-operations-game-toolbar",
-                children: (0, a.jsx)("div", {
-                    className: "mgp-foundation-toolbar-row",
-                    children: (0, a.jsxs)("label", {
-                        children: [ (0, a.jsx)("span", {
-                            children: "游戏名称"
-                        }), (0, a.jsx)("select", {
-                            "aria-label": "运营配置当前游戏",
-                            value: e,
-                            onChange: e => {
-                                f(null), v(null), l(e.target.value);
-                            },
-                            children: s.map(e => (0, a.jsx)("option", {
+                description: "运营配置直接承接 SDK 下载生成的渠道包，用于维护发行范围、区域化策略、SDK 能力启停与运行开关。",
+                action: (0, a.jsx)("section", {
+                    className: "mgp-foundation-toolbar mgp-operations-game-toolbar mgp-foundation-toolbar-inline",
+                    children: (0, a.jsx)("div", {
+                        className: "mgp-foundation-toolbar-row",
+                        children: (0, a.jsxs)("label", {
+                            children: [ (0, a.jsx)("span", {
+                                children: "游戏名称"
+                            }), (0, a.jsx)("select", {
+                                "aria-label": "运营配置当前游戏",
                                 value: e,
-                                children: e
-                            }, e))
-                        }), (0, a.jsx)(m.ChevronDown, {
-                            size: 15
-                        }) ]
+                                onChange: e => {
+                                    f(null), v(null), l(e.target.value);
+                                },
+                                children: s.map(e => (0, a.jsx)("option", {
+                                    value: e,
+                                    children: e
+                                }, e))
+                            }), (0, a.jsx)(m.ChevronDown, {
+                                size: 15
+                            }) ]
+                        })
                     })
                 })
             }), (0, a.jsxs)("section", {

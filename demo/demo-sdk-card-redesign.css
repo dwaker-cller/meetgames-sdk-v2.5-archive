@@ -637,7 +637,7 @@
 .mgp-channel-package-page {
   width: min(1440px, 100vw - 244px);
   max-width: none;
-  padding: 24px;
+  padding: 12px 24px 24px;
 }
 
 .mgp-foundation-page > .mgp-page-heading,
@@ -733,14 +733,14 @@
   display: grid;
   gap: 16px;
   padding: 18px 20px 20px;
-  background: #f7f9fc;
+  background: #fff;
 }
 
 .mgp-channel-package-builder-body > section {
   padding: 18px;
-  border: 1px solid #e1e6ee;
-  border-radius: 10px;
-  background: #fff;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
 }
 
 .mgp-channel-package-section-heading {
@@ -756,9 +756,10 @@
   place-items: center;
   width: 28px;
   height: 28px;
+  border: 1px solid #722ed1;
   border-radius: 50%;
-  background: #722ed1;
-  color: #fff;
+  background: #fff;
+  color: #722ed1;
   font-size: 12px;
   font-weight: 700;
 }
@@ -1007,7 +1008,7 @@
 }
 
 .mgp-channel-package-fields {
-  grid-template-columns: minmax(0, 2fr) minmax(300px, .8fr) !important;
+  grid-template-columns: minmax(0, 1fr) !important;
   align-items: start;
 }
 
@@ -1138,7 +1139,7 @@
 .mgp-channel-package-capability-grid > .mgp-channel-package-capability-card.selected {
   border-color: #a980dc;
   background: #faf7ff;
-  box-shadow: inset 3px 0 0 #722ed1;
+  box-shadow: none;
 }
 
 .mgp-channel-package-capability-card.selected .mgp-channel-package-capability-check {
@@ -1293,6 +1294,112 @@
   font-weight: 600;
 }
 
+.mgp-foundation-page > .mgp-page-heading,
+.mgp-channel-package-page > .mgp-page-heading {
+  height: 64px;
+  min-height: 64px;
+  margin-bottom: 0;
+}
+
+.mgp-foundation-page > .mgp-sdk-workbench-tabs,
+.mgp-channel-package-page > .mgp-sdk-workbench-tabs {
+  flex: none;
+  min-height: 42px;
+  height: 42px;
+  margin-top: 12px;
+}
+
+.mgp-config-card-modal > .mgp-config-footer {
+  justify-content: flex-end !important;
+}
+
+.mgp-config-card-modal-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.mgp-login-csv-import {
+  min-width: 88px;
+}
+
+.mgp-operations-plan-page > .mgp-page-heading > .mgp-operations-game-toolbar {
+  min-width: 360px;
+}
+
+.mgp-sdk-download-confirm-modal {
+  width: min(560px, calc(100vw - 40px));
+  overflow: hidden;
+}
+
+.mgp-sdk-download-confirm-modal > header {
+  display: grid;
+  gap: 5px;
+  padding: 22px 24px 18px;
+  border-bottom: 1px solid #e8ebf1;
+}
+
+.mgp-sdk-download-confirm-modal > header h2,
+.mgp-sdk-download-confirm-modal > header p {
+  margin: 0;
+}
+
+.mgp-sdk-download-confirm-modal > header p {
+  color: #737d90;
+  font-size: 13px;
+}
+
+.mgp-sdk-download-confirm-content {
+  display: grid;
+  gap: 20px;
+  padding: 22px 24px;
+}
+
+.mgp-sdk-download-confirm-content dl {
+  display: grid;
+  grid-template-columns: 88px minmax(0, 1fr);
+  gap: 12px 18px;
+  margin: 0;
+}
+
+.mgp-sdk-download-confirm-content dt {
+  color: #737d90;
+}
+
+.mgp-sdk-download-confirm-content dd {
+  margin: 0;
+  color: #20293a;
+  font-weight: 600;
+}
+
+.mgp-sdk-download-confirm-content > section {
+  display: grid;
+  gap: 10px;
+}
+
+.mgp-sdk-download-confirm-capabilities {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.mgp-sdk-download-confirm-capabilities > span {
+  padding: 5px 10px;
+  border: 1px solid #dcc9f4;
+  border-radius: 999px;
+  background: #faf7ff;
+  color: #722ed1;
+  font-size: 12px;
+}
+
+.mgp-sdk-download-confirm-modal > footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 14px 24px;
+  border-top: 1px solid #e8ebf1;
+}
+
 .mgp-sdk-workbench-tabs > button.active {
   border-color: #cfc1e8;
   border-bottom-color: #fff;
@@ -1318,4 +1425,29 @@
 
 .mgp-channel-package-page > .mgp-channel-package-builder {
   border-top-left-radius: 0;
+}
+
+/* V2.0 workbench feedback: shared page heading and centered SDK download context. */
+.mgp-page-heading > .mgp-foundation-toolbar-inline {
+  flex: none;
+  align-self: center;
+  min-height: 50px;
+  margin: 0;
+  padding: 5px 10px;
+}
+
+.mgp-page-heading > .mgp-foundation-toolbar-inline .mgp-foundation-toolbar-row {
+  min-height: 38px;
+}
+
+.mgp-channel-package-download-heading {
+  min-width: 0;
+  padding: 0 2px 2px;
+  border: 0;
+  background: #fff;
+  box-shadow: none;
+}
+
+.mgp-channel-package-download-heading .mgp-config-module-heading {
+  margin-bottom: 0;
 }
