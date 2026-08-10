@@ -151,9 +151,10 @@
   left: 50% !important;
   display: grid !important;
   grid-template-rows: auto minmax(0, 1fr) auto;
-  width: min(1040px, calc(100vw - 64px)) !important;
-  max-width: 1040px !important;
-  max-height: min(88vh, 900px) !important;
+  width: min(1240px, calc(100vw - 48px)) !important;
+  max-width: 1240px !important;
+  height: min(84vh, 860px) !important;
+  max-height: calc(100vh - 32px) !important;
   margin: 0 !important;
   padding: 0 !important;
   overflow: hidden !important;
@@ -265,15 +266,7 @@
 
 #config-panel-login .mgp-login-head,
 #config-panel-login .mgp-login-row {
-  grid-template-columns: 56px 140px minmax(0, 1fr) 96px !important;
-}
-
-#config-panel-login .mgp-login-head > span:last-child {
-  text-align: center;
-}
-
-#config-panel-login .mgp-login-doc {
-  justify-content: center;
+  grid-template-columns: minmax(210px, 260px) minmax(0, 1fr) !important;
 }
 
 .mgp-login-platforms {
@@ -290,7 +283,7 @@
 }
 
 #config-panel-login .mgp-login-platform-details {
-  grid-column: 3 / 5 !important;
+  grid-column: 2 / -1 !important;
   display: grid;
   grid-template-columns: minmax(0, 1fr) 96px;
   align-items: start;
@@ -340,10 +333,10 @@
 }
 
 #config-panel-agreement.mgp-config-card-modal {
-  width: min(880px, calc(100vw - 64px)) !important;
-  max-width: 880px !important;
-  height: auto !important;
-  max-height: min(78vh, 720px) !important;
+  width: min(1240px, calc(100vw - 48px)) !important;
+  max-width: 1240px !important;
+  height: min(84vh, 860px) !important;
+  max-height: calc(100vh - 32px) !important;
 }
 
 #config-panel-agreement.mgp-config-card-modal:has(.mgp-agreement-modal) {
@@ -596,8 +589,8 @@
 }
 
 #config-panel-release.mgp-config-card-modal {
-  width: min(1120px, calc(100vw - 64px)) !important;
-  max-width: 1120px !important;
+  width: min(1240px, calc(100vw - 48px)) !important;
+  max-width: 1240px !important;
 }
 
 #config-panel-release .mgp-selected-channel-head,
@@ -1023,7 +1016,7 @@
 
 .mgp-channel-package-channel-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 8px;
 }
 
@@ -1051,6 +1044,35 @@
   border-color: #722ed1;
   background: #faf7ff;
   box-shadow: inset 3px 0 0 #722ed1;
+}
+
+.mgp-channel-package-channel-grid > button:disabled {
+  opacity: 1;
+  color: #7c8798;
+  border-color: #e0e4ea;
+  background: #f5f6f8;
+  cursor: not-allowed;
+}
+
+.mgp-channel-package-channel-grid > button.selected:disabled {
+  color: #4e356f;
+  border-color: #b99ce2;
+  background: #f7f2fd;
+  box-shadow: inset 3px 0 0 #722ed1;
+}
+
+/* 编辑 SDK 时，仅保留当前渠道的视觉焦点；其余渠道不可更改。 */
+.mgp-channel-package-channel-grid > button.is-edit-unavailable {
+  color: #9aa4b2;
+  border-color: #e5e8ed;
+  background: #f5f6f8;
+  box-shadow: none;
+  filter: grayscale(1);
+  opacity: .62;
+}
+
+.mgp-channel-package-channel-grid > button.is-edit-unavailable em {
+  color: #9aa4b2;
 }
 
 .mgp-channel-package-channel-grid > button > span:nth-child(2) {
@@ -1208,6 +1230,164 @@
   .mgp-channel-package-fields {
     grid-template-columns: 1fr !important;
   }
+}
+
+/* 配置弹窗：登录选择与参数填写使用同一画布尺寸。 */
+.mgp-config-selection-modal > header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 20px 24px;
+  border-bottom: 1px solid #ececf2;
+}
+
+.mgp-config-selection-modal > header h2,
+.mgp-config-selection-modal > header p {
+  margin: 0;
+}
+
+.mgp-config-selection-modal > header p {
+  margin-top: 6px;
+  color: #747a8c;
+  font-size: 13px;
+}
+
+.mgp-config-selection-modal > .mgp-modal-body {
+  min-height: 0;
+  padding: 22px 24px;
+  overflow: auto;
+}
+
+.mgp-config-selection-modal > footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 24px;
+  border-top: 1px solid #ececf2;
+  background: #fff;
+}
+
+.mgp-config-risk-backdrop {
+  z-index: 1500 !important;
+}
+
+.mgp-config-risk-modal {
+  width: min(760px, calc(100vw - 48px)) !important;
+  max-width: 760px !important;
+  max-height: min(82vh, 720px) !important;
+  overflow: hidden;
+  border: 1px solid #f0b768 !important;
+  border-radius: 14px !important;
+  background: #fff !important;
+  box-shadow: 0 24px 70px rgba(47, 31, 18, .28) !important;
+}
+
+.mgp-config-risk-modal > header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 20px 22px;
+  border-bottom: 1px solid #f2e3cf;
+  background: #fffaf2;
+}
+
+.mgp-config-risk-modal > header h2,
+.mgp-config-risk-modal > header p {
+  margin: 0;
+}
+
+.mgp-config-risk-modal > header p {
+  margin-top: 6px;
+  color: #8a5b20;
+  font-size: 13px;
+}
+
+.mgp-config-risk-body {
+  display: grid;
+  gap: 16px;
+  max-height: 480px;
+  padding: 20px 22px;
+  overflow: auto;
+}
+
+.mgp-config-risk-warning {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 13px 14px;
+  border: 1px solid #f0b768;
+  border-radius: 9px;
+  background: #fff8e8;
+  color: #8a4d00;
+}
+
+.mgp-config-risk-warning span {
+  display: grid;
+  gap: 4px;
+}
+
+.mgp-config-risk-warning small {
+  line-height: 1.55;
+}
+
+.mgp-config-risk-change-list {
+  display: grid;
+  gap: 8px;
+}
+
+.mgp-config-risk-change-list h3 {
+  margin: 0 0 2px;
+  font-size: 14px;
+}
+
+.mgp-config-risk-change-list > div {
+  display: grid;
+  grid-template-columns: minmax(120px, .75fr) minmax(0, 1fr) 18px minmax(0, 1fr);
+  align-items: center;
+  gap: 9px;
+  padding: 9px 10px;
+  border: 1px solid #ececf2;
+  border-radius: 8px;
+}
+
+.mgp-config-risk-change-list > div span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  color: #697083;
+  font-size: 12px;
+}
+
+.mgp-config-risk-change-list > div .after {
+  color: #722ed1;
+  font-weight: 600;
+}
+
+.mgp-config-risk-arrow {
+  text-align: center;
+}
+
+.mgp-config-risk-impact {
+  margin: 0;
+  color: #a04027;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.mgp-config-risk-modal > footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 14px 22px;
+  border-top: 1px solid #ececf2;
+}
+
+.mgp-config-risk-modal .mgp-button.danger {
+  border-color: #d9363e;
+  background: #d9363e;
+  color: #fff;
 }
 
 /* V2.0 workbench feedback: compact one-line cards and in-page SDK tabs. */
@@ -1668,14 +1848,14 @@
 /* V2.0 generation and operations center. */
 .mgp-operation-plan-head,
 .mgp-operation-plan-row {
-  grid-template-columns: minmax(160px, .9fr) minmax(86px, .5fr) minmax(260px, 1.7fr) minmax(160px, .9fr) minmax(260px, 1.4fr) !important;
+  grid-template-columns: minmax(160px, .9fr) minmax(86px, .5fr) minmax(240px, 1.6fr) minmax(150px, .85fr) minmax(300px, 1.55fr) !important;
 }
 
 .mgp-operation-plan-row > span:last-child {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 12px;
+  gap: 8px;
 }
 
 .mgp-sdk-version-cell {
@@ -1730,6 +1910,15 @@
   outline: none;
 }
 
+.mgp-sdk-version-add-row:disabled,
+.mgp-sdk-version-add-row:disabled:hover {
+  color: #8b95a4;
+  border-color: #d9dee6;
+  background: #f5f6f8;
+  cursor: not-allowed;
+  opacity: 1;
+}
+
 .mgp-channel-package-capability-logos {
   display: inline-flex;
   align-items: center;
@@ -1770,23 +1959,6 @@
 .mgp-channel-package-capability-logos .mgp-login-brand > span {
   font-size: 10px !important;
   line-height: 1 !important;
-}
-
-.mgp-config-save-fab {
-  position: static;
-  order: 10;
-  align-self: flex-end;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  width: fit-content;
-  margin: 16px 0 0;
-  box-shadow: 0 10px 28px rgba(114, 46, 209, .22);
-}
-
-.mgp-config-save-fab > svg {
-  color: #fff !important;
-  stroke: currentColor !important;
 }
 
 .mgp-detail-secret {
@@ -1833,6 +2005,6 @@
 @media (max-width: 1180px) {
   .mgp-operation-plan-head,
   .mgp-operation-plan-row {
-    grid-template-columns: minmax(140px, .9fr) 78px minmax(210px, 1.5fr) minmax(140px, .9fr) minmax(220px, 1.3fr) !important;
+    grid-template-columns: minmax(140px, .9fr) 78px minmax(200px, 1.4fr) minmax(130px, .8fr) minmax(270px, 1.35fr) !important;
   }
 }

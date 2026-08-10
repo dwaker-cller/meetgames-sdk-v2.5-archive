@@ -85,6 +85,16 @@
     english,
   }));
   const COUNTRY_BY_CODE = new Map(COUNTRIES.map((country) => [country.code, country]));
+  const STRATEGY_REGION_FILTERS = [
+    ["all", "全部"],
+    ["unassigned", "未分组"],
+    ["asia", "亚洲"],
+    ["europe", "欧洲"],
+    ["north-america", "北美洲"],
+    ["south-america", "南美洲"],
+    ["oceania", "大洋洲"],
+    ["africa", "非洲"],
+  ];
   const DEFAULT_RUNTIME = {
     agreementReminder: true,
     welcomeMessage: true,
@@ -115,6 +125,24 @@
 
   function countryName(code) {
     return COUNTRY_BY_CODE.get(code)?.name || code;
+  }
+
+  function strategyRegionId(country) {
+    if (country.continent === "亚洲") return "asia";
+    if (country.continent === "欧洲") return "europe";
+    if (country.continent === "大洋洲") return "oceania";
+    if (country.continent === "非洲") return "africa";
+    if (country.region === "北美") return "north-america";
+    if (country.region === "南美") return "south-america";
+    return "other";
+  }
+
+  function channelCountryCodes(drawer) {
+    const configured = String(drawer.dataset.channelCountryCodes || "")
+      .split(",")
+      .map((code) => code.trim())
+      .filter((code) => COUNTRY_BY_CODE.has(code));
+    return unique(configured.length ? configured : COUNTRIES.map((country) => country.code));
   }
 
   function normalizeLoginIds(ids, availableIds) {
@@ -194,6 +222,7 @@
             : false;
         source.advertisingProvider = configured ? provider : "";
       }
+      if (props.item?.id) break;
     }
     configuredSourceCache.set(drawer, source);
     return source;
@@ -345,8 +374,16 @@
   }
 
   function packageIdentity(drawer) {
+    const versionId = String(drawer.dataset.sdkVersionId || "").trim();
+    if (versionId) return versionId;
     const label = drawer.querySelector(".mgp-operations-workspace-context strong")?.textContent?.trim();
     return label || drawer.getAttribute("aria-label") || "default-package";
+  }
+
+  function packageDisplayLabel(drawer) {
+    return drawer.querySelector(".mgp-operations-workspace-context strong")?.textContent?.trim()
+      || drawer.getAttribute("aria-label")
+      || "当前 SDK 版本";
   }
 
   function storageKey(packageId) {
@@ -355,11 +392,12 @@
 
   function initialModel(drawer, packageId) {
     const baseConfig = createBaseConfig(drawer);
-    const releaseCountryCodes = unique(selectedCountryCodes(drawer));
+    const allowedCountryCodes = channelCountryCodes(drawer);
     return {
       version: 2,
       packageId,
-      releaseCountryCodes: releaseCountryCodes.length ? releaseCountryCodes : ["US", "DE", "FR"],
+      allowedCountryCodes,
+      releaseCountryCodes: [...allowedCountryCodes],
       strategies: [
         {
           id: "default",
@@ -377,10 +415,15 @@
     if (!model.strategies.length || model.strategies.some((strategy) => !strategy?.config)) return fallback;
     const normalized = clone(model);
     normalized.packageId = fallback.packageId;
-    normalized.releaseCountryCodes = unique(normalized.releaseCountryCodes || fallback.releaseCountryCodes);
+    const allowedCountryCodes = unique(fallback.allowedCountryCodes || fallback.releaseCountryCodes);
+    const allowedCountrySet = new Set(allowedCountryCodes);
+    normalized.allowedCountryCodes = allowedCountryCodes;
+    normalized.releaseCountryCodes = [...allowedCountryCodes];
     normalized.strategies = normalized.strategies.map((strategy) => ({
       ...strategy,
-      countryCodes: strategy.id === "default" ? [] : unique(strategy.countryCodes || []),
+      countryCodes: strategy.id === "default"
+        ? []
+        : unique(strategy.countryCodes || []).filter((code) => allowedCountrySet.has(code)),
       config: {
         ...clone(fallback.strategies[0].config),
         ...strategy.config,
@@ -470,6 +513,9 @@
       if (!availableSupportModules.length) delete config.modules.support;
       if (!availableDataPlatformIds.length) delete config.modules.data;
       if (!advertisingProvider) delete config.modules.advertising;
+      ["login", "agreement", "compliance"].forEach((key) => {
+        if (Object.hasOwn(fallbackConfig.modules, key)) config.modules[key] = true;
+      });
     });
     return model;
   }
@@ -587,7 +633,6 @@
         data-module-section="${escapeHtml(key)}">
         <header>
           ${heading}
-          ${switchButton(key, enabled, `${title}${enabled ? "已开启" : "已关闭"}`)}
         </header>
         ${hasBody && expanded ? `<div class="osg-sdk-section-body" aria-disabled="${!enabled}">${body}</div>` : ""}
       </section>`;
@@ -610,14 +655,11 @@
             data-action="toggle-login" data-login-id="${escapeHtml(id)}"
             draggable="${selected && !required}" aria-pressed="${selected}"
             ${required ? 'aria-disabled="true"' : ""}>
+            <span class="osg-login-check" aria-hidden="true">${selected ? "✓" : ""}</span>
             <span class="osg-login-logo">${loginLogoMarkup(id)}</span>
             <span class="osg-login-copy"><strong>${escapeHtml(method[1])}</strong><small>${escapeHtml(method[2])}</small></span>
-            ${
-              selected
-                ? `<span class="osg-login-order">${selectedOrder.get(id) + 1}</span>
-                   <span class="osg-login-drag" aria-hidden="true">${required ? "🔒" : "⋮⋮"}</span>`
-                : '<span class="osg-login-check"></span>'
-            }
+            <span class="osg-login-order" aria-label="排序 ${selected ? selectedOrder.get(id) + 1 : "未选择"}">${selected ? selectedOrder.get(id) + 1 : "—"}</span>
+            <span class="osg-login-drag" aria-hidden="true">${required ? "🔒" : selected ? "⋮⋮" : ""}</span>
           </button>`;
       })
       .join("");
@@ -712,12 +754,8 @@
       ["welcomeMessage", "欢迎语开关"],
       ["guestLogoutReminder", "游客退出登录提醒开关"],
       ["guestPayment", "游客支付开关"],
-      ["crashReport", "崩溃上报开关"],
-      ["personalizedAds", "个性化广告开关"],
     ];
     return `
-      <section class="osg-runtime-section">
-        <header><div><h3>开关配置</h3><p>以下运行开关仅对当前策略组生效。</p></div></header>
         <div class="osg-runtime-grid">${items
           .map(([key, title]) => `<div><strong>${title}</strong>${inlineSwitch("toggle-runtime", key, config.runtime[key], title)}</div>`)
           .join("")}</div>
@@ -727,8 +765,7 @@
             <option value="last" ${config.runtime.silentLoginMethod === "last" ? "selected" : ""}>上次登录方式</option>
             <option value="guest" ${config.runtime.silentLoginMethod === "guest" ? "selected" : ""}>游客登录</option>
           </select>
-        </label>
-      </section>`;
+        </label>`;
   }
 
   function render(instance) {
@@ -754,14 +791,10 @@
         </div>
       </section>
       <div class="osg-sdk-stack">
-        ${Object.hasOwn(config.modules, "login") ? moduleSection("login", "登录SDK", MODULES[0][2], config.modules.login, loginSection(config), "", instance.expandedModules.has("login")) : ""}
-        ${Object.hasOwn(config.modules, "agreement") ? moduleSection("agreement", "协议SDK", MODULES[1][2], config.modules.agreement, agreementSection(config), "", instance.expandedModules.has("agreement")) : ""}
-        ${Object.hasOwn(config.modules, "payment") ? moduleSection("payment", "支付SDK", MODULES[2][2], config.modules.payment, "", "is-compact") : ""}
-        ${Object.hasOwn(config.modules, "compliance") ? moduleSection("compliance", "合规SDK", MODULES[3][2], config.modules.compliance, complianceSection(config), "", instance.expandedModules.has("compliance")) : ""}
-        ${Object.hasOwn(config.modules, "support") ? moduleSection("support", "客服工具SDK", MODULES[4][2], config.modules.support, supportSection(config), "", instance.expandedModules.has("support")) : ""}
-        ${Object.hasOwn(config.modules, "data") ? moduleSection("data", "三方数据SDK", MODULES[5][2], config.modules.data, dataSection(config), "", instance.expandedModules.has("data")) : ""}
-        ${Object.hasOwn(config.modules, "advertising") ? moduleSection("advertising", "广告变现SDK", MODULES[6][2], config.modules.advertising, advertisingSection(config), "", instance.expandedModules.has("advertising")) : ""}
-        ${runtimeSection(config)}
+        ${Object.hasOwn(config.modules, "login") ? moduleSection("login", "登录SDK", MODULES[0][2], true, loginSection(config), "", instance.expandedModules.has("login")) : ""}
+        ${Object.hasOwn(config.modules, "agreement") ? moduleSection("agreement", "协议SDK", MODULES[1][2], true, agreementSection(config), "", instance.expandedModules.has("agreement")) : ""}
+        ${Object.hasOwn(config.modules, "compliance") ? moduleSection("compliance", "合规SDK", MODULES[3][2], true, complianceSection(config), "", instance.expandedModules.has("compliance")) : ""}
+        ${Object.hasOwn(config.modules, "compliance") ? moduleSection("runtime", "开关配置", "以下运行开关仅对当前策略组生效。", true, runtimeSection(config), "osg-runtime-module", instance.expandedModules.has("runtime")) : ""}
       </div>`;
     instance.root
       .querySelectorAll(
@@ -795,81 +828,209 @@
   function openStrategyModal(instance) {
     closeModal();
     const pending = new Set();
+    const usedNumbers = instance.model.strategies
+      .map((strategy) => Number(strategy.name.match(/^策略(\d+)$/)?.[1]))
+      .filter(Number.isFinite);
+    const nextNumber = usedNumbers.length ? Math.max(...usedNumbers) + 1 : 1;
+    let strategyName = `策略${nextNumber}`;
+    let activeFilter = "all";
+    let searchQuery = "";
     const layer = document.createElement("div");
     layer.className = "osg-modal-layer";
     const assignedOwners = new Map();
     instance.model.strategies
       .filter((strategy) => strategy.id !== "default")
       .forEach((strategy) =>
-        strategy.countryCodes.forEach((code) => assignedOwners.set(code, strategy.name)),
+        strategy.countryCodes.forEach((code) => assignedOwners.set(code, strategy)),
       );
-    const regionGroups = Array.from(
-      COUNTRIES.reduce((map, country) => {
-        const key = `${country.continent}-${country.region}`;
-        if (!map.has(key)) map.set(key, { name: country.region, countries: [] });
-        map.get(key).countries.push(country);
-        return map;
-      }, new Map()).values(),
+    const allowedCountrySet = new Set(
+      instance.model.allowedCountryCodes || channelCountryCodes(instance.drawer),
     );
+    const allowedCountries = COUNTRIES.filter((country) => allowedCountrySet.has(country.code));
+    const regionLabelById = new Map(STRATEGY_REGION_FILTERS);
+    const regionCount = (filterId) => allowedCountries.filter((country) => {
+      if (filterId === "all") return true;
+      if (filterId === "unassigned") return !assignedOwners.has(country.code);
+      return strategyRegionId(country) === filterId;
+    }).length;
     layer.innerHTML = `
-      <section class="osg-modal" role="dialog" aria-modal="true" aria-labelledby="osg-modal-title">
-        <header><div><h3 id="osg-modal-title">添加策略组</h3><p>可单选或多选国家；本次选中的国家将共同使用一份策略配置。</p></div><button type="button" data-action="close-modal" aria-label="关闭">×</button></header>
-        <div class="osg-modal-body">${regionGroups
-          .map((group) => `<section><h4>${escapeHtml(group.name)}</h4><div>${group.countries
-            .map((country) => {
-              const owner = assignedOwners.get(country.code);
-              return `<label class="${owner ? "is-assigned" : ""}"><input type="checkbox" data-country-code="${country.code}" ${owner ? "disabled" : ""}><span><strong>${escapeHtml(country.name)}</strong><small>${escapeHtml(country.english)} · ${country.code}</small></span>${owner ? `<em>${escapeHtml(owner)}</em>` : ""}</label>`;
-            })
-            .join("")}</div></section>`)
-          .join("")}</div>
-        <footer><span>请选择国家/地区</span><button type="button" data-action="close-modal">取消</button><button type="button" class="primary" data-action="confirm-strategy" disabled>添加策略</button></footer>
+      <section class="osg-modal osg-strategy-creator" role="dialog" aria-modal="true" aria-labelledby="osg-modal-title" aria-describedby="osg-modal-description">
+        <header>
+          <div><h3 id="osg-modal-title">添加策略组</h3><p id="osg-modal-description">为当前发行渠道创建国家/地区策略；未分组国家自动使用默认策略。</p></div>
+          <button type="button" data-action="close-modal" aria-label="关闭">×</button>
+        </header>
+        <div class="osg-strategy-creator-fields">
+          <label class="osg-strategy-name-field" for="osg-strategy-name"><span>策略名称</span><input id="osg-strategy-name" type="text" value="${escapeHtml(strategyName)}" maxlength="30" autocomplete="off" data-field="strategy-name"></label>
+          <div class="osg-country-search-field"><label for="osg-country-search">搜索国家/地区</label><div><span aria-hidden="true">⌕</span><input id="osg-country-search" type="search" placeholder="输入中文、英文或两位代码" autocomplete="off" data-field="country-search"><button type="button" data-action="clear-search" aria-label="清除搜索" hidden>×</button></div></div>
+        </div>
+        <nav class="osg-country-filter-tabs" role="tablist" aria-label="国家区域筛选">${STRATEGY_REGION_FILTERS
+          .map(([id, label]) => `<button type="button" role="tab" class="${id === activeFilter ? "is-active" : ""}" aria-selected="${id === activeFilter}" data-action="select-country-filter" data-filter-id="${id}"><span>${label}</span><em data-filter-count="${id}">${regionCount(id)}</em></button>`)
+          .join("")}</nav>
+        <div class="osg-modal-body">
+          <section class="osg-country-picker" aria-label="可选国家/地区">
+            <header><div><strong data-filter-title>全部</strong><span data-filter-result-count></span></div><div><button type="button" data-action="select-filtered">全选当前筛选</button><button type="button" data-action="clear-selection">清空</button></div></header>
+            <div class="osg-country-list" role="group" aria-label="国家/地区列表"></div>
+            <div class="osg-country-empty" hidden><strong>没有匹配的国家/地区</strong><span>请尝试其他搜索词或区域筛选。</span></div>
+          </section>
+          <aside class="osg-selected-panel" aria-label="已选国家/地区">
+            <header><div><span>已选国家/地区</span><strong data-selected-count>0</strong></div><button type="button" data-action="clear-selection">清空</button></header>
+            <div class="osg-selected-list"></div>
+          </aside>
+        </div>
+        <footer><span data-modal-validation>至少选择 1 个国家/地区</span><button type="button" data-action="close-modal">取消</button><button type="button" class="primary" data-action="confirm-strategy" disabled>创建策略组</button></footer>
       </section>`;
     document.body.append(layer);
     activeModal = layer;
     const confirm = layer.querySelector('[data-action="confirm-strategy"]');
-    const summary = layer.querySelector("footer span");
-    const update = () => {
-      confirm.disabled = pending.size === 0;
-      summary.textContent = pending.size ? `已选择 ${pending.size} 个国家/地区` : "请选择国家/地区";
+    const validation = layer.querySelector("[data-modal-validation]");
+    const countryList = layer.querySelector(".osg-country-list");
+    const countryEmpty = layer.querySelector(".osg-country-empty");
+    const selectedList = layer.querySelector(".osg-selected-list");
+    const selectedCount = layer.querySelector("[data-selected-count]");
+    const filterTitle = layer.querySelector("[data-filter-title]");
+    const filterResultCount = layer.querySelector("[data-filter-result-count]");
+    const selectFilteredButton = layer.querySelector('[data-action="select-filtered"]');
+    const searchInput = layer.querySelector('[data-field="country-search"]');
+    const clearSearchButton = layer.querySelector('[data-action="clear-search"]');
+
+    const filteredCountries = () => {
+      const query = searchQuery.trim().toLocaleLowerCase();
+      return allowedCountries.filter((country) => {
+        const matchesRegion = activeFilter === "all"
+          || (activeFilter === "unassigned" && !assignedOwners.has(country.code))
+          || strategyRegionId(country) === activeFilter;
+        if (!matchesRegion) return false;
+        if (!query) return true;
+        return `${country.name} ${country.english} ${country.code}`
+          .toLocaleLowerCase()
+          .includes(query);
+      });
     };
+
+    const updateValidation = () => {
+      const hasName = Boolean(strategyName.trim());
+      confirm.disabled = !hasName || pending.size === 0;
+      validation.textContent = !hasName
+        ? "请输入策略名称"
+        : pending.size
+          ? `已选择 ${pending.size} 个国家/地区`
+          : "至少选择 1 个国家/地区";
+    };
+
+    const renderPicker = () => {
+      const visibleCountries = filteredCountries();
+      const selectableCountries = visibleCountries.filter(
+        (country) => !assignedOwners.has(country.code),
+      );
+      layer.querySelectorAll('[data-action="select-country-filter"]').forEach((button) => {
+        const selected = button.dataset.filterId === activeFilter;
+        button.classList.toggle("is-active", selected);
+        button.setAttribute("aria-selected", String(selected));
+      });
+      filterTitle.textContent = regionLabelById.get(activeFilter) || "全部";
+      filterResultCount.textContent = `显示 ${visibleCountries.length} 个`;
+      clearSearchButton.hidden = !searchQuery;
+      selectFilteredButton.disabled = !selectableCountries.some(
+        (country) => !pending.has(country.code),
+      );
+      countryList.innerHTML = visibleCountries.map((country) => {
+        const owner = assignedOwners.get(country.code);
+        const selected = pending.has(country.code);
+        return `<label class="osg-country-option ${owner ? "is-assigned" : ""} ${selected ? "is-selected" : ""}">
+          <input type="checkbox" data-country-code="${country.code}" ${selected ? "checked" : ""} ${owner ? "disabled" : ""}>
+          <span><strong>${escapeHtml(country.name)}</strong><small>${escapeHtml(country.english)} · ${country.code}</small></span>
+          ${owner ? `<em title="已属于${escapeHtml(owner.name)}"><b>已分组</b>${escapeHtml(owner.name)}</em>` : ""}
+        </label>`;
+      }).join("");
+      countryList.hidden = visibleCountries.length === 0;
+      countryEmpty.hidden = visibleCountries.length > 0;
+
+      const selectedCountries = allowedCountries.filter((country) => pending.has(country.code));
+      selectedCount.textContent = String(selectedCountries.length);
+      selectedList.innerHTML = selectedCountries.length
+        ? selectedCountries.map((country) => `<div class="osg-selected-country"><span><strong>${escapeHtml(country.name)}</strong><small>${escapeHtml(country.english)} · ${country.code}</small></span><button type="button" data-action="remove-selected-country" data-code="${country.code}" aria-label="移除${escapeHtml(country.name)}">×</button></div>`).join("")
+        : `<div class="osg-selected-empty"><strong>尚未选择</strong><span>从左侧勾选要共用此策略的国家/地区。</span></div>`;
+      layer.querySelectorAll('[data-action="clear-selection"]').forEach((button) => {
+        button.disabled = pending.size === 0;
+      });
+      updateValidation();
+    };
+
     layer.addEventListener("change", (event) => {
       const code = event.target.dataset.countryCode;
       if (!code) return;
       if (event.target.checked) pending.add(code);
       else pending.delete(code);
-      update();
+      renderPicker();
+    });
+    layer.addEventListener("input", (event) => {
+      if (event.target.dataset.field === "strategy-name") {
+        strategyName = event.target.value;
+        updateValidation();
+        return;
+      }
+      if (event.target.dataset.field !== "country-search") return;
+      searchQuery = event.target.value;
+      renderPicker();
     });
     layer.addEventListener("click", (event) => {
       const button = event.target.closest("button[data-action]");
       if (!button) return;
-      if (button.dataset.action === "close-modal") {
+      const action = button.dataset.action;
+      if (action === "close-modal") {
         closeModal();
         return;
       }
-      if (button.dataset.action !== "confirm-strategy" || !pending.size) return;
-      const usedNumbers = instance.model.strategies
-        .map((strategy) => Number(strategy.name.match(/^策略(\d+)$/)?.[1]))
-        .filter(Number.isFinite);
-      const nextNumber = usedNumbers.length ? Math.max(...usedNumbers) + 1 : 1;
-      const defaultConfig = clone(
-        instance.model.strategies.find((strategy) => strategy.id === "default").config,
-      );
+      if (action === "select-country-filter") {
+        activeFilter = button.dataset.filterId;
+        renderPicker();
+        return;
+      }
+      if (action === "clear-search") {
+        searchQuery = "";
+        searchInput.value = "";
+        renderPicker();
+        searchInput.focus();
+        return;
+      }
+      if (action === "select-filtered") {
+        filteredCountries().forEach((country) => {
+          if (!assignedOwners.has(country.code)) pending.add(country.code);
+        });
+        renderPicker();
+        return;
+      }
+      if (action === "clear-selection") {
+        pending.clear();
+        renderPicker();
+        return;
+      }
+      if (action === "remove-selected-country") {
+        pending.delete(button.dataset.code);
+        renderPicker();
+        return;
+      }
+      if (action !== "confirm-strategy" || !pending.size || !strategyName.trim()) return;
+      const templateStrategy = instance.model.strategies.find(
+        (strategy) => strategy.id === "default",
+      ) || activeStrategy(instance);
+      const defaultConfig = clone(templateStrategy.config);
       const strategy = {
         id: `strategy-${Date.now()}-${nextNumber}`,
-        name: `策略${nextNumber}`,
-        countryCodes: Array.from(pending),
+        name: strategyName.trim(),
+        countryCodes: allowedCountries
+          .filter((country) => pending.has(country.code))
+          .map((country) => country.code),
         config: defaultConfig,
       };
-      instance.model.releaseCountryCodes = unique([
-        ...instance.model.releaseCountryCodes,
-        ...strategy.countryCodes,
-      ]);
       instance.model.strategies.push(strategy);
       instance.model.activeStrategyId = strategy.id;
       closeModal();
       setDirty(instance);
     });
-    layer.querySelector('input:not(:disabled)')?.focus();
+    renderPicker();
+    layer.querySelector('[data-field="strategy-name"]')?.focus();
+    layer.querySelector('[data-field="strategy-name"]')?.select();
   }
 
   function toggleLogin(instance, id) {
@@ -952,12 +1113,11 @@
       return;
     }
     if (action === "toggle-login") {
-      if (!strategy.config.modules.login || Date.now() < instance.suppressLoginClickUntil) return;
+      if (Date.now() < instance.suppressLoginClickUntil) return;
       toggleLogin(instance, button.dataset.loginId);
       return;
     }
     if (action === "toggle-agreement") {
-      if (!strategy.config.modules.agreement) return;
       const id = button.dataset.agreementId;
       strategy.config.agreementGroupIds = strategy.config.agreementGroupIds.includes(id)
         ? strategy.config.agreementGroupIds.filter((groupId) => groupId !== id)
@@ -966,7 +1126,6 @@
       return;
     }
     if (action === "toggle-compliance") {
-      if (!strategy.config.modules.compliance) return;
       const key = button.dataset.key;
       if (key === "kwsVerification" && !strategy.config.compliance.ageParentalControl) return;
       strategy.config.compliance[key] = !strategy.config.compliance[key];
@@ -1016,7 +1175,7 @@
     instance.root.addEventListener("change", (event) => handleRootChange(instance, event));
     instance.root.addEventListener("dragstart", (event) => {
       const item = event.target.closest(".osg-login-method[draggable='true']");
-      if (!item || !activeStrategy(instance).config.modules.login) return;
+      if (!item) return;
       instance.draggedLoginId = item.dataset.loginId;
       event.dataTransfer.effectAllowed = "move";
       event.dataTransfer.setData("text/plain", instance.draggedLoginId);
@@ -1061,7 +1220,7 @@
       body,
       root,
       model,
-      packageLabel: packageId,
+      packageLabel: packageDisplayLabel(drawer),
       savedSignature: modelSignature(model),
       dirty: false,
       draggedLoginId: "",
