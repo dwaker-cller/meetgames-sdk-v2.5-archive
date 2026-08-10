@@ -1505,6 +1505,43 @@
   background: #fafbfc;
 }
 
+.osg-data-platform-options {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.osg-data-platform-options > div {
+  min-height: 54px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 10px;
+  border: 1px solid #e3e7ed;
+  border-radius: 7px;
+  background: #fafbfc;
+}
+
+.osg-data-platform-options > div > span {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.osg-data-platform-options strong {
+  font-size: 11px;
+}
+
+.osg-data-platform-options small {
+  color: #8a94a3;
+  font-size: 9px;
+}
+
+.osg-advertising-platform-options {
+  grid-template-columns: minmax(0, 1fr);
+}
+
 .osg-compact-field {
   max-width: 360px;
   margin-top: 11px;

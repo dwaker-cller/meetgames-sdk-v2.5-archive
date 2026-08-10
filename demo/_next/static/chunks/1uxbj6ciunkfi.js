@@ -2,7 +2,7 @@
     "use strict";
     if ("object" == typeof document && !document.getElementById("mgp-sdk-card-redesign-styles")) {
         let e = document.createElement("link");
-        e.id = "mgp-sdk-card-redesign-styles", e.rel = "stylesheet", e.href = "./demo-sdk-card-redesign.css?v=20260806-sdk-quick-title-feedback-14", 
+        e.id = "mgp-sdk-card-redesign-styles", e.rel = "stylesheet", e.href = "./demo-sdk-card-redesign.css?v=20260810-operations-config-copy-28", 
         document.head.appendChild(e);
     }
     var a = e.i(51503), n = e.i(97424), s = e.i(70391), l = e.i(12951);
@@ -20,6 +20,15 @@
         key: "h6l3hr"
     } ] ]);
     var t = e.i(22794), r = e.i(30366), d = e.i(58121), o = e.i(3683), c = e.i(4980), m = e.i(18114), p = e.i(4974), h = e.i(81884), u = e.i(73068), g = e.i(39313), x = e.i(66695), j = e.i(51541), b = e.i(34598), f = e.i(32431);
+    let SecretEyeIcon = (0, l.default)("eye", [ [ "path", {
+        d: "M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0",
+        key: "1nclc0"
+    } ], [ "circle", {
+        cx: "12",
+        cy: "12",
+        r: "3",
+        key: "1v7zrd"
+    } ] ]);
     let y = (0, l.default)("ghost", [ [ "path", {
         d: "M9 10h.01",
         key: "qbtxuw"
@@ -115,7 +124,7 @@
         id: "login",
         title: "登录",
         short: "登录",
-        description: "维护登录方式及对应平台参数。",
+        description: "维护登录方式的通用、iOS 与 Android 参数。",
         icon: $.LogIn,
         help: "https://docs.meetgames.com/sdk/login"
     }, {
@@ -618,21 +627,21 @@
             id: "ios-app-store",
             name: "App Store",
             short: "APP STORE"
-        }, {
-            id: "ios-xiaomi",
-            name: "Xiaomi GetApps",
-            short: "XIAOMI GETAPPS"
         } ]
     }, {
         platform: "Android",
         items: [ {
+            id: "android-xiaomi",
+            name: "小米商店",
+            short: "XIAOMI STORE"
+        }, {
             id: "android-google",
             name: "Google Play",
             short: "GOOGLE PLAY"
         }, {
-            id: "android-xiaomi",
-            name: "Xiaomi GetApps",
-            short: "XIAOMI GETAPPS"
+            id: "android-one-store",
+            name: "ONE Store",
+            short: "ONE STORE"
         } ]
     } ], V = B.flatMap(e => e.items.map(a => ({
         ...a,
@@ -647,8 +656,12 @@
             fields: [ [ "googleServerConfig", "Google server端参数", "google-payment-config.json", "upload-json", "请上传Google支付后台下载的json文件。仅支持json格式。" ] ]
         },
         "android-xiaomi": {
-            title: "Xiaomi GetApps 支付配置",
+            title: "小米商店支付配置",
             fields: [ [ "appId", "appid", "xiaomi-demo-appid" ], [ "secretKey", "secretKey", "xiaomi-demo-secret-key", "secret" ], [ "appName", "appName", "Demo Game" ] ]
+        },
+        "android-one-store": {
+            title: "ONE Store 支付配置",
+            fields: [ [ "licenseKey", "License Key", "one-store-demo-license-key", "secret" ], [ "clientId", "Client ID", "one-store-demo-client" ] ]
         }
     }, H = {
         paypal: {
@@ -661,10 +674,7 @@
         }
     };
     function Q(e) {
-        let a = {
-            "ios-xiaomi": "android-xiaomi"
-        }[e] || e;
-        if (X[a]) return X[a];
+        if (X[e]) return X[e];
         let n = V.find(a => a.id === e);
         return {
             title: `${n?.short || "渠道"} 商店参数`,
@@ -843,9 +853,9 @@
         } ]
     } ], ee = Y.flatMap(e => e.countries), ea = {
         "ios-app-store": [ "KP" ],
-        "ios-xiaomi": [ "KP" ],
+        "android-xiaomi": [ "KP" ],
         "android-google": [ "KP" ],
-        "android-xiaomi": [ "KP" ]
+        "android-one-store": [ "KP" ]
     }, en = {}, es = [ {
         id: "americas",
         name: "美洲",
@@ -990,68 +1000,39 @@
             secret: secret
         };
     }
-    let loginPlatformParameterMatrix = {
-        guest: {
-            iOS: [],
-            Android: []
-        },
-        email: {
-            iOS: [],
-            Android: []
-        },
-        apple: {
-            iOS: [],
-            Android: []
-        },
-        google: {
-            iOS: [ createLoginParameter("clientId", "Client ID"), createLoginParameter("scheme", "Scheme") ],
-            Android: [ createLoginParameter("clientId", "Client ID") ]
-        },
-        facebook: {
-            iOS: [ createLoginParameter("name", "Name"), createLoginParameter("clientId", "Client ID"), createLoginParameter("scheme", "Scheme"), createLoginParameter("secret", "Secret", !0) ],
-            Android: [ createLoginParameter("clientId", "Client ID"), createLoginParameter("scheme", "Scheme"), createLoginParameter("secret", "Secret", !0) ]
-        },
-        twitter: {
-            iOS: [ createLoginParameter("clientId", "Client ID"), createLoginParameter("scheme", "Scheme"), createLoginParameter("redirect", "Redirect") ],
-            Android: [ createLoginParameter("clientId", "Client ID"), createLoginParameter("scheme", "Scheme"), createLoginParameter("redirect", "Redirect") ]
-        },
-        snapchat: {
-            iOS: [ createLoginParameter("clientId", "Client ID"), createLoginParameter("scheme", "Scheme"), createLoginParameter("redirect", "Redirect") ],
-            Android: [ createLoginParameter("clientId", "Client ID"), createLoginParameter("redirect", "Redirect") ]
-        },
-        line: {
-            iOS: [ createLoginParameter("clientId", "Client ID"), createLoginParameter("scheme", "Scheme") ],
-            Android: [ createLoginParameter("clientId", "Client ID") ]
-        },
-        naver: {
-            iOS: [ createLoginParameter("name", "Name"), createLoginParameter("clientId", "Client ID"), createLoginParameter("secret", "Secret", !0), createLoginParameter("scheme", "Scheme") ],
-            Android: [ createLoginParameter("name", "Name"), createLoginParameter("clientId", "Client ID"), createLoginParameter("secret", "Secret", !0) ]
-        },
-        kakao: {
-            iOS: [ createLoginParameter("clientId", "Client ID"), createLoginParameter("scheme", "Scheme") ],
-            Android: [ createLoginParameter("clientId", "Client ID"), createLoginParameter("scheme", "Scheme") ]
-        },
-        tiktok: {
-            iOS: [ createLoginParameter("clientId", "Client ID"), createLoginParameter("scheme", "Scheme"), createLoginParameter("redirect", "Redirect") ],
-            Android: [ createLoginParameter("clientId", "Client ID"), createLoginParameter("scheme", "Scheme"), createLoginParameter("redirect", "Redirect") ]
-        },
-        discord: {
-            iOS: [ createLoginParameter("clientId", "Client ID"), createLoginParameter("secret", "Secret", !0), createLoginParameter("redirect", "Redirect") ],
-            Android: [ createLoginParameter("clientId", "Client ID"), createLoginParameter("secret", "Secret", !0), createLoginParameter("redirect", "Redirect") ]
-        }
-    };
-    function getLoginPlatformParameters(e, platform) {
-        return loginPlatformParameterMatrix[e?.id]?.[platform] || [];
+    let loginParameterScopes = [ "common", "iOS", "Android" ];
+    function getLoginPlatformParameters(e, scope) {
+        return (e?.params || []).filter(e => (e.platform || "common") === scope);
     }
-    function createDefaultLoginPlatformValue(e, platform, field) {
-        let platformKey = platform.toLowerCase();
-        return "redirect" === field.key ? `https://api.demo-game.com/login/${e.id}/${platformKey}` : "scheme" === field.key ? `meetgames.${e.id}.${platformKey}` : "name" === field.key ? `${e.displayName} Demo` : "secret" === field.key ? `demo_${e.id}_${platformKey}_secret` : `${e.id}_${platformKey}_client_id`;
+    function getLoginScopeLabel(e) {
+        return "common" === e ? "通用参数" : `${e} 参数`;
+    }
+    function getLoginScopeDescription(e) {
+        return "common" === e ? "所有发行渠道共用，仅填写一次" : "iOS" === e ? "App Store 渠道使用" : "小米商店、Google Play、ONE Store 使用";
+    }
+    function createDefaultLoginPlatformValue(e, scope, field) {
+        if (void 0 !== field.value) return field.value;
+        let scopeKey = scope.toLowerCase();
+        return "redirect" === field.key ? `https://api.demo-game.com/login/${e.id}/${scopeKey}` : "scheme" === field.key ? `meetgames.${e.id}.${scopeKey}` : "name" === field.key ? `${e.displayName} Demo` : "secret" === field.key ? `demo_${e.id}_${scopeKey}_secret` : `${e.id}_${scopeKey}_client_id`;
     }
     function createDefaultLoginValues(e) {
-        return Object.fromEntries([ "Android", "iOS" ].map(platform => [ platform, Object.fromEntries(getLoginPlatformParameters(e, platform).map(field => [ field.key, createDefaultLoginPlatformValue(e, platform, field) ])) ]));
+        return Object.fromEntries(loginParameterScopes.map(scope => [ scope, Object.fromEntries(getLoginPlatformParameters(e, scope).map(field => [ field.key, createDefaultLoginPlatformValue(e, scope, field) ])) ]));
     }
-    function getLoginPlatformValue(e, platform, key) {
-        return e?.[platform]?.[key] || "";
+    function getLoginPlatformValue(e, scope, key) {
+        return e?.[scope]?.[key] || "";
+    }
+    function isLoginScopeComplete(e = {}, method, scope) {
+        let fields = getLoginPlatformParameters(method, scope);
+        return !fields.length || fields.every(field => String(getLoginPlatformValue(e.values?.[method.id], scope, field.key)).trim());
+    }
+    function isLoginMethodCompleteForRuntime(e = {}, method, runtime) {
+        return [ "common", runtime ].filter(Boolean).every(scope => isLoginScopeComplete(e, method, scope));
+    }
+    function getLoginMethodMissingScopes(e = {}, method, runtime) {
+        return [ "common", runtime ].filter(Boolean).filter(scope => getLoginPlatformParameters(method, scope).length > 0 && !isLoginScopeComplete(e, method, scope));
+    }
+    function getLoginValuesForRuntime(e = {}, runtime) {
+        return Object.fromEntries([ "common", runtime ].filter(Boolean).map(scope => [ scope, e?.[scope] || {} ]).filter(([, values]) => Object.keys(values).length > 0));
     }
     let eS = Object.fromEntries(G.map(e => [ e.id, createDefaultLoginValues(e) ])), ew = Object.fromEntries(F.map(e => [ e.id, Object.fromEntries(e.params.map(e => [ e.key, e.value ])) ])), eA = [ {
         id: 1,
@@ -1126,7 +1107,7 @@
     }
     function eM({storeId: e, size: n = 22}) {
         if (!e$(e)) return null;
-        let s = e.includes("app-store") ? "apple" : e.includes("google") ? "google" : "xiaomi";
+        let s = e.includes("app-store") ? "apple" : e.includes("google") ? "google" : e.includes("one-store") ? "one-store" : "xiaomi";
         return (0, a.jsx)("span", {
             className: `mgp-store-logo ${s}`,
             style: {
@@ -1134,7 +1115,9 @@
                 height: n
             },
             "aria-hidden": "true",
-            children: (0, a.jsx)("img", {
+            children: "one-store" === s ? (0, a.jsx)("b", {
+                children: "1"
+            }) : (0, a.jsx)("img", {
                 src: "apple" === s ? "./assets/brands/app-store.svg" : "google" === s ? "./assets/brands/google-play.svg" : "./assets/brands/xiaomi.svg",
                 alt: ""
             })
@@ -1239,11 +1222,9 @@
                             storeId: e.id,
                             size: 24
                         }), (0, a.jsxs)("span", {
-                            children: [ (0, a.jsx)("strong", {
-                                children: e.name
-                            }), (0, a.jsx)("small", {
-                                children: e.platform
-                            }) ]
+                        children: (0, a.jsx)("strong", {
+                            children: e.name
+                        })
                         }), n ? (0, a.jsx)("em", {
                             children: "已添加"
                         }) : null ]
@@ -1255,10 +1236,7 @@
     function eR(e, a = {}) {
         if (!e.selected?.includes("guest")) return !1;
         let n = eD(e.selected).filter(e => "guest" !== e).map(e => G.find(a => a.id === e)).filter(Boolean), s = Array.from(new Set((a.channels || []).map(e => e$(e)?.platform).filter(e => "Android" === e || "iOS" === e)));
-        return n.some(a => s.some(n => {
-            let s = getLoginPlatformParameters(a, n);
-            return !s.length || s.every(s => String(getLoginPlatformValue(e.values?.[a.id], n, s.key)).trim());
-        }));
+        return n.some(a => s.some(n => isLoginMethodCompleteForRuntime(e, a, n)));
     }
     function isPaymentConfigComplete(e = {}, a = "") {
         let n = String(e.deliveryUrl || "").trim(), s = a ? [ a ] : e.channels || [];
@@ -1321,25 +1299,22 @@
         });
     }
     function eW(e) {
-        let a = String(e.ageThreshold || "").trim(), n = Number(a), s = String(e.kwsClientId || "").trim(), l = String(e.kwsClientSecret || "").trim(), i = String(e.kwsRedirect || "").trim();
-        return !!a && Number.isInteger(n) && n >= 1 && n <= 18 && !!s && !!l && /^https?:\/\/[^\s]+$/i.test(i);
+        let a = String(e.ageThreshold || "").trim(), n = Number(a), s = String(e.kwsClientId || "").trim(), l = String(e.kwsClientSecret || "").trim(), t = String(e.kwsVerifySecret || "").trim(), i = String(e.kwsRedirect || "").trim();
+        return !!a && Number.isInteger(n) && n >= 1 && n <= 18 && !!s && !!l && !!t && /^https?:\/\/[^\s]+$/i.test(i);
     }
     function isSupportModuleComplete(e = {}) {
         let a = e.onlineEnabled && !!String(e.onlineName || "").trim(), n = e.feedbackEnabled && (e.feedbackTypes || []).length > 0 && e.feedbackTypes.every(e => e.name?.trim() && e.description?.trim()), s = e.faqEnabled && (e.faqLanguages || []).length > 0 && (e.faqGroups || []).length > 0 && e.faqGroups.every(e => e.name?.trim()), l = e.smartEnabled && !!String(e.botName || "").trim() && !!String(e.fallbackText || "").trim() && (e.knowledgeItems || []).length > 0 && e.knowledgeItems.every(e => e.question?.trim());
         return !!(a || n || s || l);
     }
     function isConfigCardComplete(e, a = {}) {
-        return "release" === e ? eG(a.release) : "login" === e ? eR(a.login || {}, a.release || {}) : "agreement" === e ? (a.agreement?.groups || []).some(e => eQ(e)) : "compliance" === e ? [ "ageThreshold", "kwsClientId", "kwsClientSecret", "kwsRedirect" ].every(e => String(a.compliance?.[e] || "").trim()) && eW(a.compliance || {}) : "data" === e ? (a.data?.selected || []).length > 0 && e_(a.data || {}) : "advertising" === e ? !!a.advertising?.provider && "none" !== a.advertising.provider : "support" === e && isSupportModuleComplete(a.support || {});
+        return "release" === e ? eG(a.release) : "login" === e ? eR(a.login || {}, a.release || {}) : "agreement" === e ? (a.agreement?.groups || []).some(e => eQ(e)) : "compliance" === e ? [ "ageThreshold", "kwsClientId", "kwsClientSecret", "kwsVerifySecret", "kwsRedirect" ].every(e => String(a.compliance?.[e] || "").trim()) && eW(a.compliance || {}) : "data" === e ? (a.data?.selected || []).length > 0 && e_(a.data || {}) : "advertising" === e ? eV(a.advertising || {}) : "support" === e && isSupportModuleComplete(a.support || {});
     }
     function isDataProviderComplete(e = {}, a) {
         let n = F.find(e => e.id === a);
         return !!n && n.params.every(n => String(e.values?.[a]?.[n.key] || "").trim());
     }
     function getCompletedLoginMethodsForPlatform(e = {}, a) {
-        return eD(e.selected).filter(e => "guest" !== e).map(e => G.find(a => a.id === e)).filter(Boolean).filter(n => {
-            let s = getLoginPlatformParameters(n, a);
-            return !s.length || s.every(s => String(getLoginPlatformValue(e.values?.[n.id], a, s.key)).trim());
-        });
+        return eD(e.selected).filter(e => "guest" !== e).map(e => G.find(a => a.id === e)).filter(Boolean).filter(n => isLoginMethodCompleteForRuntime(e, n, a));
     }
     function getSupportModuleStates(e = {}) {
         return [ {
@@ -1393,7 +1368,7 @@
             kind: "text",
             label: F.find(a => a.id === e)?.name || e
         }));
-        if ("advertising" === e) return a.advertising?.provider && "none" !== a.advertising.provider ? [ {
+        if ("advertising" === e) return eV(a.advertising || {}) ? [ {
             kind: "text",
             label: eu(a.advertising.provider)
         } ] : [];
@@ -1413,7 +1388,7 @@
             missing: [ "请先选择发行渠道" ]
         };
         if ("login" === e) {
-            let e = eD(a.login?.selected).filter(e => "guest" !== e).map(e => G.find(a => a.id === e)).filter(Boolean), n = getCompletedLoginMethodsForPlatform(a.login || {}, l), s = new Set(n.map(e => e.id)), t = e.filter(e => !s.has(e.id)).map(e => `${e.displayName} ${l} 参数`);
+            let e = eD(a.login?.selected).filter(e => "guest" !== e).map(e => G.find(a => a.id === e)).filter(Boolean), n = getCompletedLoginMethodsForPlatform(a.login || {}, l), s = new Set(n.map(e => e.id)), t = e.filter(e => !s.has(e.id)).flatMap(e => getLoginMethodMissingScopes(a.login || {}, e, l).map(n => `${e.displayName} ${getLoginScopeLabel(n)}`));
             return {
                 ready: n.length > 0 && !t.length,
                 defaultIncluded: n.length > 0,
@@ -1442,6 +1417,7 @@
                 ageThreshold: "年龄阈值",
                 kwsClientId: "KWS Client ID",
                 kwsClientSecret: "KWS Client Secret",
+                kwsVerifySecret: "KWS Verify Secret",
                 kwsRedirect: "KWS Redirect"
             }, n = Object.keys(e).filter(n => !String(a.compliance?.[n] || "").trim()).map(a => e[a]), s = eW(a.compliance || {});
             return {
@@ -1480,6 +1456,10 @@
         let n = "payment" === e ? "release" : "ops-data" === e ? "data" : e, s = getConfigCardSummary(n, a);
         return s.length ? `已配置：${s.map(e => e.label).join("、")}` : "暂无已配置内容";
     }
+    function getCapabilityConfiguredLogos(e, a = {}) {
+        if ("login" !== e && "payment" !== e) return [];
+        return getConfigCardSummary("payment" === e ? "release" : "login", a);
+    }
     function eJ({checked: e, onChange: n, label: s, disabled: l = !1}) {
         return (0, a.jsx)("button", {
             type: "button",
@@ -1513,38 +1493,52 @@
             children: [ (0, a.jsx)("button", {
                 type: "button",
                 className: "config" === e ? "active" : "",
+                "data-sdk-workbench-tab": "config",
                 "aria-current": "config" === e ? "page" : void 0,
                 onClick: n,
                 children: "SDK配置"
             }), (0, a.jsx)("button", {
                 type: "button",
                 className: "download" === e ? "active" : "",
+                "data-sdk-workbench-tab": "download",
                 "aria-current": "download" === e ? "page" : void 0,
                 onClick: s,
                 children: "SDK下载"
             }) ]
         });
     }
-    function eY({label: e, value: n, onChange: s, helper: l, required: i, type: t = "text", placeholder: r, action: d, error: o}) {
+    function eY({label: e, value: s, onChange: l, helper: i, required: t, type: r = "text", placeholder: d, action: o, error: c}) {
+        let [m, p] = (0, n.useState)(!1), h = "password" === r;
         return (0, a.jsxs)("label", {
-            className: `mgp-field ${o ? "has-error" : ""}`,
+            className: `mgp-field ${c ? "has-error" : ""}`,
             children: [ (0, a.jsxs)("span", {
-                children: [ e, i ? (0, a.jsx)("em", {
+                children: [ e, t ? (0, a.jsx)("em", {
                     children: "*"
                 }) : null ]
             }), (0, a.jsxs)("div", {
                 children: [ (0, a.jsx)("input", {
-                    type: t,
-                    value: n,
-                    placeholder: r,
-                    "aria-invalid": !!o,
-                    onChange: e => s(e.target.value)
-                }), d ]
-            }), o ? (0, a.jsx)("small", {
+                    type: h && m ? "text" : r,
+                    value: s,
+                    placeholder: d,
+                    "aria-invalid": !!c,
+                    onChange: e => l(e.target.value)
+                }), h ? (0, a.jsx)("button", {
+                    type: "button",
+                    className: `mgp-secret-visibility ${m ? "is-visible" : ""}`,
+                    "aria-label": m ? `隐藏${e}` : `显示${e}`,
+                    "aria-pressed": m,
+                    onClick: e => {
+                        e.preventDefault(), p(e => !e);
+                    },
+                    children: (0, a.jsx)(SecretEyeIcon, {
+                        size: 16
+                    })
+                }) : o ]
+            }), c ? (0, a.jsx)("small", {
                 className: "mgp-field-error",
-                children: o
-            }) : null, !o && l ? (0, a.jsx)("small", {
-                children: l
+                children: c
+            }) : null, !c && i ? (0, a.jsx)("small", {
+                children: i
             }) : null ]
         });
     }
@@ -1771,7 +1765,7 @@
                         title: "配置中心"
                     }, {
                         id: "operations-plan",
-                        title: "运营配置"
+                        title: "生成及运营中心"
                     }, {
                         id: "ops",
                         title: "运行监控"
@@ -1869,7 +1863,7 @@
         }) : null;
     }
     function e9({config: e, releaseConfig: s, onChange: l, onOpenChooser: i, showErrors: t}) {
-        let [r, d] = (0, n.useState)({}), [loginDeleteTarget, setLoginDeleteTarget] = (0, n.useState)(null), o = eD(e.selected).map(e => G.find(a => a.id === e)).filter(Boolean), p = e.selected?.includes("guest"), h = o.some(e => "guest" !== e.id), selectedPlatforms = Array.from(new Set((s.channels || []).map(e => e$(e)?.platform).filter(e => "Android" === e || "iOS" === e)));
+        let [r, d] = (0, n.useState)({}), [loginDeleteTarget, setLoginDeleteTarget] = (0, n.useState)(null), [visibleLoginSecrets, setVisibleLoginSecrets] = (0, n.useState)({}), o = eD(e.selected).map(e => G.find(a => a.id === e)).filter(Boolean), p = e.selected?.includes("guest"), h = o.some(e => "guest" !== e.id), selectedScopes = Array.from(new Set([ "common", ...(s.channels || []).map(e => e$(e)?.platform).filter(e => "Android" === e || "iOS" === e) ]));
         return (0, a.jsxs)("div", {
             className: "mgp-config-body",
             children: [ (0, a.jsx)(e7, {
@@ -1891,10 +1885,10 @@
                         children: "操作"
                     }) ]
                 }) : null, o.map((n, i) => {
-                    let o = selectedPlatforms.map(platform => {
-                        let params = getLoginPlatformParameters(n, platform), filled = params.filter(a => String(getLoginPlatformValue(e.values[n.id], platform, a.key)).trim()).length, complete = !params.length || filled === params.length, stateKey = `${n.id}-${platform}`, expanded = !!params.length && !!r[stateKey], detailsId = `login-params-${n.id}-${platform.toLowerCase()}`;
+                    let o = selectedScopes.map(scope => {
+                        let params = getLoginPlatformParameters(n, scope), filled = params.filter(a => String(getLoginPlatformValue(e.values[n.id], scope, a.key)).trim()).length, complete = !params.length || filled === params.length, stateKey = `${n.id}-${scope}`, expanded = !!params.length && !!r[stateKey], detailsId = `login-params-${n.id}-${scope.toLowerCase()}`;
                         return {
-                            platform: platform,
+                            scope: scope,
                             params: params,
                             filled: filled,
                             complete: complete,
@@ -1909,13 +1903,13 @@
                             }))
                         };
                     });
-                    let parameterPlatforms = o.filter(e => e.hasParams), p = parameterPlatforms.length > 0, u = !p || parameterPlatforms.some(e => e.complete), g = !1;
+                    let parameterScopes = o.filter(e => e.hasParams), p = parameterScopes.length > 0, u = !p || parameterScopes.every(e => e.complete), g = !!t;
                     o = o.map(e => ({
                         ...e,
                         hasError: g && e.hasParams && !e.complete
                     }));
-                    parameterPlatforms = o.filter(e => e.hasParams);
-                    let x = o.filter(e => e.expanded), totalFilled = parameterPlatforms.reduce((e, a) => e + a.filled, 0), totalParams = parameterPlatforms.reduce((e, a) => e + a.params.length, 0), anyComplete = parameterPlatforms.some(e => e.complete), y = `login-required-${n.id}`;
+                    parameterScopes = o.filter(e => e.hasParams);
+                    let x = o.filter(e => e.expanded), totalFilled = parameterScopes.reduce((e, a) => e + a.filled, 0), totalParams = parameterScopes.reduce((e, a) => e + a.params.length, 0), allComplete = parameterScopes.every(e => e.complete), y = `login-required-${n.id}`;
                     return (0, a.jsxs)("div", {
                         className: `mgp-login-row checked ${p ? "has-params" : ""} ${g ? "has-error" : ""}`,
                         role: "row",
@@ -1953,20 +1947,20 @@
                         }), (0, a.jsx)("div", {
                             className: "mgp-login-platforms",
                             role: "group",
-                            "aria-label": `${n.displayName}平台参数`,
+                            "aria-label": `${n.displayName}参数`,
                             children: p ? (0, a.jsxs)("button", {
                                 type: "button",
-                                className: `mgp-login-platform-toggle mgp-login-platform-summary ${anyComplete ? "complete" : ""}`,
+                                className: `mgp-login-platform-toggle mgp-login-platform-summary ${allComplete ? "complete" : ""}`,
                                 "aria-expanded": x.length > 0,
-                                "aria-controls": parameterPlatforms.map(e => e.detailsId).join(" "),
+                                "aria-controls": parameterScopes.map(e => e.detailsId).join(" "),
                                 "aria-label": `${x.length ? "收起" : "展开"}${n.displayName}参数`,
                                 onClick: () => d(e => ({
                                     ...e,
-                                    ...Object.fromEntries(parameterPlatforms.map(e => [ e.stateKey, 0 === x.length ]))
+                                    ...Object.fromEntries(parameterScopes.map(e => [ e.stateKey, 0 === x.length ]))
                                 })),
                                 children: [ (0, a.jsx)("span", {
                                     className: "mgp-login-platform-status",
-                                    children: anyComplete ? (0, a.jsxs)(a.Fragment, {
+                                    children: allComplete ? (0, a.jsxs)(a.Fragment, {
                                         children: [ (0, a.jsx)(c.CheckCircle2, {
                                             size: 13
                                         }), "已配置" ]
@@ -2009,39 +2003,57 @@
                             }), x.map(p => (0, a.jsxs)("section", {
                                 className: "mgp-login-platform-section",
                                 id: p.detailsId,
-                                children: [ (0, a.jsx)("header", {
-                                    children: (0, a.jsxs)("strong", {
-                                        children: [ p.platform, " 参数" ]
-                                    })
+                                children: [ (0, a.jsxs)("header", {
+                                    children: [ (0, a.jsx)("strong", {
+                                        children: getLoginScopeLabel(p.scope)
+                                    }), (0, a.jsx)("small", {
+                                        children: getLoginScopeDescription(p.scope)
+                                    }) ]
                                 }), (0, a.jsx)("div", {
                                     className: "mgp-inline-param-grid",
                                     children: p.params.map(s => {
-                                        let r = getLoginPlatformValue(e.values[n.id], p.platform, s.key);
+                                        let r = getLoginPlatformValue(e.values[n.id], p.scope, s.key);
+                                        let secretKey = `${n.id}-${p.scope}-${s.key}`, secretVisible = !!visibleLoginSecrets[secretKey];
                                         return (0, a.jsxs)("label", {
                                             children: [ (0, a.jsx)("span", {
                                                 children: s.label
-                                            }), (0, a.jsx)("input", {
-                                                type: s.secret ? "password" : "text",
-                                                value: r,
-                                                "aria-label": `${n.displayName} ${p.platform} ${s.label}`,
-                                                "aria-invalid": "false",
-                                                onChange: a => l({
-                                                    values: {
-                                                        ...e.values,
-                                                        [n.id]: {
-                                                            ...e.values[n.id],
-                                                            [p.platform]: {
-                                                                ...(e.values[n.id]?.[p.platform] || {}),
-                                                                [s.key]: a.target.value
+                                            }), (0, a.jsxs)("div", {
+                                                className: "mgp-secret-input-wrap",
+                                                children: [ (0, a.jsx)("input", {
+                                                    type: s.secret && !secretVisible ? "password" : "text",
+                                                    value: r,
+                                                    "aria-label": `${n.displayName} ${getLoginScopeLabel(p.scope)} ${s.label}`,
+                                                    "aria-invalid": p.hasError && !String(r).trim() ? "true" : "false",
+                                                    onChange: a => l({
+                                                        values: {
+                                                            ...e.values,
+                                                            [n.id]: {
+                                                                ...e.values[n.id],
+                                                                [p.scope]: {
+                                                                    ...(e.values[n.id]?.[p.scope] || {}),
+                                                                    [s.key]: a.target.value
+                                                                }
                                                             }
                                                         }
-                                                    }
-                                                })
+                                                    })
+                                                }), s.secret ? (0, a.jsx)("button", {
+                                                    type: "button",
+                                                    className: `mgp-secret-visibility ${secretVisible ? "is-visible" : ""}`,
+                                                    "aria-label": secretVisible ? `隐藏${n.displayName} ${s.label}` : `显示${n.displayName} ${s.label}`,
+                                                    "aria-pressed": secretVisible,
+                                                    onClick: () => setVisibleLoginSecrets(e => ({
+                                                        ...e,
+                                                        [secretKey]: !e[secretKey]
+                                                    })),
+                                                    children: (0, a.jsx)(SecretEyeIcon, {
+                                                        size: 16
+                                                    })
+                                                }) : null ]
                                             }) ]
-                                        }, `${p.platform}-${s.key}`);
+                                        }, `${p.scope}-${s.key}`);
                                     })
                                 }) ]
-                            }, p.platform)) ]
+                            }, p.scope)) ]
                         }) : null ]
                     }, n.id);
                 }), (0, a.jsx)("button", {
@@ -3431,7 +3443,7 @@
         });
     }
     function al({config: e, onChange: n, showErrors: s}) {
-        let l = String(e.ageThreshold || "").trim(), i = s ? l ? !Number.isInteger(Number(l)) || Number(l) < 1 || Number(l) > 18 ? "请输入 1-18 之间的整数" : "" : "请填写年龄阈值" : "", t = String(e.kwsRedirect || "").trim(), r = s ? t ? /^https?:\/\/[^\s]+$/i.test(t) ? "" : "请输入以 http:// 或 https:// 开头的有效地址" : "请填写 KWS Redirect URL" : "", d = s && !String(e.kwsClientId || "").trim() ? "请填写 KWS Client ID" : "", o = s && !String(e.kwsClientSecret || "").trim() ? "请填写 KWS Client Secret" : "";
+        let l = String(e.ageThreshold || "").trim(), i = s ? l ? !Number.isInteger(Number(l)) || Number(l) < 1 || Number(l) > 18 ? "请输入 1-18 之间的整数" : "" : "请填写年龄阈值" : "", t = String(e.kwsRedirect || "").trim(), r = s ? t ? /^https?:\/\/[^\s]+$/i.test(t) ? "" : "请输入以 http:// 或 https:// 开头的有效地址" : "请填写 KWS Redirect URL" : "", d = s && !String(e.kwsClientId || "").trim() ? "请填写 KWS Client ID" : "", o = s && !String(e.kwsClientSecret || "").trim() ? "请填写 KWS Client Secret" : "", c = s && !String(e.kwsVerifySecret || "").trim() ? "请填写 KWS Verify Secret" : "";
         return (0, a.jsxs)("div", {
             className: "mgp-config-body mgp-compliance-params",
             children: [ (0, a.jsx)(e7, {
@@ -3447,9 +3459,9 @@
                         children: "合规接入帮助"
                     }) ]
                 }), (0, a.jsx)("p", {
-                    children: "需要启用对应能力时，可在运营配置中开启。"
+                    children: "需要启用对应能力时，可在生成及运营中心的运营配置中开启。"
                 }), (0, a.jsxs)("div", {
-                    className: "mgp-form-grid four",
+                    className: "mgp-form-grid five",
                     children: [ (0, a.jsx)(eY, {
                         label: "年龄阈值",
                         required: !0,
@@ -3474,6 +3486,15 @@
                         error: o,
                         onChange: e => n({
                             kwsClientSecret: e
+                        })
+                    }), (0, a.jsx)(eY, {
+                        label: "KWS Verify Secret",
+                        required: !0,
+                        type: "password",
+                        value: e.kwsVerifySecret || "",
+                        error: c,
+                        onChange: e => n({
+                            kwsVerifySecret: e
                         })
                     }), (0, a.jsx)(eY, {
                         label: "KWS Redirect URL",
@@ -3736,7 +3757,7 @@
                                     children: n.name
                                 }) ]
                             }), (0, a.jsxs)("small", {
-                                children: [ n.platform, " · ", s.packageNames?.[e] || "未填写包名" ]
+                            children: s.packageNames?.[e] || "未填写包名"
                             }) ]
                         }), (0, a.jsx)(ap, {
                             selected: l,
@@ -3823,8 +3844,6 @@
                                 }), (0, a.jsxs)("span", {
                                     children: [ (0, a.jsx)("strong", {
                                         children: l?.name || "未配置"
-                                    }), (0, a.jsx)("small", {
-                                        children: l?.platform || "未配置平台"
                                     }) ]
                                 }) ]
                             }), (0, a.jsx)("span", {
@@ -3928,7 +3947,7 @@
                         }), (0, a.jsx)("strong", {
                             children: j.packageName || "未填写包名"
                         }), (0, a.jsxs)("small", {
-                            children: [ e$(j.storeId)?.platform || "未配置", " ·", " ", e$(j.storeId)?.name || "未配置渠道" ]
+                            children: e$(j.storeId)?.name || "未配置渠道"
                         }) ]
                     }), (0, a.jsxs)("footer", {
                         children: [ (0, a.jsx)("button", {
@@ -4067,14 +4086,14 @@
             }) : null ]
         });
     }
-    function ChannelPackageBuilder({gameName: gameName, games: games, onGameChange: onGameChange, gameProfile: gameProfile, packages: packages, config: config, onSave: onSave, onDownload: onDownload, onEnterOperations: onEnterOperations, onDelete: onDelete, onUpdateConfig: onUpdateConfig, onBackToConfig: onBackToConfig, toast: toast}) {
-        let [editingId, setEditingId] = (0, n.useState)(null), [quickConfigCapability, setQuickConfigCapability] = (0, n.useState)(null), [channelDrafts, setChannelDrafts] = (0, n.useState)({}), [downloadConfirmation, setDownloadConfirmation] = (0, n.useState)(null), [form, setForm] = (0, 
-        n.useState)({
+    function ChannelPackageBuilder({gameName: gameName, games: games, onGameChange: onGameChange, gameProfile: gameProfile, packages: packages, config: config, onSave: onSave, onDownload: onDownload, onEnterOperations: onEnterOperations, onDelete: onDelete, initialSession: initialSession, onBackToConfig: onBackToConfig, toast: toast}) {
+        let emptyForm = {
             platform: "",
             storeId: "",
             packageName: "",
             includedCapabilities: []
-        }), [errors, setErrors] = (0, n.useState)({}), configuredCapabilitiesFor = e => {
+        }, restoredSession = initialSession || {}, [editingId, setEditingId] = (0, n.useState)(restoredSession.editingId || null), [channelDrafts, setChannelDrafts] = (0, n.useState)(restoredSession.channelDrafts || {}), [downloadConfirmation, setDownloadConfirmation] = (0, n.useState)(null), [form, setForm] = (0, 
+        n.useState)(restoredSession.form || emptyForm), [errors, setErrors] = (0, n.useState)({}), configuredCapabilitiesFor = e => {
             return ec.filter(a => getCapabilityConfigurationStatus(a.id, config, e).ready).map(e => e.id);
         }, configuredIds = configuredCapabilitiesFor(form.storeId), configuredSet = new Set(configuredIds), startNew = () => {
             setEditingId(null), setForm({
@@ -4102,66 +4121,99 @@
                     includedCapabilities: [ ...form.includedCapabilities ]
                 }
             }), setChannelDrafts(nextDrafts);
-            let saved = nextDrafts[e], existing = packages.find(a => a.storeId === e);
+            let saved = nextDrafts[e];
             saved ? (setEditingId(saved.editingId || null), setForm({
                 ...saved.form,
                 includedCapabilities: saved.form.includedCapabilities.filter(a => getCapabilityConfigurationStatus(a, config, e).ready)
-            }), setErrors({})) : existing ? startEdit(existing) : (setEditingId(null), setForm({
+            }), setErrors({})) : (setEditingId(null), setForm({
                 platform: a?.platform || "",
                 storeId: e,
                 packageName: "",
                 includedCapabilities: configuredCapabilitiesFor(e)
             }), setErrors({}));
         }, submit = () => {
-            let readyCapabilities = form.includedCapabilities.filter(e => getCapabilityConfigurationStatus(e, config, form.storeId).ready);
-            let a = {}, n = String(form.packageName || "").trim(), s = form.storeId ? et(form.storeId, n) : "请先选择发行渠道", l = packages.some(e => e.id !== editingId && e.storeId === form.storeId);
-            form.storeId || (a.storeId = "请选择发行渠道"), s && (a.packageName = s), l && (a.storeId = "当前发行渠道已有 SDK 包，请直接更新该渠道"), form.includedCapabilities.length || (a.capabilities = "请至少选择一种 SDK 能力");
-            if (Object.keys(a).length) return setErrors(a), toast("请检查 SDK 下载信息", "error"), void 0;
+            let readyCapabilities = form.includedCapabilities.filter(e => getCapabilityConfigurationStatus(e, config, form.storeId).ready), invalidSelectedCapabilities = form.includedCapabilities.filter(e => !getCapabilityConfigurationStatus(e, config, form.storeId).ready);
+            let a = {}, n = String(form.packageName || "").trim(), s = form.storeId ? et(form.storeId, n) : "请先选择发行渠道";
+            form.storeId || (a.storeId = "请选择发行渠道"), s && (a.packageName = s), form.includedCapabilities.length || (a.capabilities = "请至少选择一种 SDK 能力");
+            invalidSelectedCapabilities.length && (a.capabilities = `已选择的 ${invalidSelectedCapabilities.map(e => ec.find(a => a.id === e)?.title || e).join("、")} 配置已变化，请重新确认`);
+            if (Object.keys(a).length) return setErrors(a), toast("请检查 SDK 生成信息", "error"), void 0;
             if (!readyCapabilities.length) return setErrors(e => ({...e, capabilities: "请至少选择一种已配置完成的 SDK 能力"})), toast("请先完成 SDK 能力配置", "error"), void 0;
-            let i = {
-                id: editingId || `channel-bundle-${Date.now()}`,
+            let version = Math.max(0, ...packages.filter(e => e.storeId === form.storeId && e.packageName === n).map(e => Number(e.version || 0))) + 1, i = {
+                id: `sdk-version-${Date.now()}`,
                 storeId: form.storeId,
                 platform: form.platform,
                 packageName: n,
+                version: version,
                 includedCapabilities: Array.from(new Set(readyCapabilities)),
+                generatedAt: (new Date).toISOString(),
                 updatedAt: (new Date).toISOString()
             };
             setDownloadConfirmation(i);
-        }, confirmDownload = () => {
-            let i = downloadConfirmation;
-            i && !1 !== onSave(i) && (setEditingId(i.id), setChannelDrafts(e => ({
-                ...e,
-                [i.storeId]: {
-                    editingId: i.id,
-                    form: {
-                        ...form,
-                        packageName: i.packageName,
-                        includedCapabilities: [ ...i.includedCapabilities ]
-                    }
+        }, unavailableCapabilities = form.storeId ? ec.map(e => ({
+            ...e,
+            status: getCapabilityConfigurationStatus(e.id, config, form.storeId)
+        })).filter(e => !e.status.ready) : [], createSession = () => {
+            let nextDrafts = {
+                ...channelDrafts
+            };
+            return form.storeId && (nextDrafts[form.storeId] = {
+                editingId: editingId,
+                form: {
+                    ...form,
+                    includedCapabilities: [ ...form.includedCapabilities ]
                 }
-            })), onDownload(i), toast("SDK 包已生成并开始下载"), setDownloadConfirmation(null));
+            }), {
+                editingId: editingId,
+                form: {
+                    ...form,
+                    includedCapabilities: [ ...form.includedCapabilities ]
+                },
+                channelDrafts: nextDrafts
+            };
+        }, returnToConfig = () => onBackToConfig({
+            session: createSession(),
+            channelId: form.storeId,
+            missingCapabilityIds: unavailableCapabilities.map(e => e.id)
+        }), confirmGenerate = () => {
+            let i = downloadConfirmation;
+            i && !1 !== onSave(i) && (toast(`SDK V${i.version} 已生成`), setDownloadConfirmation(null));
         };
         (0, n.useEffect)(() => {
-            setChannelDrafts({}), setDownloadConfirmation(null), setQuickConfigCapability(null), startNew();
+            let e = initialSession || {};
+            setChannelDrafts(e.channelDrafts || {}), setEditingId(e.editingId || null), setForm(e.form || emptyForm), setErrors({}), setDownloadConfirmation(null);
         }, [ gameName ]);
         return (0, a.jsxs)("div", {
             className: "mgp-page mgp-channel-package-page",
             children: [ (0, a.jsx)(eZ, {
                 eyebrow: null,
-                title: "配置中心",
-                description: "维护游戏级 SDK 能力参数，为 SDK 下载准备可复用能力配置。",
-                action: (0, a.jsxs)("button", {
-                    type: "button",
-                    className: "mgp-button secondary",
-                    onClick: onBackToConfig,
-                    children: [ (0, a.jsx)(s.ArrowLeft, {
-                        size: 15
-                    }), "返回SDK配置" ]
+                title: "生成及运营中心",
+                description: "生成、下载并管理各发行渠道的 SDK 版本。",
+                action: (0, a.jsx)("section", {
+                    className: "mgp-foundation-toolbar mgp-operations-game-toolbar mgp-foundation-toolbar-inline",
+                    children: (0, a.jsxs)("div", {
+                        className: "mgp-foundation-toolbar-row",
+                        children: [ (0, a.jsxs)("label", {
+                            children: [ (0, a.jsx)("span", {
+                                children: "游戏名称"
+                            }), (0, a.jsx)("select", {
+                                "aria-label": "SDK生成当前游戏",
+                                value: gameName,
+                                onChange: e => onGameChange?.(e.target.value),
+                                children: games.map(e => (0, a.jsx)("option", {
+                                    value: e,
+                                    children: e
+                                }, e))
+                            }), (0, a.jsx)(m.ChevronDown, {
+                                size: 15
+                            }) ]
+                        }), (0, a.jsx)("button", {
+                            type: "button",
+                            className: "mgp-button secondary",
+                            onClick: () => onEnterOperations?.(),
+                            children: "返回列表"
+                        }) ]
+                    })
                 })
-            }), (0, a.jsx)(SdkWorkbenchTabs, {
-                active: "download",
-                onConfig: onBackToConfig,
-                onDownload: () => {}
             }), (0, a.jsxs)("section", {
                 className: "mgp-builder-panel mgp-channel-package-builder",
                 "data-build-mode": editingId ? "edit" : "create",
@@ -4173,9 +4225,9 @@
                             className: "mgp-config-module-heading",
                             children: [ (0, a.jsx)("h3", {
                                 className: "mgp-plain-section-title",
-                                children: "SDK下载"
+                                children: "SDK生成"
                             }), (0, a.jsx)("p", {
-                                children: "选择发行渠道、填写包名并按渠道确认 SDK 能力，生成可接入游戏的渠道 SDK 包。"
+                                children: "选择发行渠道、填写包名并确认 SDK 能力，生成可下载和运营配置的 SDK 版本。"
                             }) ]
                         })
                     }), (0, a.jsxs)("section", {
@@ -4198,7 +4250,7 @@
                                     role: "radiogroup",
                                     "aria-label": "选择发行渠道",
                                     children: V.map(e => {
-                                        let n = form.storeId === e.id, s = packages.some(a => a.storeId === e.id);
+                                        let n = form.storeId === e.id, s = packages.filter(a => a.storeId === e.id).length;
                                         return (0, a.jsxs)("button", {
                                             type: "button",
                                             role: "radio",
@@ -4212,14 +4264,9 @@
                                             }), (0, a.jsxs)("span", {
                                                 children: [ (0, a.jsx)("strong", {
                                                     children: e.name
-                                                }), (0, a.jsxs)("small", {
-                                                    children: [ (0, a.jsx)(eO, {
-                                                        platform: e.platform,
-                                                        size: 14
-                                                    }), e.platform ]
                                                 }) ]
                                             }), s ? (0, a.jsx)("em", {
-                                                children: "已有包"
+                                                children: `${s} 个版本`
                                             }) : null ]
                                         }, e.id);
                                     })
@@ -4247,7 +4294,7 @@
                                         }));
                                     }
                                 }), (0, a.jsx)("small", {
-                                    children: errors.packageName || (form.storeId ? ei(form.storeId) : "选择渠道后按对应平台校验包名格式。")
+                                    children: errors.packageName || (form.storeId ? ei(form.storeId) : "选择发行渠道后校验对应包名格式。")
                                 }) ]
                             }) : null ]
                         }) ]
@@ -4262,12 +4309,48 @@
                                     children: "选择 SDK 能力"
                                 })
                             }) ]
-                        }), (0, a.jsx)("div", {
+                        }), form.storeId && unavailableCapabilities.length ? (0, a.jsxs)("div", {
+                            className: "mgp-channel-package-validation-banner",
+                            role: "status",
+                            children: [ (0, a.jsxs)("div", {
+                                children: [ (0, a.jsx)(C, {
+                                    size: 18,
+                                    "aria-hidden": "true"
+                                }), (0, a.jsxs)("p", {
+                                    children: [ (0, a.jsx)("strong", {
+                                        children: `${e$(form.storeId)?.name || "当前发行渠道"} 有 ${unavailableCapabilities.length} 项能力暂不可用`
+                                    }), (0, a.jsxs)("span", {
+                                        children: [ unavailableCapabilities.map(e => e.title).join("、"), "。如果需要，请返回SDK配置补齐后继续。" ]
+                                    }) ]
+                                }) ]
+                            }), (0, a.jsxs)("button", {
+                                type: "button",
+                                className: "mgp-button secondary",
+                                onClick: returnToConfig,
+                                children: [ (0, a.jsx)(s.ArrowLeft, {
+                                    size: 15
+                                }), "返回SDK配置" ]
+                            }) ]
+                        }) : null, (0, a.jsx)("div", {
                             className: `mgp-channel-package-capability-grid ${errors.capabilities ? "has-error" : ""}`,
                             role: "group",
                             "aria-label": "选择要包含的SDK能力",
                             children: ec.map(e => {
-                                let s = getCapabilityConfigurationStatus(e.id, config, form.storeId), n = s.ready && form.includedCapabilities.includes(e.id), l = getCapabilityConfiguredPreview(e.id, config), i = () => {
+                                let s = getCapabilityConfigurationStatus(e.id, config, form.storeId), n = s.ready && form.includedCapabilities.includes(e.id), l = getCapabilityConfiguredPreview(e.id, config), configuredLogos = getCapabilityConfiguredLogos(e.id, config), configuredPreview = configuredLogos.length ? (0, a.jsxs)("span", {
+                                    className: "mgp-channel-package-capability-logo-summary",
+                                    children: [ (0, a.jsx)("em", {
+                                        children: "已配置："
+                                    }), (0, a.jsx)("span", {
+                                        className: "mgp-channel-package-capability-logos",
+                                        "aria-label": configuredLogos.map(e => e.label).join("、"),
+                                        children: configuredLogos.map((e, n) => "store" === e.kind ? (0, a.jsx)(eM, {
+                                            storeId: e.id,
+                                            size: 18
+                                        }, `${e.kind}-${e.id}-${n}`) : (0, a.jsx)(e4, {
+                                            methodId: e.id
+                                        }, `${e.kind}-${e.id}-${n}`))
+                                    }) ]
+                                }) : l, i = () => {
                                     if (!form.storeId || !s.ready) return;
                                     setForm(a => ({
                                         ...a,
@@ -4282,7 +4365,7 @@
                                     role: "checkbox",
                                     tabIndex: form.storeId && s.ready ? 0 : -1,
                                     "aria-checked": n,
-                                    "aria-disabled": form.storeId ? void 0 : !0,
+                                    "aria-disabled": !form.storeId || !s.ready ? !0 : void 0,
                                     "data-capability-id": e.id,
                                     onClick: i,
                                     onKeyDown: e => {
@@ -4297,20 +4380,13 @@
                                         children: [ (0, a.jsx)("strong", {
                                             children: e.title
                                         }), (0, a.jsx)("small", {
-                                            children: form.storeId ? s.ready ? "当前渠道已配置，可直接出包" : s.missing.length ? `待配置：${s.missing.join("、")}` : "待配置" : l
+                                            children: form.storeId ? s.ready ? configuredPreview : s.missing.length ? `待配置：${s.missing.join("、")}` : "待配置" : configuredPreview
                                         }) ]
                                     }), form.storeId ? (0, a.jsxs)("span", {
                                         className: "mgp-channel-package-capability-actions",
                                         children: [ (0, a.jsx)("em", {
                                             children: s.ready ? "已配置" : "待配置"
-                                        }), !s.ready && form.storeId ? (0, a.jsx)("button", {
-                                            type: "button",
-                                            className: "mgp-capability-config-action",
-                                            onClick: a => {
-                                                a.stopPropagation(), setQuickConfigCapability(e.id);
-                                            },
-                                            children: "去配置"
-                                        }) : null ]
+                                        }) ]
                                     }) : null ]
                                 }, e.id);
                             })
@@ -4329,34 +4405,23 @@
                             onClick: submit,
                             children: [ (0, a.jsx)(z.Save, {
                                 size: 16
-                            }), "下载" ]
+                            }), "生成SDK" ]
                         })
                     }) ]
                 }) ]
-            }), quickConfigCapability ? (0, a.jsx)(QuickConfigEditor, {
-                capabilityId: quickConfigCapability,
-                storeId: form.storeId,
-                config: config,
-                onChange: onUpdateConfig,
-                onClose: () => setQuickConfigCapability(null),
-                onConfigured: e => setForm(a => ({
-                    ...a,
-                    includedCapabilities: a.includedCapabilities.includes(e) ? a.includedCapabilities : [ ...a.includedCapabilities, e ]
-                })),
-                toast: toast
-            }) : null, downloadConfirmation ? (0, a.jsx)("div", {
+            }), downloadConfirmation ? (0, a.jsx)("div", {
                 className: "mgp-modal-backdrop mgp-sdk-download-confirm-backdrop",
                 role: "presentation",
                 children: (0, a.jsxs)("section", {
                     className: "mgp-modal mgp-sdk-download-confirm-modal",
                     role: "dialog",
                     "aria-modal": "true",
-                    "aria-label": "确认下载SDK包",
+                    "aria-label": "确认生成SDK",
                     children: [ (0, a.jsxs)("header", {
                         children: [ (0, a.jsx)("h2", {
-                            children: "确认下载"
+                            children: "确认生成SDK"
                         }), (0, a.jsx)("p", {
-                            children: "请确认本次生成的渠道 SDK 包信息。"
+                            children: "请确认本次生成的 SDK 版本信息。"
                         }) ]
                     }), (0, a.jsxs)("div", {
                         className: "mgp-sdk-download-confirm-content",
@@ -4373,6 +4438,10 @@
                                 children: "包名"
                             }), (0, a.jsx)("dd", {
                                 children: downloadConfirmation.packageName
+                            }), (0, a.jsx)("dt", {
+                                children: "SDK版本"
+                            }), (0, a.jsx)("dd", {
+                                children: `V${downloadConfirmation.version || 1}`
                             }) ]
                         }), (0, a.jsxs)("section", {
                             children: [ (0, a.jsx)("strong", {
@@ -4393,17 +4462,27 @@
                         }), (0, a.jsx)("button", {
                             type: "button",
                             className: "mgp-button primary",
-                            onClick: confirmDownload,
-                            children: "确认并生成"
+                            onClick: confirmGenerate,
+                            children: "确认生成"
                         }) ]
                     }) ]
                 })
             }) : null ]
         });
     }
-    function ac({gameName: e, setGameName: l, games: i, gameProfiles: t, onAddGame: r, onUpdateGame: d, config: c, setConfig: p, activeStep: h, setActiveStep: u, validMap: g, completeMap: x, onStepSaved: j, onStepsDirty: b, toast: f, availableChannels: y, mode: v, packages: k, onModeChange: N, onDownloadPackage: C, onEnterOperations: S, onDeletePackage: w, onOpenSdkDownload: onOpenSdkDownload}) {
-        let [A, $] = (0, n.useState)(null), [I, D] = (0, n.useState)(!1), [E, P] = (0, n.useState)("create"), [O, M] = (0, 
-        n.useState)(eo), [L, U] = (0, n.useState)(null), _ = h >= 0 ? R[h] : null, B = Object.values(x).filter(Boolean).length, V = O.name.trim() && O.type && O.stage, X = (e, a) => {
+    function ac({gameName: e, setGameName: l, games: i, gameProfiles: t, onAddGame: r, onUpdateGame: d, config: c, setConfig: p, activeStep: h, setActiveStep: u, validMap: g, completeMap: x, onStepSaved: j, onStepsDirty: b, toast: f, availableChannels: y, mode: v, packages: k, onModeChange: N, onDownloadPackage: downloadPackage, onEnterOperations: S, onDeletePackage: w, downloadReturnContext: downloadReturnContext, onOpenSdkDownload: onOpenSdkDownload}) {
+        let [A, $] = (0, n.useState)(null), [I, D] = (0, n.useState)(!1), [sdkPreflightOpen, setSdkPreflightOpen] = (0, n.useState)(!1), [E, P] = (0, n.useState)("create"), [pendingDeleteButton, setPendingDeleteButton] = (0, n.useState)(null), deleteBypassRef = (0, n.useRef)(new WeakSet), [O, M] = (0, 
+        n.useState)(eo), [L, U] = (0, n.useState)(null), _ = h >= 0 ? R[h] : null, B = Object.values(x).filter(Boolean).length, sdkIncompleteSteps = R.filter(e => !x[e.id]), unresolvedReturnCapabilityIds = (downloadReturnContext?.missingCapabilityIds || []).filter(e => !getCapabilityConfigurationStatus(e, c, downloadReturnContext?.channelId || "").ready), returnMissingSet = new Set(unresolvedReturnCapabilityIds.map(e => "payment" === e ? "release" : "ops-data" === e ? "data" : e)), handleConfigDeleteCapture = e => {
+            let button = e.target.closest?.("button");
+            if (!button || !button.closest(".mgp-config-card-modal") || button.closest(".mgp-config-package-delete-modal") || button.classList.contains("mgp-login-delete")) return;
+            if (deleteBypassRef.current.has(button)) return void deleteBypassRef.current.delete(button);
+            let label = `${button.getAttribute("aria-label") || ""} ${button.textContent || ""}`.trim();
+            if (!button.classList.contains("danger") && !label.includes("删除") && !label.includes("移除")) return;
+            e.preventDefault(), e.stopPropagation(), setPendingDeleteButton(button);
+        }, openSdkDownload = () => {
+            if (downloadReturnContext) return onOpenSdkDownload();
+            sdkIncompleteSteps.length ? setSdkPreflightOpen(!0) : onOpenSdkDownload();
+        }, V = O.name.trim() && O.type && O.stage, X = (e, a) => {
             b([ e ]), p(n => ({
                 ...n,
                 [e]: {
@@ -4411,13 +4490,14 @@
                     ...a
                 }
             }));
-        }, H = e => "login" === e ? eD(c.login?.selected).some(e => "guest" !== e) : "agreement" === e ? (c.agreement?.groups || []).length > 0 : "compliance" === e ? [ "ageThreshold", "kwsClientId", "kwsClientSecret", "kwsRedirect" ].some(e => String(c.compliance?.[e] || "").trim()) : "data" === e ? (c.data?.selected || []).length > 0 : "advertising" === e ? !!c.advertising?.provider && "none" !== c.advertising.provider : "support" === e && (!!String(c.support?.onlineName || "").trim() || (c.support?.feedbackTypes || []).length > 0 || !!String(c.support?.faqBackground || "").trim() || (c.support?.faqGroups || []).length > 0 || !!String(c.support?.botName || "").trim() || (c.support?.knowledgeItems || []).length > 0);
+        }, H = e => "login" === e ? eD(c.login?.selected).some(e => "guest" !== e) : "agreement" === e ? (c.agreement?.groups || []).length > 0 : "compliance" === e ? [ "ageThreshold", "kwsClientId", "kwsClientSecret", "kwsVerifySecret", "kwsRedirect" ].some(e => String(c.compliance?.[e] || "").trim()) : "data" === e ? (c.data?.selected || []).length > 0 : "advertising" === e ? !!c.advertising?.provider && "none" !== c.advertising.provider : "support" === e && (!!String(c.support?.onlineName || "").trim() || (c.support?.feedbackTypes || []).length > 0 || !!String(c.support?.faqBackground || "").trim() || (c.support?.faqGroups || []).length > 0 || !!String(c.support?.botName || "").trim() || (c.support?.knowledgeItems || []).length > 0);
         return (0, a.jsxs)("div", {
             className: "mgp-page mgp-foundation-page",
+            onClickCapture: handleConfigDeleteCapture,
             children: [ (0, a.jsx)(eZ, {
                 eyebrow: null,
                 title: "配置中心",
-                description: "维护游戏级 SDK 能力参数，为 SDK 下载准备可复用能力配置。",
+                description: "维护并保存游戏级 SDK 能力参数，供 SDK 生成时复用。",
                 action: (0, a.jsxs)("section", {
                 className: "mgp-foundation-toolbar mgp-foundation-toolbar-inline",
                 children: [ (0, a.jsx)("div", {
@@ -4472,12 +4552,15 @@
                             children: e
                         }) ]
                     })
-                }) ]
+                }), !1 && downloadReturnContext ? (0, a.jsxs)("button", {
+                    type: "button",
+                    className: "mgp-button secondary mgp-return-sdk-generation",
+                    onClick: openSdkDownload,
+                    children: [ (0, a.jsx)(s.ArrowLeft, {
+                        size: 15
+                    }), "返回SDK生成" ]
+                }) : null ]
             })
-            }), (0, a.jsx)(SdkWorkbenchTabs, {
-                active: "config",
-                onConfig: () => {},
-                onDownload: onOpenSdkDownload
             }), !1 ? (0, a.jsx)(ao, {
                 gameName: e,
                 gameProfile: t[e],
@@ -4489,7 +4572,7 @@
                 onResume: () => {
                     u(0), U(null), N("flow");
                 },
-                onDownload: C,
+                onDownload: downloadPackage,
                 onEnterOperations: S,
                 onDelete: w,
                 toast: f
@@ -4515,7 +4598,7 @@
                             return (0, a.jsxs)("button", {
                                 type: "button",
                                 id: `config-tab-${e.id}`,
-                                className: `mgp-config-card ${s ? "active" : ""} ${x[e.id] ? "configured" : ""}`,
+                                className: `mgp-config-card ${s ? "active" : ""} ${x[e.id] ? "configured" : ""} ${returnMissingSet.has(e.id) ? "needs-attention" : ""}`,
                                 onClick: () => {
                                     u(n), U(null);
                                 },
@@ -4660,28 +4743,94 @@
                                         U("release"), f("请至少保留一种支付方式并检查发货地址", "error");
                                         return;
                                     }
-                                    U(null), j("release"), f("支付方式已保存"), u(-1);
+                                    U(null), j("release"), f("保存成功"), u(-1);
+                                    return;
+                                }
+                                if ("advertising" === _.id && !eV(c.advertising || {})) {
+                                    p(e => ({
+                                        ...e,
+                                        advertising: eh()
+                                    })), b([ "advertising" ]), U(null), f("未填写广告参数，已按未选择处理"), u(-1);
                                     return;
                                 }
                                 if (H(_.id) && !g[_.id]) {
                                     U(_.id), f("请检查已填写内容", "error");
                                     return;
                                 }
-                                U(null), H(_.id) ? j(_.id) : b([ _.id ]), u(-1);
+                                U(null), H(_.id) ? j(_.id) : b([ _.id ]), f("保存成功"), u(-1);
                             },
                             children: [ (0, a.jsx)(z.Save, {
                                 size: 16
                             }), "保存" ]
                         }) ]
                     }) ]
-                }) : null ]
-            }), (0, a.jsx)("button", {
+                }) : null, (0, a.jsxs)("button", {
+                        type: "button",
+                        className: "mgp-button primary mgp-config-save-fab",
+                        "aria-label": "保存SDK配置",
+                        onClick: () => {
+                            eV(c.advertising || {}) || p(e => ({
+                                ...e,
+                                advertising: eh()
+                            })), R.forEach(e => {
+                                H(e.id) && g[e.id] && j(e.id);
+                            }), f("保存成功");
+                        },
+                        children: [ (0, a.jsx)(z.Save, {
+                            size: 16
+                        }), "保存" ]
+                    }) ]
+            }), !1 ? (0, a.jsx)("button", {
                 type: "button",
                 className: "mgp-sdk-download-fab",
-                "aria-label": "SDK下载",
-                onClick: onOpenSdkDownload,
-                children: "SDK下载"
-            }), I ? (0, a.jsx)("div", {
+                "aria-label": downloadReturnContext ? "返回SDK下载" : "SDK下载",
+                onClick: openSdkDownload,
+                children: downloadReturnContext ? "返回SDK下载" : "SDK下载"
+            }) : null, !1 && sdkPreflightOpen ? (0, a.jsx)("div", {
+                className: "mgp-modal-backdrop mgp-sdk-preflight-backdrop",
+                role: "presentation",
+                children: (0, a.jsxs)("section", {
+                    className: "mgp-modal mgp-sdk-preflight-modal",
+                    role: "dialog",
+                    "aria-modal": "true",
+                    "aria-label": "SDK配置检查",
+                    children: [ (0, a.jsxs)("header", {
+                        children: [ (0, a.jsx)("h2", {
+                            children: "SDK 配置检查"
+                        }), (0, a.jsx)("p", {
+                            children: B ? `已有 ${B} 项能力可用于下载，${sdkIncompleteSteps.length} 项尚未完成配置。` : "当前还没有可用于下载的 SDK 能力。"
+                        }) ]
+                    }), (0, a.jsxs)("div", {
+                        className: "mgp-sdk-preflight-content",
+                        children: [ (0, a.jsx)("p", {
+                            children: "未配置能力进入 SDK下载后将置灰且不可选择。"
+                        }), (0, a.jsx)("div", {
+                            className: "mgp-sdk-preflight-list",
+                            children: sdkIncompleteSteps.map(e => (0, a.jsxs)("span", {
+                                children: [ (0, a.jsx)(C, {
+                                    size: 14,
+                                    "aria-hidden": "true"
+                                }), e.title ]
+                            }, e.id))
+                        }) ]
+                    }), (0, a.jsxs)("footer", {
+                        children: [ (0, a.jsx)("button", {
+                            type: "button",
+                            className: "mgp-button secondary",
+                            onClick: () => setSdkPreflightOpen(!1),
+                            children: "继续配置"
+                        }), (0, a.jsx)("button", {
+                            type: "button",
+                            className: "mgp-button primary",
+                            disabled: 0 === B,
+                            onClick: () => {
+                                setSdkPreflightOpen(!1), onOpenSdkDownload();
+                            },
+                            children: "使用已配置能力下载"
+                        }) ]
+                    }) ]
+                })
+            }) : null, I ? (0, a.jsx)("div", {
                 className: "mgp-modal-backdrop",
                 role: "presentation",
                 children: (0, a.jsxs)("section", {
@@ -4808,11 +4957,46 @@
                         selected: e
                     }), $(null);
                 }
+            }) : null, pendingDeleteButton ? (0, a.jsx)("div", {
+                className: "mgp-modal-overlay mgp-sdk-config-delete-confirm-overlay",
+                children: (0, a.jsxs)("section", {
+                    className: "mgp-modal mgp-config-package-delete-modal mgp-sdk-config-delete-confirm-modal",
+                    role: "dialog",
+                    "aria-modal": "true",
+                    "aria-label": "确认删除配置内容",
+                    children: [ (0, a.jsxs)("header", {
+                        children: [ (0, a.jsx)("h2", {
+                            children: "确认删除"
+                        }), (0, a.jsx)("p", {
+                            children: "删除后将影响当前游戏的 SDK 配置，请确认是否继续。"
+                        }) ]
+                    }), (0, a.jsx)("div", {
+                        className: "mgp-modal-body mgp-config-package-delete-body",
+                        children: (0, a.jsxs)("p", {
+                            children: [ "即将执行：", pendingDeleteButton.getAttribute("aria-label") || pendingDeleteButton.textContent?.trim() || "删除当前配置" ]
+                        })
+                    }), (0, a.jsxs)("footer", {
+                        children: [ (0, a.jsx)("button", {
+                            type: "button",
+                            className: "mgp-button secondary",
+                            onClick: () => setPendingDeleteButton(null),
+                            children: "取消"
+                        }), (0, a.jsx)("button", {
+                            type: "button",
+                            className: "mgp-button danger",
+                            onClick: () => {
+                                let button = pendingDeleteButton;
+                                setPendingDeleteButton(null), button && (deleteBypassRef.current.add(button), button.click());
+                            },
+                            children: "确认删除"
+                        }) ]
+                    }) ]
+                })
             }) : null ]
         });
     }
     function am({selected: e, paymentConfigs: s, packageNames: l, onSelect: i, onRemove: t, onPackageNameChange: r, onPaymentChange: d, showErrors: o = !1}) {
-        let [p, h] = (0, n.useState)(B[0].platform), [u, g] = (0, n.useState)({}), x = B.find(e => e.platform === p) || B[0], j = (e, a) => {
+        let [p, h] = (0, n.useState)(B[0].platform), [u, g] = (0, n.useState)({}), [visiblePaymentSecrets, setVisiblePaymentSecrets] = (0, n.useState)({}), x = B.find(e => e.platform === p) || B[0], j = (e, a) => {
             g(n => ({
                 ...n,
                 [e]: !a
@@ -4825,8 +5009,6 @@
                 children: [ (0, a.jsxs)("div", {
                     className: "mgp-selected-channel-head",
                     children: [ (0, a.jsx)("span", {
-                        children: "平台"
-                    }), (0, a.jsx)("span", {
                         children: "发行渠道"
                     }), (0, a.jsx)("span", {
                         children: "支付配置"
@@ -4846,7 +5028,7 @@
                             className: "mgp-selected-channel-summary",
                             role: "button",
                             tabIndex: 0,
-                            "aria-label": `${n.platform} ${n.name}支付配置`,
+                            "aria-label": `${n.name}支付配置`,
                             "aria-expanded": k,
                             "aria-controls": `channel-config-details-${n.id}`,
                             onClick: e => {
@@ -4859,14 +5041,6 @@
                                 j(a, k)));
                             },
                             children: [ (0, a.jsxs)("span", {
-                                className: "mgp-platform-label",
-                                children: [ (0, a.jsx)(eO, {
-                                    platform: n.platform,
-                                    size: 20
-                                }), (0, a.jsx)("span", {
-                                    children: n.platform
-                                }) ]
-                            }), (0, a.jsxs)("span", {
                                 className: "mgp-release-store-label",
                                 children: [ (0, a.jsx)(eM, {
                                     storeId: n.id,
@@ -4925,6 +5099,7 @@
                                             [s]: e
                                         }
                                     });
+                                    let secretKey = `${n.id}-${s}`, secretVisible = !!visiblePaymentSecrets[secretKey];
                                     return "upload-json" === i ? (0, a.jsx)(e0, {
                                         label: l,
                                         required: !0,
@@ -4937,12 +5112,28 @@
                                         className: r ? "has-error" : "",
                                         children: [ (0, a.jsx)("span", {
                                             children: l
-                                        }), (0, a.jsx)("input", {
-                                            type: "secret" === i ? "password" : "text",
-                                            value: p.official?.[s] || "",
-                                            placeholder: `请输入${l}`,
-                                            "aria-invalid": !!r,
-                                            onChange: e => c(e.target.value)
+                                        }), (0, a.jsxs)("div", {
+                                            className: "mgp-secret-input-wrap",
+                                            children: [ (0, a.jsx)("input", {
+                                                type: "secret" === i && !secretVisible ? "password" : "text",
+                                                value: p.official?.[s] || "",
+                                                placeholder: `请输入${l}`,
+                                                "aria-label": `${n.name} ${l}`,
+                                                "aria-invalid": !!r,
+                                                onChange: e => c(e.target.value)
+                                            }), "secret" === i ? (0, a.jsx)("button", {
+                                                type: "button",
+                                                className: `mgp-secret-visibility ${secretVisible ? "is-visible" : ""}`,
+                                                "aria-label": secretVisible ? `隐藏${n.name} ${l}` : `显示${n.name} ${l}`,
+                                                "aria-pressed": secretVisible,
+                                                onClick: () => setVisiblePaymentSecrets(e => ({
+                                                    ...e,
+                                                    [secretKey]: !e[secretKey]
+                                                })),
+                                                children: (0, a.jsx)(SecretEyeIcon, {
+                                                    size: 16
+                                                })
+                                            }) : null ]
                                         }), r ? (0, a.jsx)("small", {
                                             className: "mgp-field-error",
                                             children: r
@@ -5336,7 +5527,7 @@
             switches: Object.fromEntries(Object.keys(l || {}).sort().map(e => [ e, l[e] ]))
         });
     }
-    function ab({item: e, configuredLoginMethodIds: s, configuredAgreementGroups: l, onSave: i, onClose: t, onGoLoginConfig: r, onGoAgreementConfig: d, toast: o}) {
+    function ab({item: e, configuredLoginMethodIds: s, configuredAgreementGroups: l, configuredDataPlatformIds: configuredDataPlatformIds = [], configuredAdvertising: configuredAdvertising = {}, configuredSupport: configuredSupport = {}, onSave: i, onClose: t, onGoLoginConfig: r, onGoAgreementConfig: d, toast: o}) {
         let [c, m] = (0, n.useState)(!1), [p, h] = (0, n.useState)(!1), u = e.storeId || e.channels?.[0] || "", g = (0, 
         n.useMemo)(() => (l || []).filter(e => !!e.name?.trim() && !!(e.languages || []).length), [ l ]), x = (0, 
         n.useMemo)(() => el(u).flatMap(e => e.countries.map(e => e.code)), [ u ]), j = (e.countries || []).filter(e => x.includes(e)), [b, f] = (0, 
@@ -5395,14 +5586,14 @@
                 role: "dialog",
                 "aria-modal": "true",
                 "data-package-capabilities": I.join(","),
-                "aria-label": `自定义配置 ${e.packageName}`,
+                "aria-label": `运营配置 ${e.packageName}`,
                 children: [ (0, a.jsxs)("header", {
                     className: "mgp-sdk-drawer-header",
                     children: [ (0, a.jsxs)("div", {
                         children: [ (0, a.jsx)("span", {
                             children: e.packageName
                         }), (0, a.jsx)("h2", {
-                            children: "自定义配置"
+                            children: "运营配置"
                         }) ]
                     }), (0, a.jsx)("button", {
                         type: "button",
@@ -5427,7 +5618,7 @@
                             className: "mgp-operations-workspace-context",
                             children: [ (0, a.jsxs)("span", {
                                 children: [ (0, a.jsx)("small", {
-                                    children: "当前渠道包"
+                                    children: "当前SDK版本"
                                 }), (0, a.jsxs)("strong", {
                                     children: [ Y?.name || u, " · ", e.packageName ]
                                 }) ]
@@ -5450,7 +5641,7 @@
                             }) ]
                         }), (0, a.jsx)("nav", {
                             className: "mgp-operations-workspace-nav",
-                            "aria-label": "运营配置工作台导航",
+                            "aria-label": "运营配置导航",
                             children: en.map((e, n) => (0, a.jsxs)("button", {
                                 type: "button",
                                 className: X === e.id ? "active" : "",
@@ -5557,7 +5748,7 @@
                                     }),
                                     onGoConfig: () => ei(r),
                                     disabled: !V,
-                                    disabledReason: B ? "当前国家或地区已关闭登录SDK，开启后可继续编辑；原选择与排序会保留。" : "配置中心未将登录SDK加入当前渠道包，登录方式选择与排序暂不可编辑。"
+                                    disabledReason: B ? "当前国家或地区已关闭登录SDK，开启后可继续编辑；原选择与排序会保留。" : "当前SDK版本未包含登录能力，登录方式选择与排序暂不可编辑。"
                                 }), (0, a.jsx)(au, {
                                     groups: g,
                                     selected: (S[A] || []).filter(e => g.some(a => a.id === e)),
@@ -5596,7 +5787,7 @@
                                 children: [ (0, a.jsx)("h3", {
                                     children: "SDK与运行开关"
                                 }), (0, a.jsx)("p", {
-                                    children: "可维护当前国家或地区的全部 SDK 能力，并配置渠道包运行开关。"
+                                    children: "仅可维护当前SDK版本已包含的能力，并配置版本运行开关。"
                                 }) ]
                             })
                         }), b.length ? (0, a.jsx)(ag, {
@@ -5663,18 +5854,38 @@
                         },
                         children: [ (0, a.jsx)(z.Save, {
                             size: 16
-                        }), "保存运营配置" ]
+                            }), "保存运营配置" ]
                     }) ]
                 }) ]
             })
         });
     }
     function af({item: e, gameName: s, gameProfile: l, configuredLoginMethodIds: i, configuredAgreementGroups: t, configuredCompliance: complianceConfig = {}, configuredDataPlatformIds: r, configuredAdvertising: d = {}, configuredSupport: supportConfig = {}, onClose: o, onEdit: c}) {
-        let [m, p] = (0, n.useState)(!1), h = {
+        let [m, p] = (0, n.useState)(!1), [secretVisibility, setSecretVisibility] = (0, n.useState)({}), h = {
             ...eh(),
             ...d
         }, u = e.storeId || e.channels?.[0] || "", x = e$(u), j = e.channelPaymentConfigs?.[u] || J(u), b = Q(u), f = eD(i || []).map(e => ez(e)).filter(Boolean), y = t || [], v = (r || []).map(e => F.find(a => a.id === e)).filter(Boolean), S = (e.countries || []).map(e => eE(e)?.name || e).filter(Boolean), w = (e = o) => {
             m || (p(!0), window.setTimeout(e, 260));
+        }, renderSecretValue = (key, value) => {
+            let normalizedValue = String(value || "").trim(), visible = !!secretVisibility[key];
+            return normalizedValue ? (0, a.jsxs)("span", {
+                className: "mgp-detail-secret",
+                children: [ (0, a.jsx)("span", {
+                    children: visible ? normalizedValue : "••••••••"
+                }), (0, a.jsx)("button", {
+                    type: "button",
+                    className: "mgp-detail-secret-toggle",
+                    "aria-label": visible ? "隐藏密文" : "显示明文",
+                    "aria-pressed": visible,
+                    onClick: () => setSecretVisibility(e => ({
+                        ...e,
+                        [key]: !e[key]
+                    })),
+                    children: (0, a.jsx)(SecretEyeIcon, {
+                        size: 15
+                    })
+                }) ]
+            }) : "未填写";
         };
         return (0, a.jsx)("div", {
             className: `mgp-drawer-backdrop ${m ? "is-closing" : ""}`,
@@ -5683,14 +5894,14 @@
                 className: "mgp-sdk-drawer mgp-sdk-detail-drawer mgp-template-detail-drawer",
                 role: "dialog",
                 "aria-modal": "true",
-            "aria-label": `渠道包详情 ${x?.name || u}`,
+            "aria-label": `SDK版本详情 ${x?.name || u}`,
                 children: [ (0, a.jsxs)("header", {
                     className: "mgp-sdk-drawer-header",
                     children: [ (0, a.jsxs)("div", {
                         children: [ (0, a.jsxs)("span", {
                             children: [ "当前游戏：", e.gameName || s ]
                         }), (0, a.jsx)("h2", {
-                        children: "渠道包详情"
+                        children: "SDK版本详情"
                         }) ]
                     }), (0, a.jsx)("button", {
                         type: "button",
@@ -5705,7 +5916,7 @@
                     children: [ (0, a.jsxs)("section", {
                         className: "mgp-package-detail-section",
                         children: [ (0, a.jsx)("h3", {
-                            children: "配置中心基础信息"
+                            children: "SDK版本信息"
                         }), (0, a.jsxs)("dl", {
                             className: "mgp-package-overview",
                             children: [ (0, a.jsxs)("div", {
@@ -5729,7 +5940,7 @@
                                         storeId: u,
                                         size: 24
                                     }), (0, a.jsxs)("span", {
-                                        children: [ x?.name || u, " · ", x?.platform || "未配置平台" ]
+                                        children: x?.name || u
                                     }) ]
                                 }) ]
                             }), (0, a.jsxs)("div", {
@@ -5740,17 +5951,16 @@
                                 }) ]
                             }), (0, a.jsxs)("div", {
                                 children: [ (0, a.jsx)("dt", {
-                                    children: "运营发行范围"
+                                    children: "SDK版本"
                                 }), (0, a.jsx)("dd", {
-                                    children: S.length ? S.join("、") : "待配置"
+                                    children: `V${e.version || 1}`
                                 }) ]
                             }), (0, a.jsxs)("div", {
                                 children: [ (0, a.jsx)("dt", {
-                                    children: "渠道配置状态"
+                                    children: "生成时间"
                                 }), (0, a.jsx)("dd", {
-                                    children: (0, a.jsx)("span", {
-                                        className: `mgp-status-pill ${Z(u, j) ? "complete" : ""}`,
-                                        children: Z(u, j) ? "配置完整" : "待完善"
+                                    children: new Date(e.generatedAt || e.updatedAt || Date.now()).toLocaleString("zh-CN", {
+                                        hour12: !1
                                     })
                                 }) ]
                             }) ]
@@ -5767,7 +5977,7 @@
                                     children: [ (0, a.jsx)("dt", {
                                         children: n
                                     }), (0, a.jsx)("dd", {
-                                        children: "secret" === s && l ? "••••••••" : l || "未填写"
+                                        children: "secret" === s ? renderSecretValue(`payment-${e}`, l) : l || "未填写"
                                     }) ]
                                 }, e);
                             }), (0, a.jsxs)("div", {
@@ -5830,7 +6040,13 @@
                                 children: [ (0, a.jsx)("dt", {
                                     children: "KWS Client Secret"
                                 }), (0, a.jsx)("dd", {
-                                    children: complianceConfig.kwsClientSecret ? "••••••••" : "未填写"
+                                    children: renderSecretValue("kws-client-secret", complianceConfig.kwsClientSecret)
+                                }) ]
+                            }), (0, a.jsxs)("div", {
+                                children: [ (0, a.jsx)("dt", {
+                                    children: "KWS Verify Secret"
+                                }), (0, a.jsx)("dd", {
+                                    children: renderSecretValue("kws-verify-secret", complianceConfig.kwsVerifySecret)
                                 }) ]
                             }), (0, a.jsxs)("div", {
                                 children: [ (0, a.jsx)("dt", {
@@ -5931,13 +6147,13 @@
                         onClick: () => w(c),
                         children: [ (0, a.jsx)(q, {
                             size: 15
-                        }), "自定义配置" ]
+                        }), "运营配置" ]
                     }) : null ]
                 }) ]
             })
         });
     }
-    function ay({gameName: e, games: s, onGameChange: l, packages: i, configuredLoginMethodIds: t, configuredAgreementGroups: r, configuredCompliance: configuredCompliance, configuredDataPlatformIds: d, configuredAdvertising: o, configuredSupport: configuredSupport, gameProfile: c, initialEditingPackageId: p, onInitialEditingHandled: h, onSave: u, onGoLoginConfig: g, onGoAgreementConfig: x, toast: j}) {
+    function ay({gameName: e, games: s, onGameChange: l, packages: i, configuredLoginMethodIds: t, configuredAgreementGroups: r, configuredCompliance: configuredCompliance, configuredDataPlatformIds: d, configuredAdvertising: o, configuredSupport: configuredSupport, gameProfile: c, initialEditingPackageId: p, onInitialEditingHandled: h, onSave: u, onGoLoginConfig: g, onGoAgreementConfig: x, onStartGenerate: onStartGenerate, onDownload: onDownload, toast: j}) {
         let [b, f] = (0, n.useState)(p || null), [y, v] = (0, n.useState)(null), k = i.filter(a => !a.gameName || a.gameName === e), N = k.find(e => e.id === b), C = k.find(e => e.id === y);
         return (0, n.useEffect)(() => {
             p && (v(null), f(p), h?.());
@@ -5945,17 +6161,17 @@
             className: "mgp-page mgp-sdk-page mgp-operations-plan-page",
             children: [ (0, a.jsx)(eZ, {
                 eyebrow: null,
-                title: "运营配置",
-                description: "运营配置直接承接 SDK 下载生成的渠道包，用于维护发行范围、区域化策略、SDK 能力启停与运行开关。",
+                title: "生成及运营中心",
+                description: "生成、下载和管理各发行渠道的 SDK 版本，并配置版本内已有的 SDK 能力。",
                 action: (0, a.jsx)("section", {
                     className: "mgp-foundation-toolbar mgp-operations-game-toolbar mgp-foundation-toolbar-inline",
-                    children: (0, a.jsx)("div", {
+                    children: (0, a.jsxs)("div", {
                         className: "mgp-foundation-toolbar-row",
                         children: (0, a.jsxs)("label", {
                             children: [ (0, a.jsx)("span", {
                                 children: "游戏名称"
                             }), (0, a.jsx)("select", {
-                                "aria-label": "运营配置当前游戏",
+                                "aria-label": "生成及运营中心当前游戏",
                                 value: e,
                                 onChange: e => {
                                     f(null), v(null), l(e.target.value);
@@ -5977,28 +6193,24 @@
                     children: [ (0, a.jsxs)("div", {
                         className: "mgp-operation-plan-head",
                         children: [ (0, a.jsx)("span", {
-                            children: "包名"
-                        }), (0, a.jsx)("span", {
                             children: "发行渠道"
                         }), (0, a.jsx)("span", {
-                            children: "发行国家 / 地区"
+                            children: "版本"
                         }), (0, a.jsx)("span", {
                             children: "SDK 能力"
+                        }), (0, a.jsx)("span", {
+                            children: "生成时间"
                         }), (0, a.jsx)("span", {
                             children: "操作"
                         }) ]
                     }), k.map(n => {
-                        let s = n.storeId || n.channels?.[0], l = e$(s), i = eK(n).map(e => eq(e)?.title).filter(Boolean), t = (n.countries || []).map(e => eE(e)?.name).filter(Boolean);
+                        let s = n.storeId || n.channels?.[0], l = e$(s), i = eK(n).map(e => eq(e)?.title).filter(Boolean), t = new Date(n.generatedAt || n.updatedAt || Date.now()).toLocaleString("zh-CN", {
+                            hour12: !1
+                        });
                         return (0, a.jsxs)("div", {
                             className: "mgp-operation-plan-row",
+                            "data-sdk-version-id": n.id,
                             children: [ (0, a.jsxs)("span", {
-                                className: "mgp-sdk-package-cell",
-                                children: [ (0, a.jsx)("strong", {
-                                    children: n.packageName
-                                }), (0, a.jsx)("small", {
-                                    children: n.gameName || e
-                                }) ]
-                            }), (0, a.jsxs)("span", {
                                 className: "mgp-sdk-store-cell",
                                 children: [ (0, a.jsx)(eM, {
                                     storeId: s,
@@ -6007,39 +6219,60 @@
                                     children: l?.name || "未配置"
                                 }) ]
                             }), (0, a.jsx)("span", {
-                                className: t.length ? "" : "mgp-sdk-plan-pending",
-                                title: t.join("、"),
-                                children: t.length ? t.join("、") : "待配置"
+                                className: "mgp-sdk-version-cell",
+                                children: `V${n.version || 1}`
                             }), (0, a.jsx)("span", {
                                 title: i.join("、"),
                                 children: i.join("、")
+                            }), (0, a.jsx)("span", {
+                                className: "mgp-sdk-generated-time",
+                                children: t
                             }), (0, a.jsxs)("span", {
                                 children: [ (0, a.jsx)("button", {
                                     type: "button",
                                     className: "mgp-text-action",
+                                    "aria-label": `查看${n.packageName} V${n.version || 1}详情`,
                                     onClick: () => {
                                         f(null), v(n.id);
                                     },
-                                    children: "详情"
+                                    children: "查看详情"
                                 }), (0, a.jsx)("button", {
                                     type: "button",
                                     className: "mgp-text-action",
+                                    "aria-label": `下载${n.packageName} V${n.version || 1}`,
+                                    onClick: () => onDownload(n),
+                                    children: "下载"
+                                }), (0, a.jsx)("button", {
+                                    type: "button",
+                                    className: "mgp-text-action",
+                                    "aria-label": `运营配置${n.packageName} V${n.version || 1}`,
                                     onClick: () => {
                                         v(null), f(n.id);
                                     },
-                                    children: "自定义配置"
+                                    children: "运营配置"
                                 }) ]
                             }) ]
                         }, n.id);
                     }), k.length ? null : (0, a.jsx)("div", {
                         className: "mgp-operation-plan-empty",
-                        children: "当前游戏暂无渠道包模板，请先在配置中心选择发行渠道并补全渠道支付参数。"
+                        children: "当前游戏暂无 SDK 版本。"
+                    }), (0, a.jsx)("button", {
+                        type: "button",
+                        className: "mgp-sdk-version-add-row",
+                        "aria-label": "生成SDK",
+                        onClick: onStartGenerate,
+                        children: (0, a.jsx)(K.Plus, {
+                            size: 18
+                        })
                     }) ]
                 }) ]
             }), N ? (0, a.jsx)(ab, {
                 item: N,
-                configuredLoginMethodIds: t,
-                configuredAgreementGroups: r,
+                configuredLoginMethodIds: eD(N.configSnapshot?.login?.selected || t),
+                configuredAgreementGroups: N.configSnapshot?.agreement?.groups || r,
+                configuredDataPlatformIds: N.configSnapshot?.data?.selected || d,
+                configuredAdvertising: N.configSnapshot?.advertising || o,
+                configuredSupport: N.configSnapshot?.support || configuredSupport,
                 onSave: (e, a) => {
                     u(e, a), f(null);
                 },
@@ -6051,12 +6284,12 @@
                 item: C,
                 gameName: e,
                 gameProfile: c,
-                configuredLoginMethodIds: t,
-                configuredAgreementGroups: r,
-                configuredCompliance: configuredCompliance,
-                configuredDataPlatformIds: d,
-                configuredAdvertising: o,
-                configuredSupport: configuredSupport,
+                configuredLoginMethodIds: eD(C.configSnapshot?.login?.selected || t),
+                configuredAgreementGroups: C.configSnapshot?.agreement?.groups || r,
+                configuredCompliance: C.configSnapshot?.compliance || configuredCompliance,
+                configuredDataPlatformIds: C.configSnapshot?.data?.selected || d,
+                configuredAdvertising: C.configSnapshot?.advertising || o,
+                configuredSupport: C.configSnapshot?.support || configuredSupport,
                 onClose: () => v(null),
                 onEdit: () => {
                     v(null), f(C.id);
@@ -6122,7 +6355,7 @@
                 })
             }), (0, a.jsx)("section", {
                 className: "mgp-metrics",
-                children: [ [ "本月生成SDK包", "12", "较上月 +20%", E.PackageCheck, "purple" ], [ "今日活跃用户", "128,460", "较昨日 +8.4%", L.UserRound, "blue" ], [ "登录成功率", "99.32%", "稳定运行", $.LogIn, "green" ], [ "支付成功率", "96.84%", "较昨日 +0.7%", u.CreditCard, "orange" ] ].map(([e, n, s, l, i]) => (0, 
+                children: [ [ "本月生成SDK", "12", "较上月 +20%", E.PackageCheck, "purple" ], [ "今日活跃用户", "128,460", "较昨日 +8.4%", L.UserRound, "blue" ], [ "登录成功率", "99.32%", "稳定运行", $.LogIn, "green" ], [ "支付成功率", "96.84%", "较昨日 +0.7%", u.CreditCard, "orange" ] ].map(([e, n, s, l, i]) => (0,
                 a.jsxs)("article", {
                     className: `mgp-metric ${i}`,
                     role: "group",
@@ -6264,7 +6497,6 @@
             release: {
                 storeId: t,
                 channel: r?.name || t,
-                platform: r?.platform || "",
                 packageName: e.packageName,
                 deliveryUrl: n.release?.deliveryUrl || "",
                 payment: d.includes("payment") ? e.channelPaymentConfigs?.[t] || n.release?.channelPaymentConfigs?.[t] || null : null
@@ -6273,7 +6505,7 @@
                 methods: d.includes("login") ? o.map(e => ({
                     id: e,
                     name: ez(e)?.displayName || e,
-                    values: n.login?.values?.[e] || {}
+                    values: getLoginValuesForRuntime(n.login?.values?.[e] || {}, r?.platform)
                 })) : []
             },
             agreements: d.includes("agreement") ? c : [],
@@ -6557,6 +6789,7 @@
                 kwsEnabled: !0,
                 kwsClientId: "kws_demo_client",
                 kwsClientSecret: "kws_demo_secret",
+                kwsVerifySecret: "kws_demo_verify_secret",
                 kwsRedirect: "https://api.demo-game.com/kws/callback"
             },
             capabilities: {
@@ -6598,22 +6831,24 @@
                 storeId: "android-google",
                 platform: "Android",
                 packageName: "com.demo.legend.global",
+                version: 1,
                 includedCapabilities: ec.map(e => e.id),
+                generatedAt: "2026-08-06T00:00:00.000Z",
                 updatedAt: "2026-08-06T00:00:00.000Z"
             } ]
         }), [w, A] = (0, n.useState)([]), [$, I] = (0, n.useState)([]), [D, E] = (0, n.useState)(!1), [q, K] = (0, 
         n.useState)("list"), [z, P] = (0, n.useState)(0), [O, M] = (0, n.useState)(aA), [L, T] = (0, 
         n.useState)(null), [G, U] = (0, n.useState)(null), [_, B] = (0, n.useState)(eA), [V, X] = (0, 
-        n.useState)(null), H = e => JSON.parse(JSON.stringify(e)), Q = (0, n.useRef)(null);
+        n.useState)(null), [sdkDownloadSessions, setSdkDownloadSessions] = (0, n.useState)({}), [sdkReturnContext, setSdkReturnContext] = (0, n.useState)(null), H = e => JSON.parse(JSON.stringify(e)), Q = (0, n.useRef)(null);
         Q.current || (Q.current = H(k));
         let W = (0, n.useMemo)(() => Object.fromEntries(R.map(e => {
             var a;
-            return [ e.id, (a = e.id, "release" === a ? eG(k.release) : "login" === a ? eR(k.login, k.release) : "support" === a ? eF(k.support) : "data" === a ? e_(k.data) : "advertising" === a ? !!k.advertising?.provider && "none" !== k.advertising.provider : "agreement" === a ? eX(k.agreement, k.release) : "capabilities" === a ? eU(k.capabilities, k.release, k.data, k.advertising, k.support) : "compliance" === a && eW(k.compliance)) ];
+            return [ e.id, (a = e.id, "release" === a ? eG(k.release) : "login" === a ? eR(k.login, k.release) : "support" === a ? eF(k.support) : "data" === a ? e_(k.data) : "advertising" === a ? eV(k.advertising || {}) : "agreement" === a ? eX(k.agreement, k.release) : "capabilities" === a ? eU(k.capabilities, k.release, k.data, k.advertising, k.support) : "compliance" === a && eW(k.compliance)) ];
         })), [ k ]), savedStepIds = b[m] || [], Y = (0, n.useMemo)(() => Object.fromEntries(R.map(e => [ e.id, isConfigCardComplete(e.id, k) ])), [ k ]), ee = Object.values(Y).filter(Boolean).length, ea = (0, 
         n.useMemo)(() => {
             let e = C[m] || {};
             return (channelBundles[m] || []).map(a => {
-                let n = e[a.storeId] || {}, s = eK(a), l = {
+                let n = e[a.id] || e[a.storeId] || {}, s = eK(a), versionConfig = a.configSnapshot || k, l = {
                     ...aw,
                     ...n.sdkSwitches || {},
                     ...n.switches || {}
@@ -6629,9 +6864,9 @@
                     includedCapabilities: s,
                     modules: s,
                     channelPaymentConfigs: {
-                        [a.storeId]: k.release?.channelPaymentConfigs?.[a.storeId]
+                        [a.storeId]: versionConfig.release?.channelPaymentConfigs?.[a.storeId]
                     },
-                    paymentConfigured: Z(a.storeId, k.release?.channelPaymentConfigs?.[a.storeId]) ? [ a.storeId ] : [],
+                    paymentConfigured: Z(a.storeId, versionConfig.release?.channelPaymentConfigs?.[a.storeId]) ? [ a.storeId ] : [],
                     countryCapabilityEnabled: i,
                     countryModules: i,
                     switches: l,
@@ -6640,7 +6875,7 @@
             });
         }, [ channelBundles, k.release, m, C ]), en = (0, n.useMemo)(() => ea.map(e => ({
             ...e,
-            configurationComplete: !!e.storeId && !et(e.storeId, e.packageName) && eK(e).length > 0 && (!eK(e).includes("payment") || isPaymentConfigComplete(k.release || {}, e.storeId))
+            configurationComplete: !!e.storeId && !et(e.storeId, e.packageName) && eK(e).length > 0
         })), [ ea, k ]), es = (0, n.useMemo)(() => en.filter(e => e.configurationComplete), [ en ]), el = (e, a = "success") => {
             X({
                 message: e,
@@ -6686,6 +6921,7 @@
                 kwsEnabled: !1,
                 kwsClientId: "",
                 kwsClientSecret: "",
+                kwsVerifySecret: "",
                 kwsRedirect: ""
             }, e.capabilities = {
                 byChannel: {}
@@ -6783,6 +7019,7 @@
             availableChannels: (k.release?.channels || []).map(e => e$(e)).filter(Boolean),
             mode: l,
             packages: en,
+            downloadReturnContext: sdkReturnContext?.gameName === m ? sdkReturnContext : null,
             onModeChange: i,
             onDownloadPackage: e => {
                 var a, n, s;
@@ -6800,7 +7037,6 @@
                         release: {
                             storeId: i,
                             channel: t?.name || i,
-                            platform: t?.platform || "",
                             packageName: e.packageName,
                             deliveryUrl: a.release?.deliveryUrl || "",
                             payment: e.channelPaymentConfigs?.[i] || null
@@ -6809,7 +7045,7 @@
                             methods: d.map(e => ({
                                 id: e,
                                 name: ez(e)?.displayName || e,
-                                values: a.login?.values?.[e] || {}
+                                values: getLoginValuesForRuntime(a.login?.values?.[e] || {}, t?.platform)
                             }))
                         },
                         agreements: o,
@@ -6839,7 +7075,7 @@
                     }), p = m.release;
                     return [ {
                         name: `${l}README.txt`,
-                        content: `MeetGames SDK 渠道组合包\n游戏：${m.game.name}\n发行渠道：${p.channel}（${p.platform}）\n包名：${p.packageName}\nSDK 能力：${m.sdkCapabilities.items.map(e => e.name).join("、")}\n预计体积：${m.sdkCapabilities.estimatedSizeMb.toFixed(1)} MB\n\n本 ZIP 为可验证的 Demo 组合包，包含本次配置快照与接入清单。`
+                        content: `MeetGames SDK 渠道组合包\n游戏：${m.game.name}\n发行渠道：${p.channel}\n包名：${p.packageName}\nSDK 能力：${m.sdkCapabilities.items.map(e => e.name).join("、")}\n预计体积：${m.sdkCapabilities.estimatedSizeMb.toFixed(1)} MB\n\n本 ZIP 为可验证的 Demo 组合包，包含本次配置快照与接入清单。`
                     }, {
                         name: `${l}manifest.json`,
                         content: JSON.stringify(m, null, 2)
@@ -6918,7 +7154,7 @@
                 el("渠道包已删除"));
             },
             onOpenSdkDownload: () => {
-                v(-1), s("channel-packages");
+                setSdkReturnContext(null), v(-1), s("channel-packages");
             }
         }) : "channel-packages" === e ? (0, a.jsx)(ChannelPackageBuilder, {
             gameName: m,
@@ -6927,28 +7163,33 @@
             gameProfile: u[m],
             packages: en,
             config: k,
+            initialSession: sdkDownloadSessions[m] || null,
             onSave: e => (setChannelBundles(a => {
-                let n = a[m] || [], s = n.findIndex(a => a.id === e.id), l = s >= 0 ? n.map((a, n) => n === s ? e : a) : [ ...n, e ];
+                let storedVersion = {
+                    ...e,
+                    configSnapshot: H(k)
+                }, n = a[m] || [], s = n.findIndex(a => a.id === storedVersion.id), l = s >= 0 ? n.map((a, n) => n === s ? storedVersion : a) : [ ...n, storedVersion ];
                 return {
                     ...a,
                     [m]: l
                 };
-            }), !0),
-            onDownload: e => downloadChannelPackageArchive(e, k, m, u[m], el),
-            onUpdateConfig: (e, a) => {
-                ei([ e ]), N(n => ({
-                    ...n,
-                    [e]: {
-                        ...n[e],
-                        ...a
-                    }
-                }));
-            },
-            onBackToConfig: () => {
-                v(-1), s("config");
+            }), setSdkDownloadSessions(a => ({
+                ...a,
+                [m]: null
+            })), setSdkReturnContext(null), s("operations-plan"), !0),
+            onDownload: e => downloadChannelPackageArchive(e, e.configSnapshot || k, m, u[m], el),
+            onBackToConfig: e => {
+                setSdkDownloadSessions(a => ({
+                    ...a,
+                    [m]: e?.session || null
+                })), setSdkReturnContext({
+                    gameName: m,
+                    channelId: e?.channelId || "",
+                    missingCapabilityIds: e?.missingCapabilityIds || []
+                }), v(-1), s("config");
             },
             onEnterOperations: e => {
-                r(e.id), s("operations-plan");
+                r(e?.id || null), s("operations-plan");
             },
             onDelete: e => {
                 let a = en.find(a => a.id === e);
@@ -6980,11 +7221,18 @@
             configuredSupport: k.support || {},
             initialEditingPackageId: t,
             onInitialEditingHandled: () => r(null),
+            onStartGenerate: () => {
+                setSdkReturnContext(null), setSdkDownloadSessions(a => ({
+                    ...a,
+                    [m]: null
+                })), s("channel-packages");
+            },
+            onDownload: e => downloadChannelPackageArchive(e, k, m, u[m], el),
             onSave: (e, a) => {
                 let n = es.find(a => a.id === e);
                 n && (S(e => {
                     let s = e[m] || {}, l = {
-                        ...s[n.storeId] || {}
+                        ...s[n.id] || s[n.storeId] || {}
                     };
                     Object.prototype.hasOwnProperty.call(a, "countries") && (l.countries = a.countries), 
                     Object.prototype.hasOwnProperty.call(a, "channelCountries") && (l.channelCountries = a.channelCountries);
@@ -6997,7 +7245,7 @@
                         ...e,
                         [m]: {
                             ...s,
-                            [n.storeId]: l
+                            [n.id]: l
                         }
                     };
                 }), el("运营配置已保存"));

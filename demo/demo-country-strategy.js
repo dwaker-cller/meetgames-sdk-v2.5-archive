@@ -141,6 +141,9 @@
       loginMethodIds: [],
       agreementGroups: [],
       compliance: {},
+      supportModules: {},
+      dataPlatformIds: [],
+      advertisingProvider: "",
     };
     const fiberKey = Object.keys(drawer).find((key) => key.startsWith("__reactFiber$"));
     let fiber = fiberKey ? drawer[fiberKey] : null;
@@ -168,6 +171,28 @@
           ageParentalControl: props.configuredCompliance.ageGate !== false,
           kwsVerification: props.configuredCompliance.kwsEnabled !== false,
         };
+      }
+      if (props.configuredSupport && typeof props.configuredSupport === "object") {
+        const support = props.configuredSupport;
+        source.supportModules = {
+          onlineService: support.onlineEnabled !== false && Boolean(String(support.onlineName || "").trim()),
+          feedback: support.feedbackEnabled !== false && Boolean((support.feedbackTypes || []).some((item) => String(item?.name || item || "").trim())),
+          faq: support.faqEnabled !== false && Boolean((support.faqGroups || []).length),
+          smartService: support.smartEnabled !== false && Boolean(String(support.botName || "").trim() || (support.knowledgeItems || []).length),
+        };
+      }
+      if (Array.isArray(props.configuredDataPlatformIds)) {
+        source.dataPlatformIds = unique(props.configuredDataPlatformIds.map((id) => String(id).toLowerCase()));
+      }
+      if (props.configuredAdvertising && typeof props.configuredAdvertising === "object") {
+        const advertising = props.configuredAdvertising;
+        const provider = String(advertising.provider || "").toLowerCase();
+        const configured = provider === "admob"
+          ? Boolean(String(advertising.admobAppId || "").trim())
+          : provider === "applovin-max"
+            ? Boolean(String(advertising.maxSdkKey || "").trim())
+            : false;
+        source.advertisingProvider = configured ? provider : "";
       }
     }
     configuredSourceCache.set(drawer, source);
@@ -267,7 +292,8 @@
 
   function createBaseConfig(drawer) {
     const loginOptions = extractLoginOptions(drawer);
-    const configuredCompliance = extractConfiguredSource(drawer).compliance;
+    const configuredSource = extractConfiguredSource(drawer);
+    const configuredCompliance = configuredSource.compliance;
     // The operations drawer only renders methods selected in 配置中心; the
     // selected class itself is the per-country strategy override.
     const availableLoginIds = unique(loginOptions.map((option) => option.id));
@@ -276,8 +302,17 @@
       .sort((left, right) => left.order - right.order)
       .map((option) => option.id);
     const agreementGroups = extractAgreementGroups(drawer);
+    const modules = extractModuleFlags(drawer);
+    const availableSupportModules = Object.entries(configuredSource.supportModules || {})
+      .filter(([, configured]) => configured)
+      .map(([key]) => key);
+    const availableDataPlatformIds = unique(configuredSource.dataPlatformIds || []);
+    const advertisingProvider = configuredSource.advertisingProvider || "";
+    if (!availableSupportModules.length) delete modules.support;
+    if (!availableDataPlatformIds.length) delete modules.data;
+    if (!advertisingProvider) delete modules.advertising;
     return {
-      modules: extractModuleFlags(drawer),
+      modules,
       availableLoginIds,
       loginMethodIds: normalizeLoginIds(selectedLoginIds, availableLoginIds),
       availableAgreementGroups: agreementGroups.map(({ id, name, languages }) => ({
@@ -293,11 +328,17 @@
         kwsVerification: configuredCompliance.kwsVerification ?? true,
       },
       support: {
-        onlineService: true,
-        feedback: true,
-        faq: true,
-        smartService: true,
+        availableModules: availableSupportModules,
+        onlineService: availableSupportModules.includes("onlineService"),
+        feedback: availableSupportModules.includes("feedback"),
+        faq: availableSupportModules.includes("faq"),
+        smartService: availableSupportModules.includes("smartService"),
         faqGroup: "default",
+      },
+      dataPlatforms: Object.fromEntries(availableDataPlatformIds.map((id) => [id, true])),
+      advertisingPlatform: {
+        id: advertisingProvider,
+        enabled: Boolean(advertisingProvider),
       },
       runtime: { ...DEFAULT_RUNTIME },
     };
@@ -333,8 +374,7 @@
 
   function normalizeStoredModel(model, fallback) {
     if (!model || model.version !== 2 || !Array.isArray(model.strategies)) return fallback;
-    const defaultStrategy = model.strategies.find((strategy) => strategy.id === "default");
-    if (!defaultStrategy?.config) return fallback;
+    if (!model.strategies.length || model.strategies.some((strategy) => !strategy?.config)) return fallback;
     const normalized = clone(model);
     normalized.packageId = fallback.packageId;
     normalized.releaseCountryCodes = unique(normalized.releaseCountryCodes || fallback.releaseCountryCodes);
@@ -365,6 +405,14 @@
           ...fallback.strategies[0].config.support,
           ...(strategy.config?.support || {}),
         },
+        dataPlatforms: {
+          ...fallback.strategies[0].config.dataPlatforms,
+          ...(strategy.config?.dataPlatforms || {}),
+        },
+        advertisingPlatform: {
+          ...fallback.strategies[0].config.advertisingPlatform,
+          ...(strategy.config?.advertisingPlatform || {}),
+        },
         runtime: {
           ...fallback.strategies[0].config.runtime,
           ...(strategy.config?.runtime || {}),
@@ -382,6 +430,9 @@
     const availableLoginIds = unique(fallbackConfig.availableLoginIds);
     const availableAgreementGroups = clone(fallbackConfig.availableAgreementGroups || []);
     const fallbackAgreementIds = unique(fallbackConfig.agreementGroupIds || []);
+    const availableSupportModules = unique(fallbackConfig.support?.availableModules || []);
+    const availableDataPlatformIds = Object.keys(fallbackConfig.dataPlatforms || {});
+    const advertisingProvider = fallbackConfig.advertisingPlatform?.id || "";
     model.strategies.forEach((strategy) => {
       const config = strategy.config;
       const previousAvailableLoginIds = unique(config.availableLoginIds || availableLoginIds);
@@ -405,6 +456,20 @@
       config.availableAgreementGroups = clone(availableAgreementGroups);
       config.agreementGroupIds = unique([...retainedAgreementIds, ...newDefaultAgreementIds]);
       config.compliance.ageThreshold = fallbackConfig.compliance.ageThreshold;
+      config.support.availableModules = [...availableSupportModules];
+      ["onlineService", "feedback", "faq", "smartService"].forEach((key) => {
+        config.support[key] = availableSupportModules.includes(key) && config.support[key] !== false;
+      });
+      config.dataPlatforms = Object.fromEntries(
+        availableDataPlatformIds.map((id) => [id, config.dataPlatforms?.[id] !== false]),
+      );
+      config.advertisingPlatform = {
+        id: advertisingProvider,
+        enabled: Boolean(advertisingProvider) && config.advertisingPlatform?.enabled !== false,
+      };
+      if (!availableSupportModules.length) delete config.modules.support;
+      if (!availableDataPlatformIds.length) delete config.modules.data;
+      if (!advertisingProvider) delete config.modules.advertising;
     });
     return model;
   }
@@ -477,15 +542,11 @@
               aria-selected="${active}" data-action="select-strategy"
               data-strategy-id="${escapeHtml(strategy.id)}">
               <strong>${escapeHtml(strategy.name)}</strong>
-              <small>${escapeHtml(conciseCountryList(codes))}</small>
+              <small>${strategy.id === "default" ? "全球" : escapeHtml(conciseCountryList(codes))}</small>
             </button>
-            ${
-              strategy.id === "default"
-                ? ""
-                : `<button type="button" class="osg-strategy-remove" data-action="remove-strategy"
-                    data-strategy-id="${escapeHtml(strategy.id)}"
-                    aria-label="删除${escapeHtml(strategy.name)}">×</button>`
-            }
+            <button type="button" class="osg-strategy-remove" data-action="remove-strategy"
+              data-strategy-id="${escapeHtml(strategy.id)}"
+              aria-label="删除${escapeHtml(strategy.name)}">×</button>
           </div>`;
       })
       .join("");
@@ -601,7 +662,8 @@
       ["feedback", "表单反馈", "玩家问题类型与反馈表单"],
       ["faq", "FAQ", "FAQ 语种与问题分组"],
       ["smartService", "智能客服配置", "智能客服问答与推荐"],
-    ];
+    ].filter(([key]) => (config.support.availableModules || []).includes(key));
+    if (!items.length) return "";
     return `
       <div class="osg-support-options">${items
         .map(([key, title, detail]) => `
@@ -616,6 +678,32 @@
           <option value="account" ${config.support.faqGroup === "account" ? "selected" : ""}>账号问题 FAQ</option>
         </select>
       </label>`;
+  }
+
+  function dataSection(config) {
+    const platformNames = {
+      firebase: "Firebase",
+      appsflyer: "AppsFlyer",
+      adjust: "Adjust",
+    };
+    const platforms = Object.keys(config.dataPlatforms || {});
+    if (!platforms.length) return "";
+    return `<div class="osg-data-platform-options" aria-label="三方数据平台开关">${platforms
+      .map((id) => `<div><span><strong>${escapeHtml(platformNames[id] || id)}</strong><small>控制该平台是否在当前策略中运行</small></span>${inlineSwitch("toggle-data-platform", id, config.dataPlatforms[id], `${platformNames[id] || id} 开关`)}</div>`)
+      .join("")}</div>`;
+  }
+
+  function advertisingSection(config) {
+    const platformNames = {
+      admob: "Google AdMob",
+      "applovin-max": "AppLovin MAX",
+    };
+    const platform = config.advertisingPlatform || {};
+    if (!platform.id) return "";
+    const name = platformNames[platform.id] || platform.id;
+    return `<div class="osg-data-platform-options osg-advertising-platform-options" aria-label="广告变现平台开关">
+      <div><span><strong>${escapeHtml(name)}</strong><small>已配置的广告变现平台</small></span>${inlineSwitch("toggle-advertising-platform", platform.id, platform.enabled, `${name} 开关`)}</div>
+    </div>`;
   }
 
   function runtimeSection(config) {
@@ -662,7 +750,7 @@
         <nav class="osg-strategy-tabs" role="tablist" aria-label="策略组">${strategyTabs(instance)}</nav>
         <div class="osg-current-strategy">
           <span>当前编辑：<strong>${escapeHtml(strategy.name)}</strong></span>
-          <small>${escapeHtml(conciseCountryList(strategyCodes))}</small>
+          <small>${strategy.id === "default" ? "全球" : escapeHtml(conciseCountryList(strategyCodes))}</small>
         </div>
       </section>
       <div class="osg-sdk-stack">
@@ -671,8 +759,8 @@
         ${Object.hasOwn(config.modules, "payment") ? moduleSection("payment", "支付SDK", MODULES[2][2], config.modules.payment, "", "is-compact") : ""}
         ${Object.hasOwn(config.modules, "compliance") ? moduleSection("compliance", "合规SDK", MODULES[3][2], config.modules.compliance, complianceSection(config), "", instance.expandedModules.has("compliance")) : ""}
         ${Object.hasOwn(config.modules, "support") ? moduleSection("support", "客服工具SDK", MODULES[4][2], config.modules.support, supportSection(config), "", instance.expandedModules.has("support")) : ""}
-        ${Object.hasOwn(config.modules, "data") ? moduleSection("data", "三方数据SDK", MODULES[5][2], config.modules.data, '<div class="osg-summary-line"><strong>已接入平台</strong><span class="osg-chip">Firebase</span><span class="osg-chip">AppsFlyer</span></div>', "is-compact", instance.expandedModules.has("data")) : ""}
-        ${Object.hasOwn(config.modules, "advertising") ? moduleSection("advertising", "广告变现SDK", MODULES[6][2], config.modules.advertising, '<div class="osg-summary-line"><strong>广告平台</strong><span>跟随渠道包中的广告变现配置。</span></div>', "is-compact", instance.expandedModules.has("advertising")) : ""}
+        ${Object.hasOwn(config.modules, "data") ? moduleSection("data", "三方数据SDK", MODULES[5][2], config.modules.data, dataSection(config), "", instance.expandedModules.has("data")) : ""}
+        ${Object.hasOwn(config.modules, "advertising") ? moduleSection("advertising", "广告变现SDK", MODULES[6][2], config.modules.advertising, advertisingSection(config), "", instance.expandedModules.has("advertising")) : ""}
         ${runtimeSection(config)}
       </div>`;
     instance.root
@@ -838,13 +926,20 @@
       const strategy = instance.model.strategies.find(
         (item) => item.id === button.dataset.strategyId,
       );
-      if (!strategy || strategy.id === "default") return;
-      if (!window.confirm(`确认删除“${strategy.name}”吗？该组国家将回落到默认策略。`)) return;
+      if (!strategy) return;
+      if (instance.model.strategies.length === 1) {
+        window.alert("至少保留一个发行策略。");
+        return;
+      }
+      const confirmation = strategy.id === "default"
+        ? "确认删除“默认策略”吗？删除后将仅保留已创建的区域策略。"
+        : `确认删除“${strategy.name}”吗？该组国家将回落到默认策略。`;
+      if (!window.confirm(confirmation)) return;
       instance.model.strategies = instance.model.strategies.filter(
         (item) => item.id !== strategy.id,
       );
       if (instance.model.activeStrategyId === strategy.id) {
-        instance.model.activeStrategyId = "default";
+        instance.model.activeStrategyId = instance.model.strategies[0]?.id || "";
       }
       setDirty(instance);
       return;
@@ -882,6 +977,19 @@
       if (!strategy.config.modules.support) return;
       const key = button.dataset.key;
       strategy.config.support[key] = !strategy.config.support[key];
+      setDirty(instance);
+      return;
+    }
+    if (action === "toggle-data-platform") {
+      if (!strategy.config.modules.data) return;
+      const key = button.dataset.key;
+      strategy.config.dataPlatforms[key] = !strategy.config.dataPlatforms[key];
+      setDirty(instance);
+      return;
+    }
+    if (action === "toggle-advertising-platform") {
+      if (!strategy.config.modules.advertising) return;
+      strategy.config.advertisingPlatform.enabled = !strategy.config.advertisingPlatform.enabled;
       setDirty(instance);
       return;
     }

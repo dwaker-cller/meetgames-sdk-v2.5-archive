@@ -602,7 +602,7 @@
 
 #config-panel-release .mgp-selected-channel-head,
 #config-panel-release .mgp-selected-channel-summary {
-  grid-template-columns: minmax(132px, .72fr) minmax(190px, 1fr) minmax(190px, 1fr) 112px 68px !important;
+  grid-template-columns: minmax(220px, 1.2fr) minmax(190px, 1fr) 112px 68px !important;
 }
 
 #config-panel-release .mgp-selected-channel-summary {
@@ -1272,6 +1272,34 @@
   flex: none;
 }
 
+.mgp-store-logo.one-store {
+  display: inline-grid;
+  place-items: center;
+  border-radius: 6px;
+  background: #7c3aed;
+  color: #fff;
+  font-weight: 800;
+}
+
+.mgp-store-logo.one-store b {
+  font-size: .68em;
+  line-height: 1;
+}
+
+.mgp-login-platform-section > header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.mgp-login-platform-section > header small {
+  color: #7b8497;
+  font-size: 12px;
+  font-weight: 400;
+  white-space: nowrap;
+}
+
 .mgp-sdk-workbench-tabs {
   display: flex;
   align-items: end;
@@ -1450,4 +1478,361 @@
 
 .mgp-channel-package-download-heading .mgp-config-module-heading {
   margin-bottom: 0;
+}
+
+.mgp-sdk-preflight-modal {
+  width: min(600px, calc(100vw - 48px));
+}
+
+.mgp-sdk-preflight-content {
+  display: grid;
+  gap: 14px;
+  padding: 22px 24px 26px;
+}
+
+.mgp-sdk-preflight-content > p {
+  margin: 0;
+  color: #5f687a;
+}
+
+.mgp-sdk-preflight-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.mgp-sdk-preflight-list > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 10px;
+  border: 1px solid #ead8b4;
+  border-radius: 8px;
+  background: #fffaf0;
+  color: #8a5a16;
+  font-size: 13px;
+}
+
+.mgp-sdk-preflight-modal > footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.mgp-sdk-return-context,
+.mgp-channel-package-validation-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  border: 1px solid #ead8b4;
+  border-radius: 10px;
+  background: #fffaf0;
+  color: #6f4a18;
+}
+
+.mgp-sdk-return-context {
+  margin: 0 12px 14px;
+  padding: 12px 14px;
+}
+
+.mgp-channel-package-validation-banner {
+  margin: 2px 0 14px;
+  padding: 11px 12px;
+}
+
+.mgp-sdk-return-context > div,
+.mgp-channel-package-validation-banner > div {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  min-width: 0;
+}
+
+.mgp-sdk-return-context p,
+.mgp-channel-package-validation-banner p {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+  margin: 0;
+}
+
+.mgp-sdk-return-context p span,
+.mgp-channel-package-validation-banner p span {
+  color: #8a6a3b;
+  font-size: 12px;
+}
+
+.mgp-sdk-return-context > span {
+  flex: none;
+  color: #9a6a23;
+  font-size: 12px;
+}
+
+.mgp-channel-package-validation-banner .mgp-button {
+  flex: none;
+  background: #fff;
+}
+
+.mgp-config-card.needs-attention {
+  position: relative;
+  border-color: #d89a34 !important;
+  background: #fffaf0 !important;
+  box-shadow: 0 0 0 2px rgba(216, 154, 52, .1);
+}
+
+.mgp-config-card.needs-attention::after {
+  content: "待补齐";
+  position: absolute;
+  top: 8px;
+  right: 30px;
+  color: #a5650c;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+@media (max-width: 900px) {
+  .mgp-sdk-return-context,
+  .mgp-channel-package-validation-banner {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
+/* V2.0 unified secret visibility, five KWS parameters, and clickable workbench tabs. */
+.mgp-sdk-workbench-tabs {
+  width: fit-content;
+}
+
+.mgp-field > div:has(.mgp-secret-visibility),
+.mgp-secret-input-wrap {
+  position: relative;
+}
+
+.mgp-field > div:has(.mgp-secret-visibility) > input,
+.mgp-secret-input-wrap > input {
+  width: 100%;
+  padding-right: 36px !important;
+}
+
+.mgp-secret-visibility {
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  transform: translateY(-50%);
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: #7b8495;
+  cursor: pointer;
+}
+
+.mgp-secret-visibility:hover,
+.mgp-secret-visibility:focus-visible,
+.mgp-secret-visibility.is-visible {
+  background: #f3edfb;
+  color: #722ed1;
+  outline: none;
+}
+
+.mgp-form-grid.five {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.mgp-sdk-config-delete-confirm-modal {
+  width: min(520px, calc(100vw - 40px));
+}
+
+.mgp-sdk-config-delete-confirm-overlay {
+  position: fixed;
+  z-index: 1400;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(17, 18, 28, 0.48);
+}
+
+@media (max-width: 900px) {
+  .mgp-form-grid.five {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* V2.0 generation and operations center. */
+.mgp-operation-plan-head,
+.mgp-operation-plan-row {
+  grid-template-columns: minmax(160px, .9fr) minmax(86px, .5fr) minmax(260px, 1.7fr) minmax(160px, .9fr) minmax(260px, 1.4fr) !important;
+}
+
+.mgp-operation-plan-row > span:last-child {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.mgp-sdk-version-cell {
+  color: #722ed1;
+  font-weight: 700;
+}
+
+.mgp-sdk-generated-time {
+  color: #697386;
+  font-size: 12px;
+}
+
+.mgp-sdk-generate-add {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  min-width: 40px;
+  height: 40px;
+  padding: 0;
+  color: #fff;
+}
+
+.mgp-sdk-generate-add > svg {
+  position: static !important;
+  inset: auto !important;
+  transform: none !important;
+  flex: 0 0 auto;
+  color: #fff !important;
+  stroke: currentColor !important;
+  pointer-events: none;
+}
+
+.mgp-sdk-version-add-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: calc(100% - 32px);
+  min-height: 42px;
+  margin: 12px 16px 16px;
+  border: 1px dashed #d7c4f3;
+  border-radius: 6px;
+  background: #fff;
+  color: #722ed1;
+  cursor: pointer;
+}
+
+.mgp-sdk-version-add-row:hover,
+.mgp-sdk-version-add-row:focus-visible {
+  border-color: #722ed1;
+  background: #faf7ff;
+  outline: none;
+}
+
+.mgp-channel-package-capability-logos {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 20px;
+}
+
+.mgp-channel-package-capability-logo-summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.mgp-channel-package-capability-logo-summary > em {
+  color: inherit;
+  font-style: normal;
+  font-weight: 400;
+}
+
+.mgp-channel-package-capability-logos .mgp-store-brand,
+.mgp-channel-package-capability-logos .mgp-login-brand {
+  flex: 0 0 auto;
+}
+
+.mgp-channel-package-capability-logos .mgp-login-brand {
+  width: 18px !important;
+  min-width: 18px !important;
+  height: 18px !important;
+  border-radius: 4px !important;
+}
+
+.mgp-channel-package-capability-logos .mgp-login-brand svg,
+.mgp-channel-package-capability-logos .mgp-login-brand img {
+  width: 12px !important;
+  height: 12px !important;
+}
+
+.mgp-channel-package-capability-logos .mgp-login-brand > span {
+  font-size: 10px !important;
+  line-height: 1 !important;
+}
+
+.mgp-config-save-fab {
+  position: static;
+  order: 10;
+  align-self: flex-end;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  width: fit-content;
+  margin: 16px 0 0;
+  box-shadow: 0 10px 28px rgba(114, 46, 209, .22);
+}
+
+.mgp-config-save-fab > svg {
+  color: #fff !important;
+  stroke: currentColor !important;
+}
+
+.mgp-detail-secret {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.mgp-detail-secret > span {
+  overflow-wrap: anywhere;
+}
+
+.mgp-detail-secret-toggle {
+  display: inline-grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  color: #667085;
+  cursor: pointer;
+}
+
+.mgp-detail-secret-toggle:hover,
+.mgp-detail-secret-toggle:focus-visible {
+  color: #722ed1;
+  background: #f5efff;
+  outline: none;
+}
+
+.mgp-return-sdk-generation {
+  white-space: nowrap;
+}
+
+.mgp-channel-package-page > .mgp-page-heading,
+.mgp-operations-plan-page > .mgp-page-heading {
+  min-height: 64px;
+  height: auto;
+}
+
+@media (max-width: 1180px) {
+  .mgp-operation-plan-head,
+  .mgp-operation-plan-row {
+    grid-template-columns: minmax(140px, .9fr) 78px minmax(210px, 1.5fr) minmax(140px, .9fr) minmax(220px, 1.3fr) !important;
+  }
 }
