@@ -11,7 +11,7 @@
     ["payment", "支付SDK", "沿用当前发行渠道在配置中心维护的支付参数。"],
     ["compliance", "合规SDK", "按策略维护年龄门槛、KWS 验证与游客保护。"],
     ["support", "客服工具SDK", "按策略启用在线客服、表单反馈与 FAQ。"],
-    ["data", "三方数据SDK", "控制 Firebase 与归因平台是否在当前策略中运行。"],
+    ["data", "归因数据SDK", "控制 Firebase 与归因平台是否在当前策略中运行。"],
     ["advertising", "广告变现SDK", "控制组合包中的广告变现能力是否在当前策略中运行。"],
   ];
   const MODULE_KEY_BY_TITLE = new Map(MODULES.map(([key, title]) => [title, key]));
@@ -103,6 +103,12 @@
     crashReport: true,
     personalizedAds: false,
     silentLoginMethod: "none",
+  };
+  const RUNTIME_OWNER = {
+    agreementReminder: "agreement",
+    welcomeMessage: "agreement",
+    guestLogoutReminder: "login",
+    guestPayment: "login",
   };
   const instances = new WeakMap();
   const configuredSourceCache = new WeakMap();
@@ -223,6 +229,53 @@
         source.advertisingProvider = configured ? provider : "";
       }
       if (props.item?.id) break;
+    }
+    if (drawer.dataset.configuredLoginIds !== undefined) {
+      source.loginMethodIds = unique(
+        String(drawer.dataset.configuredLoginIds || "").split(",").map((id) => id.trim().toLowerCase()),
+      );
+    }
+    if (drawer.dataset.configuredAgreementGroups) {
+      try {
+        const groups = JSON.parse(drawer.dataset.configuredAgreementGroups);
+        if (Array.isArray(groups)) {
+          source.agreementGroups = groups.map((group, index) => ({
+            id: String(group.id || `agreement-${index + 1}`),
+            name: String(group.name || `协议分组${index + 1}`),
+            languages: Array.isArray(group.languages) ? group.languages.join("、") : String(group.languages || ""),
+          }));
+        }
+      } catch (_error) {}
+    }
+    if (drawer.dataset.configuredCompliance) {
+      try {
+        const compliance = JSON.parse(drawer.dataset.configuredCompliance);
+        source.compliance = {
+          ageThreshold: String(compliance.ageThreshold || "").trim(),
+          gdprPrompt: compliance.gdpr !== false,
+          ageParentalControl: compliance.ageGate !== false,
+          kwsVerification: compliance.kwsEnabled !== false,
+        };
+      } catch (_error) {}
+    }
+    if (drawer.dataset.configuredSupport) {
+      try {
+        const support = JSON.parse(drawer.dataset.configuredSupport);
+        source.supportModules = {
+          onlineService: support.onlineEnabled !== false && Boolean(String(support.onlineName || "").trim()),
+          feedback: support.feedbackEnabled !== false && Boolean((support.feedbackTypes || []).some((item) => String(item?.name || item || "").trim())),
+          faq: support.faqEnabled !== false && Boolean((support.faqGroups || []).length),
+          smartService: support.smartEnabled !== false && Boolean(String(support.botName || "").trim() || (support.knowledgeItems || []).length),
+        };
+      } catch (_error) {}
+    }
+    if (drawer.dataset.configuredDataPlatformIds !== undefined) {
+      source.dataPlatformIds = unique(
+        String(drawer.dataset.configuredDataPlatformIds || "").split(",").map((id) => id.trim().toLowerCase()),
+      );
+    }
+    if (drawer.dataset.configuredAdvertisingProvider !== undefined) {
+      source.advertisingProvider = String(drawer.dataset.configuredAdvertisingProvider || "").trim().toLowerCase();
     }
     configuredSourceCache.set(drawer, source);
     return source;
@@ -381,9 +434,10 @@
   }
 
   function packageDisplayLabel(drawer) {
-    return drawer.querySelector(".mgp-operations-workspace-context strong")?.textContent?.trim()
+    return String(drawer.dataset.packageLabel || "").trim()
+      || drawer.querySelector(".mgp-operations-workspace-context strong")?.textContent?.trim()
       || drawer.getAttribute("aria-label")
-      || "当前 SDK 版本";
+      || "当前 SDK 组合包";
   }
 
   function storageKey(packageId) {
@@ -462,6 +516,11 @@
         },
       },
     }));
+    normalized.strategies.forEach((strategy) => {
+      if (!strategy.config.compliance.ageParentalControl) {
+        strategy.config.compliance.kwsVerification = false;
+      }
+    });
     if (!normalized.strategies.some((strategy) => strategy.id === normalized.activeStrategyId)) {
       normalized.activeStrategyId = "default";
     }
@@ -499,6 +558,7 @@
       config.availableAgreementGroups = clone(availableAgreementGroups);
       config.agreementGroupIds = unique([...retainedAgreementIds, ...newDefaultAgreementIds]);
       config.compliance.ageThreshold = fallbackConfig.compliance.ageThreshold;
+      if (!config.compliance.ageParentalControl) config.compliance.kwsVerification = false;
       config.support.availableModules = [...availableSupportModules];
       ["onlineService", "feedback", "faq", "smartService"].forEach((key) => {
         config.support[key] = availableSupportModules.includes(key) && config.support[key] !== false;
@@ -655,45 +715,47 @@
             data-action="toggle-login" data-login-id="${escapeHtml(id)}"
             draggable="${selected && !required}" aria-pressed="${selected}"
             ${required ? 'aria-disabled="true"' : ""}>
-            <span class="osg-login-check" aria-hidden="true">${selected ? "✓" : ""}</span>
+            <span class="osg-login-order" aria-label="排序 ${selected ? selectedOrder.get(id) + 1 : "未选择"}">${selected ? selectedOrder.get(id) + 1 : "—"}</span>
             <span class="osg-login-logo">${loginLogoMarkup(id)}</span>
             <span class="osg-login-copy"><strong>${escapeHtml(method[1])}</strong><small>${escapeHtml(method[2])}</small></span>
-            <span class="osg-login-order" aria-label="排序 ${selected ? selectedOrder.get(id) + 1 : "未选择"}">${selected ? selectedOrder.get(id) + 1 : "—"}</span>
             <span class="osg-login-drag" aria-hidden="true">${required ? "🔒" : selected ? "⋮⋮" : ""}</span>
+            <span class="osg-login-check" aria-hidden="true">${selected ? "✓" : ""}</span>
           </button>`;
       })
       .join("");
-    return `<div class="osg-login-grid" aria-label="登录方式选择及排序">${cards}</div>`;
+    return `<div class="osg-login-grid" aria-label="登录方式选择及排序">${cards}</div>${loginRuntimeSettings(config)}`;
   }
 
   function agreementSection(config) {
     const groups = config.availableAgreementGroups || [];
-    if (!groups.length) {
-      return '<div class="osg-empty">当前发行渠道暂无可用协议，请先前往配置中心维护。</div>';
-    }
-    return `<div class="osg-agreement-grid">${groups
-      .map((group) => {
-        const checked = config.agreementGroupIds.includes(group.id);
-        return `
-          <button type="button" class="osg-agreement-option ${checked ? "is-selected" : ""}"
-            data-action="toggle-agreement" data-agreement-id="${escapeHtml(group.id)}"
-            aria-pressed="${checked}">
-            <span class="osg-agreement-icon">▤</span>
-            <span><strong>${escapeHtml(group.name)}</strong><small>${escapeHtml(group.languages || "尚未配置语种")}</small></span>
-            <i>${checked ? "✓" : ""}</i>
-          </button>`;
-      })
-      .join("")}</div>`;
+    const groupContent = groups.length
+      ? `<div class="osg-agreement-grid">${groups
+          .map((group) => {
+            const checked = config.agreementGroupIds.includes(group.id);
+            return `
+              <button type="button" class="osg-agreement-option ${checked ? "is-selected" : ""}"
+                data-action="toggle-agreement" data-agreement-id="${escapeHtml(group.id)}"
+                aria-pressed="${checked}">
+                <span class="osg-agreement-icon">▤</span>
+                <span class="osg-agreement-copy"><strong>${escapeHtml(group.name)}</strong><small>${escapeHtml(group.languages || "尚未配置语种")}</small></span>
+                <i class="osg-agreement-check" aria-hidden="true">${checked ? "✓" : ""}</i>
+              </button>`;
+          })
+          .join("")}</div>`
+      : '<div class="osg-empty">当前发行渠道暂无可用协议，请先前往配置中心维护。</div>';
+    return `${groupContent}${agreementRuntimeSettings(config)}`;
   }
 
   function complianceSection(config) {
+    const ageParentalControl = Boolean(config.compliance.ageParentalControl);
+    const kwsVerification = ageParentalControl && Boolean(config.compliance.kwsVerification);
     return `
       <fieldset class="osg-field-grid osg-compliance-fields">
         <div class="osg-readonly-field"><span>年龄门槛</span><strong aria-readonly="true">${escapeHtml(config.compliance.ageThreshold)} 岁</strong></div>
         <div class="osg-compliance-switches">
           <div class="osg-inline-setting"><span><strong>GDPR 隐私协议弹窗</strong><small>控制隐私协议同意弹窗。</small></span>${inlineSwitch("toggle-compliance", "gdprPrompt", config.compliance.gdprPrompt, "GDPR 隐私协议弹窗")}</div>
-          <div class="osg-inline-setting"><span><strong>年龄获取与家长控制</strong><small>开启后可控制 KWS 年龄验证。</small></span>${inlineSwitch("toggle-compliance", "ageParentalControl", config.compliance.ageParentalControl, "年龄获取与家长控制")}</div>
-          <div class="osg-inline-setting"><span><strong>KWS 年龄验证</strong><small>需要家长验证时接入 KWS。</small></span>${inlineSwitch("toggle-compliance", "kwsVerification", config.compliance.kwsVerification, "KWS 年龄验证", !config.compliance.ageParentalControl)}</div>
+          <div class="osg-inline-setting"><span><strong>年龄获取与家长控制</strong><small>开启后可控制 KWS 年龄验证。</small></span>${inlineSwitch("toggle-compliance", "ageParentalControl", ageParentalControl, "年龄获取与家长控制")}</div>
+          <div class="osg-inline-setting"><span><strong>KWS 年龄验证</strong><small>${ageParentalControl ? "需要家长验证时接入 KWS。" : "请先开启年龄获取与家长控制。"}</small></span>${inlineSwitch("toggle-compliance", "kwsVerification", kwsVerification, "KWS 年龄验证", !ageParentalControl)}</div>
         </div>
       </fieldset>`;
   }
@@ -730,7 +792,7 @@
     };
     const platforms = Object.keys(config.dataPlatforms || {});
     if (!platforms.length) return "";
-    return `<div class="osg-data-platform-options" aria-label="三方数据平台开关">${platforms
+    return `<div class="osg-data-platform-options" aria-label="归因数据平台开关">${platforms
       .map((id) => `<div><span><strong>${escapeHtml(platformNames[id] || id)}</strong><small>控制该平台是否在当前策略中运行</small></span>${inlineSwitch("toggle-data-platform", id, config.dataPlatforms[id], `${platformNames[id] || id} 开关`)}</div>`)
       .join("")}</div>`;
   }
@@ -748,24 +810,35 @@
     </div>`;
   }
 
-  function runtimeSection(config) {
+  function agreementRuntimeSettings(config) {
     const items = [
       ["agreementReminder", "协议提醒开关"],
       ["welcomeMessage", "欢迎语开关"],
+    ];
+    return `<div class="osg-runtime-subsection osg-agreement-runtime-settings">
+      <div class="osg-runtime-grid">${items
+        .map(([key, title]) => `<div><strong>${title}</strong>${inlineSwitch("toggle-runtime", key, config.runtime[key], title)}</div>`)
+        .join("")}</div>
+    </div>`;
+  }
+
+  function loginRuntimeSettings(config) {
+    const items = [
       ["guestLogoutReminder", "游客退出登录提醒开关"],
       ["guestPayment", "游客支付开关"],
     ];
-    return `
-        <div class="osg-runtime-grid">${items
-          .map(([key, title]) => `<div><strong>${title}</strong>${inlineSwitch("toggle-runtime", key, config.runtime[key], title)}</div>`)
-          .join("")}</div>
-        <label class="osg-silent-login"><span>静默登录方式</span>
-          <select data-field="runtime.silentLoginMethod">
-            <option value="none" ${config.runtime.silentLoginMethod === "none" ? "selected" : ""}>关</option>
-            <option value="last" ${config.runtime.silentLoginMethod === "last" ? "selected" : ""}>上次登录方式</option>
-            <option value="guest" ${config.runtime.silentLoginMethod === "guest" ? "selected" : ""}>游客登录</option>
-          </select>
-        </label>`;
+    return `<div class="osg-runtime-subsection osg-login-runtime-settings">
+      <div class="osg-runtime-grid">${items
+        .map(([key, title]) => `<div><strong>${title}</strong>${inlineSwitch("toggle-runtime", key, config.runtime[key], title)}</div>`)
+        .join("")}</div>
+      <label class="osg-silent-login"><span>静默登录方式</span>
+        <select data-field="runtime.silentLoginMethod">
+          <option value="none" ${config.runtime.silentLoginMethod === "none" ? "selected" : ""}>关</option>
+          <option value="last" ${config.runtime.silentLoginMethod === "last" ? "selected" : ""}>上次登录方式</option>
+          <option value="guest" ${config.runtime.silentLoginMethod === "guest" ? "selected" : ""}>游客登录</option>
+        </select>
+      </label>
+    </div>`;
   }
 
   function render(instance) {
@@ -794,7 +867,6 @@
         ${Object.hasOwn(config.modules, "login") ? moduleSection("login", "登录SDK", MODULES[0][2], true, loginSection(config), "", instance.expandedModules.has("login")) : ""}
         ${Object.hasOwn(config.modules, "agreement") ? moduleSection("agreement", "协议SDK", MODULES[1][2], true, agreementSection(config), "", instance.expandedModules.has("agreement")) : ""}
         ${Object.hasOwn(config.modules, "compliance") ? moduleSection("compliance", "合规SDK", MODULES[3][2], true, complianceSection(config), "", instance.expandedModules.has("compliance")) : ""}
-        ${Object.hasOwn(config.modules, "compliance") ? moduleSection("runtime", "开关配置", "以下运行开关仅对当前策略组生效。", true, runtimeSection(config), "osg-runtime-module", instance.expandedModules.has("runtime")) : ""}
       </div>`;
     instance.root
       .querySelectorAll(
@@ -804,6 +876,7 @@
         control.disabled = true;
         control.setAttribute("aria-disabled", "true");
       });
+    instance.drawer.__mgpStrategyModel = clone(instance.model);
     updateFooterState(instance);
   }
 
@@ -1129,6 +1202,9 @@
       const key = button.dataset.key;
       if (key === "kwsVerification" && !strategy.config.compliance.ageParentalControl) return;
       strategy.config.compliance[key] = !strategy.config.compliance[key];
+      if (key === "ageParentalControl" && !strategy.config.compliance.ageParentalControl) {
+        strategy.config.compliance.kwsVerification = false;
+      }
       setDirty(instance);
       return;
     }
@@ -1154,8 +1230,11 @@
     }
     if (action === "toggle-runtime") {
       const key = button.dataset.key;
+      const owner = RUNTIME_OWNER[key];
+      if (!owner || !Object.hasOwn(strategy.config.modules, owner)) return;
       strategy.config.runtime[key] = !strategy.config.runtime[key];
       setDirty(instance);
+      return;
     }
   }
 
@@ -1166,6 +1245,10 @@
     const strategy = activeStrategy(instance);
     if (group === "compliance" && !strategy.config.modules.compliance) return;
     if (group === "support" && !strategy.config.modules.support) return;
+    if (group === "runtime") {
+      if (key !== "silentLoginMethod" || !Object.hasOwn(strategy.config.modules, "login")) return;
+      if (!["none", "last", "guest"].includes(event.target.value)) return;
+    }
     strategy.config[group][key] = event.target.value;
     setDirty(instance);
   }
@@ -1201,13 +1284,44 @@
     });
   }
 
-  function installOperationsDrawer(drawer) {
-    if (instances.has(drawer)) return;
+  function drawerSourceSignature(drawer) {
+    return [
+      drawer.dataset.packageCapabilities,
+      drawer.dataset.storeId,
+      drawer.dataset.packageLabel,
+      drawer.dataset.channelCountryCodes,
+      drawer.dataset.configuredLoginIds,
+      drawer.dataset.configuredAgreementGroups,
+      drawer.dataset.configuredCompliance,
+      drawer.dataset.configuredSupport,
+      drawer.dataset.configuredDataPlatformIds,
+      drawer.dataset.configuredAdvertisingProvider,
+    ].map((value) => String(value || "")).join("|");
+  }
+
+  function installStrategyDrawer(drawer) {
     const body = drawer.querySelector(".mgp-operations-drawer-body");
     const oldHead = body?.querySelector(":scope > .mgp-operations-workspace-head");
     const oldSections = body?.querySelectorAll(":scope > .mgp-operations-section");
     if (!body || !oldHead || !oldSections?.length) return;
     const packageId = packageIdentity(drawer);
+    const sourceSignature = drawerSourceSignature(drawer);
+    const existing = instances.get(drawer);
+    if (existing) {
+      if (existing.sourceSignature !== sourceSignature) {
+        configuredSourceCache.delete(drawer);
+        const fallback = initialModel(drawer, packageId);
+        existing.model = syncConfigurationSources(
+          normalizeStoredModel(existing.model, fallback),
+          fallback,
+        );
+        existing.packageLabel = packageDisplayLabel(drawer);
+        existing.sourceSignature = sourceSignature;
+        existing.dirty = modelSignature(existing.model) !== existing.savedSignature;
+        render(existing);
+      }
+      return;
+    }
     const root = document.createElement("div");
     root.className = "osg-workspace";
     root.dataset.packageId = packageId;
@@ -1226,6 +1340,7 @@
       draggedLoginId: "",
       suppressLoginClickUntil: 0,
       expandedModules: new Set(),
+      sourceSignature,
     };
     instances.set(drawer, instance);
     wireRoot(instance);
@@ -1248,7 +1363,7 @@
     scheduled = true;
     requestAnimationFrame(() => {
       scheduled = false;
-      document.querySelectorAll(".mgp-operations-drawer").forEach(installOperationsDrawer);
+      document.querySelectorAll(".mgp-operations-drawer, .mgp-generation-drawer").forEach(installStrategyDrawer);
       moveOtherPaymentButton();
     });
   }
@@ -1256,7 +1371,7 @@
   document.addEventListener(
     "click",
     (event) => {
-      const drawer = event.target.closest(".mgp-operations-drawer");
+      const drawer = event.target.closest(".mgp-operations-drawer, .mgp-generation-drawer");
       if (!drawer) return;
       const instance = instances.get(drawer);
       if (!instance) return;
@@ -1264,6 +1379,7 @@
         ".mgp-sdk-drawer-footer .mgp-button.primary",
       );
       if (saveButton) {
+        if (drawer.classList.contains("mgp-generation-drawer")) return;
         localStorage.setItem(storageKey(instance.model.packageId), JSON.stringify(instance.model));
         instance.savedSignature = modelSignature(instance.model);
         instance.dirty = false;
@@ -1273,6 +1389,7 @@
       const closeButton = event.target.closest(
         ".mgp-sdk-drawer-header > button, .mgp-sdk-drawer-footer .mgp-button.secondary",
       );
+      if (drawer.classList.contains("mgp-generation-drawer")) return;
       if (!closeButton || !instance.dirty) return;
       if (!window.confirm("当前运营配置有未保存修改，确定放弃修改并关闭吗？")) {
         event.preventDefault();
@@ -1283,8 +1400,54 @@
     true,
   );
 
+  window.__MGP_STRATEGY_GROUPS_API__ = {
+    getModel(drawer) {
+      const instance = drawer ? instances.get(drawer) : null;
+      return instance ? clone(instance.model) : null;
+    },
+    isDirty(drawer) {
+      const instance = drawer ? instances.get(drawer) : null;
+      return Boolean(instance?.dirty);
+    },
+    commit(drawer) {
+      const instance = drawer ? instances.get(drawer) : null;
+      if (!instance) return false;
+      localStorage.setItem(storageKey(instance.model.packageId), JSON.stringify(instance.model));
+      instance.savedSignature = modelSignature(instance.model);
+      instance.dirty = false;
+      drawer.__mgpStrategyModel = clone(instance.model);
+      updateFooterState(instance);
+      return true;
+    },
+    discard(drawer) {
+      const instance = drawer ? instances.get(drawer) : null;
+      if (!instance) return false;
+      localStorage.removeItem(storageKey(instance.model.packageId));
+      instance.dirty = false;
+      drawer.__mgpStrategyModel = null;
+      updateFooterState(instance);
+      return true;
+    },
+  };
+
   const observer = new MutationObserver(scheduleSync);
-  observer.observe(document.documentElement, { childList: true, subtree: true });
+  observer.observe(document.documentElement, {
+    childList: true,
+    subtree: true,
+    attributes: true,
+    attributeFilter: [
+      "data-package-capabilities",
+      "data-store-id",
+      "data-package-label",
+      "data-channel-country-codes",
+      "data-configured-login-ids",
+      "data-configured-agreement-groups",
+      "data-configured-compliance",
+      "data-configured-support",
+      "data-configured-data-platform-ids",
+      "data-configured-advertising-provider",
+    ],
+  });
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", scheduleSync, { once: true });
   } else {

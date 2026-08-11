@@ -794,6 +794,165 @@
   font-weight: 400;
 }
 
+#config-panel-login .mgp-login-head,
+#config-panel-login .mgp-login-row {
+  grid-template-columns: minmax(250px, 300px) minmax(0, 1fr);
+}
+
+#config-panel-login .mgp-login-method {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 10px;
+}
+
+.mgp-login-method-copy {
+  display: flex;
+  min-width: 0;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.mgp-login-method-copy b,
+.mgp-login-method-copy small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mgp-login-method-copy small {
+  color: #7a8495;
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 1.45;
+  white-space: normal;
+}
+
+#config-panel-login .mgp-login-platforms {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+#config-panel-login .mgp-login-platform-summary {
+  grid-column: 1;
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+#config-panel-login .mgp-login-platform-empty.complete {
+  grid-template-columns: auto minmax(0, 1fr);
+  border-style: solid;
+  border-color: #cfe9df;
+  background: #f6fbf8;
+  color: #19855f;
+}
+
+#config-panel-login .mgp-login-platform-details {
+  grid-column: 2 / -1;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 96px;
+  align-items: start;
+  gap: 12px 16px;
+}
+
+#config-panel-login .mgp-login-platform-details > .mgp-login-platform-section {
+  grid-column: 1;
+}
+
+#config-panel-login .mgp-login-expanded-doc {
+  grid-column: 2;
+  grid-row: 1;
+  align-self: start;
+  justify-self: start;
+  white-space: nowrap;
+}
+
+#config-panel-login .mgp-inline-param-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px 16px;
+}
+
+.mgp-login-parameter-field {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.mgp-login-parameter-label {
+  display: flex;
+  min-height: 22px;
+  align-items: center;
+  gap: 6px;
+  color: #333b49;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.mgp-login-parameter-label > span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mgp-login-parameter-label code {
+  flex: 0 0 auto;
+  padding: 2px 5px;
+  border-radius: 4px;
+  background: #f2f4f7;
+  color: #737d8d;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 10px;
+  font-weight: 500;
+}
+
+.mgp-login-parameter-label em {
+  flex: 0 0 auto;
+  padding: 2px 5px;
+  border-radius: 999px;
+  background: #fff3e8;
+  color: #b55b12;
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 600;
+}
+
+.mgp-login-parameter-field input {
+  width: 100%;
+}
+
+.mgp-login-parameter-field.has-error input {
+  border-color: #e45b65;
+  box-shadow: 0 0 0 2px rgb(228 91 101 / 10%);
+}
+
+.mgp-login-parameter-helper,
+.mgp-login-parameter-error {
+  min-height: 18px;
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+.mgp-login-parameter-helper {
+  color: #7f8999;
+}
+
+.mgp-login-parameter-error {
+  color: #c83f4c;
+}
+
+@media (max-width: 900px) {
+  #config-panel-login .mgp-login-head,
+  #config-panel-login .mgp-login-row {
+    grid-template-columns: minmax(190px, 230px) minmax(0, 1fr);
+  }
+
+  #config-panel-login .mgp-inline-param-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 @media (max-width: 760px) {
   .mgp-country-strategy-toolbar {
     align-items: stretch;
@@ -1197,7 +1356,7 @@
   min-width: 0;
   min-height: 54px;
   display: grid;
-  grid-template-columns: 18px 30px minmax(0, 1fr) 24px 20px;
+  grid-template-columns: 24px 30px minmax(0, 1fr) 20px 18px;
   align-items: center;
   gap: 8px;
   padding: 7px 9px;
@@ -1283,20 +1442,22 @@
 }
 
 .osg-login-order {
-  width: 22px;
-  height: 22px;
+  width: 24px;
+  height: 24px;
   display: grid;
   place-items: center;
-  color: #fff;
-  border-radius: 5px;
-  background: #722ed1;
-  font-size: 10px;
+  color: #722ed1;
+  border: 1px solid #b98ae9;
+  border-radius: 50%;
+  background: #fff;
+  font-size: 11px;
   font-weight: 700;
 }
 
 .osg-login-method:not(.is-selected) .osg-login-order {
   color: #98a2b3;
-  background: #eef1f5;
+  border-color: #d8dde5;
+  background: #f7f8fa;
 }
 
 .osg-login-drag {
@@ -1330,12 +1491,12 @@
 }
 
 .osg-agreement-option {
-  min-height: 58px;
+  min-height: 54px;
   display: grid;
-  grid-template-columns: 32px minmax(0, 1fr) 20px;
+  grid-template-columns: 30px minmax(0, 1fr) 18px;
   align-items: center;
-  gap: 9px;
-  padding: 8px 10px;
+  gap: 8px;
+  padding: 7px 9px;
   border: 1px solid #dfe4eb;
   border-radius: 7px;
   background: #fff;
@@ -1357,7 +1518,7 @@
   background: #f0e7fb;
 }
 
-.osg-agreement-option > span:nth-child(2) {
+.osg-agreement-copy {
   min-width: 0;
   display: flex;
   flex-direction: column;
@@ -1376,9 +1537,9 @@
   white-space: nowrap;
 }
 
-.osg-agreement-option i {
-  width: 18px;
-  height: 18px;
+.osg-agreement-check {
+  width: 16px;
+  height: 16px;
   display: grid;
   place-items: center;
   color: #fff;
@@ -1389,7 +1550,7 @@
   font-style: normal;
 }
 
-.osg-agreement-option.is-selected i {
+.osg-agreement-option.is-selected .osg-agreement-check {
   border-color: #722ed1;
   background: #722ed1;
 }
@@ -2285,4 +2446,26 @@
   .osg-modal > footer span {
     display: none;
   }
+}
+
+/* Runtime controls now live with their owning SDK modules. */
+.osg-runtime-subsection {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid #edf0f4;
+}
+
+.osg-runtime-subsection .osg-runtime-grid {
+  max-width: none;
+  padding: 0;
+}
+
+.osg-runtime-subsection .osg-silent-login {
+  max-width: none;
+  margin-top: 8px;
+  padding: 0;
+}
+
+.osg-login-runtime-settings .osg-silent-login {
+  width: min(100%, 420px);
 }
