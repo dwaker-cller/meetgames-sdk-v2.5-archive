@@ -1791,7 +1791,7 @@
 
 .osg-modal-layer {
   position: fixed;
-  z-index: 520;
+  z-index: 3000;
   inset: 0;
   display: grid;
   place-items: center;
@@ -2185,6 +2185,10 @@
   padding: 24px;
   color: #7c8796;
   text-align: center;
+}
+
+.osg-country-empty[hidden] {
+  display: none !important;
 }
 
 .osg-country-empty strong {
