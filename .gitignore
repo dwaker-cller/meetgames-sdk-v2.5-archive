@@ -1,0 +1,39 @@
+# Credentials and local environment
+.env
+.env.*
+*.pem
+*.key
+
+# Dependencies and generated output
+node_modules/
+.pnpm-store/
+.next*/
+dist/
+out/
+
+# Local validation and temporary artifacts
+tmp/
+.qa*/
+.docx-qa/
+.pre-research/
+.commit-v2-check-*/
+.commit-v2-check-*.tar
+.logs/
+*.log
+
+# Internal archives and working copies
+backups/
+deliverables/
+workspaces/
+.agents/
+.rollback/
+release-assets/
+
+# Research and exported private data
+tools/pre-*.png
+tools/feishu-base-mcp/exports/
+tools/feishu-base-mcp/.tmp/
+
+# OS/editor files
+.DS_Store
+Thumbs.db
