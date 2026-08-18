@@ -29,7 +29,7 @@ The demo stores state in the browser and generates simulated download files. It 
 
 ```text
 demo/       Current V2.5 runnable delivery snapshot
-docs/       Current PRD and project handoff notes
+docs/       Authoritative PRD, supporting product/engineering documents, and project history
 tools/      Static-entry synchronization helper
 VERSIONS.md Formal version index, tags, dates, and checksums
 SECURITY.md Credential and private-data handling notes
@@ -43,14 +43,16 @@ No formal V1.4 delivery directory or ZIP was found. A local source backup existe
 
 ## Archive boundaries
 
-This repository intentionally excludes internal backups, rollback snapshots, QA extraction folders, dependency caches, build caches, logs, Feishu exports, and other working-directory artifacts.
+This repository intentionally excludes internal backups, rollback snapshots, QA extraction folders, dependency caches, build caches, logs, Feishu Base data exports, and other working-directory artifacts.
 
 Formal delivery artifacts are preserved unchanged at the user's direction. They contain demo-only `ClientSecret` placeholders and a repeated role-address email used by the demo. Never replace those values with production credentials, and never place a real client secret in browser-side code.
 
 ## Documentation
 
-- [PRD V2.5](docs/MeetGames-SDK-产品需求文档-PRD-V2.5.md)
-- [Project handoff](docs/HANDOFF.md)
+- [Documentation index](docs/README.md)
+- Authoritative PRD V2.5: [DOCX](docs/product/MeetGames-SDK-产品需求文档-PRD-V2.5.docx) · [PDF](docs/product/MeetGames-SDK-产品需求文档-PRD-V2.5.pdf)
+- [Archived PRD working-source Markdown](docs/project-history/MeetGames-SDK-产品需求文档-PRD-V2.5-working-source.md)
+- [Project handoff snapshot](docs/project-history/HANDOFF-2026-08-14.md)
 
 ## Rights
 
