@@ -87,6 +87,7 @@
   const COUNTRY_BY_CODE = new Map(COUNTRIES.map((country) => [country.code, country]));
   const STRATEGY_REGION_FILTERS = [
     ["all", "全部"],
+    ["unassigned", "未分组"],
     ["asia", "亚洲"],
     ["europe", "欧洲"],
     ["north-america", "北美洲"],
@@ -922,6 +923,7 @@
     const regionLabelById = new Map(STRATEGY_REGION_FILTERS);
     const regionCount = (filterId) => allowedCountries.filter((country) => {
       if (filterId === "all") return true;
+      if (filterId === "unassigned") return !assignedOwners.has(country.code);
       return strategyRegionId(country) === filterId;
     }).length;
     layer.innerHTML = `
@@ -944,7 +946,7 @@
             <div class="osg-country-empty" hidden><strong>没有匹配的国家/地区</strong><span>请尝试其他搜索词或区域筛选。</span></div>
           </section>
           <aside class="osg-selected-panel" aria-label="已选国家/地区">
-            <header><div><span>已选国家/地区</span><strong data-selected-count>0</strong></div></header>
+            <header><div><span>已选国家/地区</span><strong data-selected-count>0</strong></div><button type="button" data-action="clear-selection">清空</button></header>
             <div class="osg-selected-list"></div>
           </aside>
         </div>
@@ -968,6 +970,7 @@
       const query = searchQuery.trim().toLocaleLowerCase();
       return allowedCountries.filter((country) => {
         const matchesRegion = activeFilter === "all"
+          || (activeFilter === "unassigned" && !assignedOwners.has(country.code))
           || strategyRegionId(country) === activeFilter;
         if (!matchesRegion) return false;
         if (!query) return true;
@@ -988,9 +991,7 @@
     };
 
     const renderPicker = () => {
-      const visibleCountries = filteredCountries().sort(
-        (left, right) => Number(assignedOwners.has(left.code)) - Number(assignedOwners.has(right.code)),
-      );
+      const visibleCountries = filteredCountries();
       const selectableCountries = visibleCountries.filter(
         (country) => !assignedOwners.has(country.code),
       );
@@ -1010,7 +1011,7 @@
         const selected = pending.has(country.code);
         return `<label class="osg-country-option ${owner ? "is-assigned" : ""} ${selected ? "is-selected" : ""}">
           <input type="checkbox" data-country-code="${country.code}" ${selected ? "checked" : ""} ${owner ? "disabled" : ""}>
-          <span><strong>${escapeHtml(country.name)}</strong></span>
+          <span><strong>${escapeHtml(country.name)}</strong><small>${escapeHtml(country.english)} · ${country.code}</small></span>
           ${owner ? `<em title="已属于${escapeHtml(owner.name)}"><b>已分组</b>${escapeHtml(owner.name)}</em>` : ""}
         </label>`;
       }).join("");
@@ -1020,7 +1021,7 @@
       const selectedCountries = allowedCountries.filter((country) => pending.has(country.code));
       selectedCount.textContent = String(selectedCountries.length);
       selectedList.innerHTML = selectedCountries.length
-        ? selectedCountries.map((country) => `<div class="osg-selected-country"><span><strong>${escapeHtml(country.name)}</strong></span><button type="button" data-action="remove-selected-country" data-code="${country.code}" aria-label="移除${escapeHtml(country.name)}">×</button></div>`).join("")
+        ? selectedCountries.map((country) => `<div class="osg-selected-country"><span><strong>${escapeHtml(country.name)}</strong><small>${escapeHtml(country.english)} · ${country.code}</small></span><button type="button" data-action="remove-selected-country" data-code="${country.code}" aria-label="移除${escapeHtml(country.name)}">×</button></div>`).join("")
         : `<div class="osg-selected-empty"><strong>尚未选择</strong><span>从左侧勾选要共用此策略的国家/地区。</span></div>`;
       layer.querySelectorAll('[data-action="clear-selection"]').forEach((button) => {
         button.disabled = pending.size === 0;
@@ -1400,6 +1401,31 @@
   );
 
   window.__MGP_STRATEGY_GROUPS_API__ = {
+    seed(drawer, { model = null, sourcePackageId = "" } = {}) {
+      const instance = drawer ? instances.get(drawer) : null;
+      if (!instance) return false;
+      const targetPackageId = packageIdentity(drawer);
+      const fallback = initialModel(drawer, targetPackageId);
+      let sourceModel = null;
+      if (sourcePackageId) {
+        try {
+          sourceModel = JSON.parse(localStorage.getItem(storageKey(sourcePackageId)) || "null");
+        } catch (_error) {
+          sourceModel = null;
+        }
+      }
+      if (!sourceModel && model) sourceModel = clone(model);
+      instance.model = sourceModel
+        ? syncConfigurationSources(normalizeStoredModel(sourceModel, fallback), fallback)
+        : fallback;
+      instance.packageLabel = packageDisplayLabel(drawer);
+      instance.sourceSignature = drawerSourceSignature(drawer);
+      instance.savedSignature = modelSignature(instance.model);
+      instance.dirty = false;
+      drawer.__mgpStrategyModel = clone(instance.model);
+      render(instance);
+      return clone(instance.model);
+    },
     getModel(drawer) {
       const instance = drawer ? instances.get(drawer) : null;
       return instance ? clone(instance.model) : null;
@@ -1425,6 +1451,12 @@
       instance.dirty = false;
       drawer.__mgpStrategyModel = null;
       updateFooterState(instance);
+      return true;
+    },
+    remove(packageId) {
+      const id = String(packageId || "").trim();
+      if (!id) return false;
+      localStorage.removeItem(storageKey(id));
       return true;
     },
   };

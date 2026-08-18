@@ -12,4 +12,4 @@ c:I[34178,["./_next/static/chunks/2c3iyqbsfg6bp.js","./_next/static/chunks/24nn1
 9:[["$","meta","0",{"charSet":"utf-8"}],["$","meta","1",{"name":"viewport","content":"width=device-width, initial-scale=1"}]]
 d:I[85709,["./_next/static/chunks/2c3iyqbsfg6bp.js","./_next/static/chunks/24nn151c8nclt.js"],"IconMark"]
 7:null
-b:[["$","title","0",{"children":"MeetGames SDK 工具 Demo V2.5"}],["$","meta","1",{"name":"description","content":"配置中心、SDK生成、运营配置与 SDK 交互 Demo"}],["$","link","2",{"rel":"icon","href":"/icon.svg?icon.1e2ux_byo1zp2.svg","sizes":"any","type":"image/svg+xml"}],["$","$Ld","3",{}]]
+b:[["$","title","0",{"children":"MeetGames SDK 工具 Demo V2.4.1"}],["$","meta","1",{"name":"description","content":"配置中心、SDK生成、运营配置与 SDK 交互 Demo"}],["$","link","2",{"rel":"icon","href":"/icon.svg?icon.1e2ux_byo1zp2.svg","sizes":"any","type":"image/svg+xml"}],["$","$Ld","3",{}]]
